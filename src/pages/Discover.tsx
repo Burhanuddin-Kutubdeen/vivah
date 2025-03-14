@@ -37,7 +37,7 @@ const profiles = [
     occupation: 'Marketing Manager',
     location: 'Galle, Sri Lanka',
     interests: ['Dancing', 'Painting', 'Yoga'],
-    bio: 'Creative soul with a passion for arts and wellness. Looking for someone who appreciates life's simple pleasures and values personal growth.',
+    bio: 'Creative soul with a passion for arts and wellness. Looking for someone who appreciates life\'s simple pleasures and values personal growth.',
     imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80'
   }
 ];
