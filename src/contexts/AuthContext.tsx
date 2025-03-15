@@ -57,6 +57,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, userData: any) => {
     try {
       console.log("Signing up with:", email);
+      
+      // Validate email format before sending to Supabase
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        toast({
+          title: "Registration failed",
+          description: "Please enter a valid email address format (e.g., user@example.com)",
+          variant: "destructive",
+        });
+        return { error: { message: "Invalid email format" } };
+      }
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -71,11 +83,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         console.error("Registration error:", error);
         
-        // For development: If the error is related to email validation
+        // Enhanced error handling with more specific messages
         if (error.message.includes("invalid")) {
           toast({
-            title: "Registration failed",
-            description: "For local development with Supabase, try using a test email from Mailinator or another test email service, or check the Supabase documentation for email configuration.",
+            title: "Email validation failed",
+            description: "For development, use a valid test email (like user@example.com) or try an email service like Mailinator (user@mailinator.com).",
+            variant: "destructive",
+          });
+        } else if (error.message.includes("already registered")) {
+          toast({
+            title: "Email already registered",
+            description: "This email is already in use. Please try logging in instead.",
             variant: "destructive",
           });
         } else {
