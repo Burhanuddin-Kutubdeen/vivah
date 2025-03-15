@@ -68,11 +68,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        toast({
-          title: "Registration failed",
-          description: error.message,
-          variant: "destructive",
-        });
+        // More descriptive error message for email validation issues
+        if (error.message.includes("invalid")) {
+          toast({
+            title: "Registration failed",
+            description: "Email validation failed. During development, you may need to enable public email domains in your Supabase project settings.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Registration failed",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
         return { error };
       }
 
