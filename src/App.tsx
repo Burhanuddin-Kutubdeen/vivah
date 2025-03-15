@@ -10,6 +10,9 @@ import Discover from "./pages/Discover";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +27,8 @@ const AnimatedRoutes = () => {
         <Route path="/discover" element={<Discover />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -31,13 +36,19 @@ const AnimatedRoutes = () => {
   );
 };
 
+const AppWithAuth = () => (
+  <AuthProvider>
+    <AnimatedRoutes />
+  </AuthProvider>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AnimatedRoutes />
+        <AppWithAuth />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

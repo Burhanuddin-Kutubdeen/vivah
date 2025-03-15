@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
+import { useAuth } from '@/contexts/AuthContext';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -84,21 +86,48 @@ const Navbar: React.FC = () => {
 
         {/* CTA Buttons */}
         <div className="hidden md:flex items-center space-x-4">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="rounded-full font-medium px-5 py-2 border-matrimony-300 text-matrimony-700 hover:bg-matrimony-50"
-            asChild
-          >
-            <Link to="/login">Login</Link>
-          </Button>
-          <Button 
-            size="sm" 
-            className="rounded-full font-medium px-5 py-2 bg-matrimony-600 hover:bg-matrimony-700 transition-colors"
-            asChild
-          >
-            <Link to="/register">Register</Link>
-          </Button>
+          {user ? (
+            <>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-full font-medium px-5 py-2 border-matrimony-300 text-matrimony-700 hover:bg-matrimony-50"
+                asChild
+              >
+                <Link to="/profile">
+                  <User size={16} className="mr-2" />
+                  Profile
+                </Link>
+              </Button>
+              <Button 
+                variant="outline"
+                size="sm" 
+                className="rounded-full font-medium px-5 py-2 border-matrimony-300 text-matrimony-700 hover:bg-matrimony-50"
+                onClick={() => signOut()}
+              >
+                <LogOut size={16} className="mr-2" />
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-full font-medium px-5 py-2 border-matrimony-300 text-matrimony-700 hover:bg-matrimony-50"
+                asChild
+              >
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button 
+                size="sm" 
+                className="rounded-full font-medium px-5 py-2 bg-matrimony-600 hover:bg-matrimony-700 transition-colors"
+                asChild
+              >
+                <Link to="/register">Register</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -145,19 +174,44 @@ const Navbar: React.FC = () => {
               Success Stories
             </Link>
             <div className="flex flex-col space-y-3 pt-5">
-              <Button 
-                variant="outline" 
-                className="w-full justify-center rounded-full font-medium border-matrimony-300 text-matrimony-700"
-                asChild
-              >
-                <Link to="/login">Login</Link>
-              </Button>
-              <Button 
-                className="w-full justify-center rounded-full font-medium bg-matrimony-600 hover:bg-matrimony-700"
-                asChild
-              >
-                <Link to="/register">Register</Link>
-              </Button>
+              {user ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-center rounded-full font-medium border-matrimony-300 text-matrimony-700"
+                    asChild
+                  >
+                    <Link to="/profile">
+                      <User size={18} className="mr-2" />
+                      Profile
+                    </Link>
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    className="w-full justify-center rounded-full font-medium border-matrimony-300 text-matrimony-700"
+                    onClick={() => signOut()}
+                  >
+                    <LogOut size={18} className="mr-2" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-center rounded-full font-medium border-matrimony-300 text-matrimony-700"
+                    asChild
+                  >
+                    <Link to="/login">Login</Link>
+                  </Button>
+                  <Button 
+                    className="w-full justify-center rounded-full font-medium bg-matrimony-600 hover:bg-matrimony-700"
+                    asChild
+                  >
+                    <Link to="/register">Register</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </nav>
         </div>
