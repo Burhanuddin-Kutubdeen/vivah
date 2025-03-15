@@ -12,6 +12,8 @@ interface AuthContextProps {
   signUp: (email: string, password: string, userData: any) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  isProfileComplete: boolean;
+  setIsProfileComplete: (value: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -20,6 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -33,6 +36,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         setSession(data.session);
         setUser(data.session?.user || null);
+        
+        // Check if user profile is complete
+        if (data.session?.user) {
+          checkProfileCompletion(data.session.user.id);
+        }
       }
       
       setLoading(false);
@@ -42,9 +50,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, newSession) => {
+      async (_event, newSession) => {
         setSession(newSession);
         setUser(newSession?.user || null);
+        
+        // Check profile completion when auth state changes
+        if (newSession?.user) {
+          await checkProfileCompletion(newSession.user.id);
+        }
+        
         setLoading(false);
       }
     );
@@ -53,6 +67,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       subscription.unsubscribe();
     };
   }, []);
+
+  // Function to check if the user's profile is complete
+  const checkProfileCompletion = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('date_of_birth, gender, interests, civil_status, avatar_url')
+        .eq('id', userId)
+        .single();
+      
+      if (error) {
+        console.error('Error checking profile:', error);
+        setIsProfileComplete(false);
+        return;
+      }
+      
+      // Check if required fields are filled
+      const isComplete = !!(
+        data.date_of_birth && 
+        data.gender && 
+        data.interests?.length > 0 && 
+        data.civil_status && 
+        data.avatar_url
+      );
+      
+      setIsProfileComplete(isComplete);
+    } catch (error) {
+      console.error('Error in profile check:', error);
+      setIsProfileComplete(false);
+    }
+  };
 
   const signUp = async (email: string, password: string, userData: any) => {
     try {
@@ -69,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error: { message: "Invalid email format" } };
       }
       
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -108,10 +153,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       toast({
         title: "Registration successful",
-        description: "Please check your email to confirm your account.",
+        description: "Welcome to Mango Matrimony! Let's set up your profile.",
       });
 
-      navigate('/login');
+      // Automatically navigate to profile setup after successful registration
+      navigate('/profile-setup');
       return { error: null };
     } catch (error: any) {
       console.error("Unexpected registration error:", error);
@@ -127,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     try {
       console.log("Signing in with:", email);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -147,7 +193,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Welcome back!",
       });
 
-      navigate('/');
+      // If logged in successfully, check if profile is complete
+      if (data.user) {
+        await checkProfileCompletion(data.user.id);
+      }
+      
+      // Redirect to profile setup if profile is not complete, otherwise to home
+      if (!isProfileComplete) {
+        navigate('/profile-setup');
+      } else {
+        navigate('/');
+      }
+      
       return { error: null };
     } catch (error: any) {
       console.error("Unexpected login error:", error);
@@ -178,6 +235,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         signIn,
         signOut,
+        isProfileComplete,
+        setIsProfileComplete,
       }}
     >
       {children}
