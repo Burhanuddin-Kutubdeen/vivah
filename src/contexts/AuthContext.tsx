@@ -56,6 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, userData: any) => {
     try {
+      console.log("Signing up with:", email);
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -68,11 +69,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
-        // More descriptive error message for email validation issues
+        console.error("Registration error:", error);
+        
+        // For development: If the error is related to email validation
         if (error.message.includes("invalid")) {
           toast({
             title: "Registration failed",
-            description: "Email validation failed. During development, you may need to enable public email domains in your Supabase project settings.",
+            description: "For local development with Supabase, try using a test email from Mailinator or another test email service, or check the Supabase documentation for email configuration.",
             variant: "destructive",
           });
         } else {
@@ -93,6 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       navigate('/login');
       return { error: null };
     } catch (error: any) {
+      console.error("Unexpected registration error:", error);
       toast({
         title: "Registration failed",
         description: error.message,
@@ -104,12 +108,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log("Signing in with:", email);
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error("Login error:", error);
         toast({
           title: "Login failed",
           description: error.message,
@@ -126,6 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       navigate('/');
       return { error: null };
     } catch (error: any) {
+      console.error("Unexpected login error:", error);
       toast({
         title: "Login failed",
         description: error.message,
