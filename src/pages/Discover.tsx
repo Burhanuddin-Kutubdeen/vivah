@@ -1,12 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import ProfileCard from '@/components/ProfileCard';
 import { Button } from "@/components/ui/button";
-import { Filter, Search } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 // Sample profile data
 const profiles = [
@@ -45,6 +47,42 @@ const profiles = [
 const Discover = () => {
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Check connection status on mount
+    const handleOnlineStatus = () => {
+      setIsOffline(false);
+      toast({
+        title: "Connection restored",
+        description: "You're back online. Profile discovery is active.",
+      });
+    };
+
+    const handleOfflineStatus = () => {
+      setIsOffline(true);
+      toast({
+        title: "Connection issue",
+        description: "You appear to be offline. Some features may be limited.",
+        variant: "destructive",
+      });
+    };
+
+    // Add event listeners for online/offline status
+    window.addEventListener('online', handleOnlineStatus);
+    window.addEventListener('offline', handleOfflineStatus);
+    
+    // Check initial status
+    if (!navigator.onLine) {
+      setIsOffline(true);
+    }
+
+    return () => {
+      window.removeEventListener('online', handleOnlineStatus);
+      window.removeEventListener('offline', handleOfflineStatus);
+    };
+  }, [toast]);
 
   const nextProfile = () => {
     if (currentProfileIndex < profiles.length - 1) {
@@ -65,12 +103,21 @@ const Discover = () => {
 
         <main className="pt-24 pb-16 px-4">
           <div className="container mx-auto">
+            {isOffline && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertTitle>Connection Issue</AlertTitle>
+                <AlertDescription>
+                  You are currently offline. Some features may be limited until your connection is restored.
+                </AlertDescription>
+              </Alert>
+            )}
+            
             <div className="flex items-center justify-between mb-8">
               <div>
                 <h1 className="text-3xl font-bold">Discover</h1>
                 <p className="text-matrimony-600 dark:text-matrimony-300">Find your perfect match</p>
               </div>
-              <div className="flex space-x-3">
+              <div>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -79,14 +126,6 @@ const Discover = () => {
                 >
                   <Filter size={16} className="mr-2" />
                   Filters
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="rounded-full border-matrimony-200 hover:border-matrimony-300 hover:bg-matrimony-50 dark:border-gray-700"
-                >
-                  <Search size={16} className="mr-2" />
-                  Search
                 </Button>
               </div>
             </div>
@@ -170,6 +209,7 @@ const Discover = () => {
                 size="lg" 
                 className="rounded-full bg-matrimony-600 hover:bg-matrimony-700 text-white px-8"
                 onClick={nextProfile}
+                disabled={isOffline}
               >
                 View Next Profile
               </Button>
