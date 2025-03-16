@@ -41,10 +41,7 @@ const Navbar: React.FC = () => {
           className="flex items-center space-x-2"
         >
           <span className="text-2xl font-serif font-bold text-matrimony-700">
-            Mango
-          </span>
-          <span className="text-2xl font-serif font-bold text-secondary">
-            Matrimony
+            Vivah
           </span>
         </Link>
 
