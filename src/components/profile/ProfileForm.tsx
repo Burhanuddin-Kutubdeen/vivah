@@ -55,15 +55,17 @@ const formSchema = z.object({
 interface ProfileFormProps {
   avatarUrl: string | null;
   translate: (key: string) => string;
+  connectionError?: boolean;
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
+const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connectionError = false }) => {
   const { user, setIsProfileComplete, checkProfileCompletion } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,20 +79,39 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
     },
   });
 
-  // Load existing profile data if available
+  // Load existing profile data with improved error handling
   useEffect(() => {
     const loadProfileData = async () => {
       if (!user?.id) return;
       
       try {
+        setLoadError(false);
+        
+        // Add timeout for the request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
         const { data, error } = await supabase
           .from('profiles')
           .select('date_of_birth, gender, civil_status, religion, location, bio, interests, height, weight')
           .eq('id', user.id)
-          .single();
+          .maybeSingle()
+          .abortSignal(controller.signal);
           
+        clearTimeout(timeoutId);
+        
         if (error) {
           console.error("Error loading profile data:", error);
+          setLoadError(true);
+          
+          // Only show toast if not already showing connection error
+          if (!connectionError) {
+            toast({
+              title: "Error loading profile data",
+              description: "Your previously saved data couldn't be loaded. You can still continue setting up your profile.",
+              variant: "destructive",
+            });
+          }
           return;
         }
         
@@ -110,13 +131,31 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
         }
       } catch (error) {
         console.error("Error loading profile data:", error);
+        setLoadError(true);
+        
+        // Only show toast if not already showing connection error
+        if (!connectionError) {
+          toast({
+            title: "Error loading profile data",
+            description: "We couldn't connect to load your profile. You can still continue setting up your profile.",
+            variant: "destructive",
+          });
+        }
       }
     };
     
     loadProfileData();
-  }, [user, form]);
+    
+    // Retry loading when online status changes
+    const handleOnline = () => {
+      loadProfileData();
+    };
+    
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [user, form, toast, connectionError]);
 
-  // Handle form submission
+  // Handle form submission with improved error handling
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       // Validate user is logged in
@@ -143,6 +182,34 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
       setIsSubmitting(true);
       console.log("Submitting profile with values:", values);
       
+      // Check if we're offline
+      if (!navigator.onLine) {
+        toast({
+          title: "You're offline",
+          description: "Your profile will be saved when you're back online.",
+          variant: "destructive",
+        });
+        
+        // Store form data temporarily 
+        localStorage.setItem('pendingProfileData', JSON.stringify({
+          ...values,
+          dateOfBirth: values.dateOfBirth.toISOString(), // Convert Date to string for storage
+          avatarUrl
+        }));
+        
+        // Still allow navigation as if it succeeded
+        setTimeout(() => {
+          setIsProfileComplete(true);
+          navigate('/discover', { replace: true });
+        }, 800);
+        
+        return;
+      }
+      
+      // Add request timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      
       // Update profile in database
       const { error } = await supabase
         .from('profiles')
@@ -159,7 +226,10 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
           avatar_url: avatarUrl,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', user.id);
+        .eq('id', user.id)
+        .abortSignal(controller.signal);
+      
+      clearTimeout(timeoutId);
       
       if (error) {
         console.error("Profile update error:", error);
@@ -167,6 +237,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
       }
       
       console.log("Profile updated successfully");
+      
+      // Remove any pending profile data
+      localStorage.removeItem('pendingProfileData');
       
       // Show success message
       toast({
@@ -188,6 +261,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
       } catch (checkError) {
         console.error("Error checking profile completion:", checkError);
         // Still navigate even if check fails
+        setIsProfileComplete(true);
         setTimeout(() => {
           navigate('/discover', { replace: true });
         }, 800);
@@ -195,11 +269,21 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
     } catch (error: any) {
       console.error("Profile update error:", error);
       setSaveSuccess(false);
-      toast({
-        title: "Update failed",
-        description: error.message || "Failed to update profile. Please try again.",
-        variant: "destructive",
-      });
+      
+      // Special handling for timeout errors
+      if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+        toast({
+          title: "Connection timed out",
+          description: "The server is taking too long to respond. Please try again later.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Update failed",
+          description: error.message || "Failed to update profile. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }

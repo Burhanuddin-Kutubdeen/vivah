@@ -13,13 +13,25 @@ const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }
   const { user, loading, isProfileComplete } = useAuth();
   const [isChecking, setIsChecking] = useState(true);
   const [checkCount, setCheckCount] = useState(0);
+  const [lastPath, setLastPath] = useState<string | null>(null);
   const location = useLocation();
   const { toast } = useToast();
   
   useEffect(() => {
+    // Prevent multiple redirects or checks on the same path
+    if (lastPath === location.pathname) {
+      return;
+    }
+    
+    setLastPath(location.pathname);
+    
     // More conservative approach to prevent infinite loops
     const verifyProfile = async () => {
-      if (user && !loading && checkCount < 2) {
+      if (loading) {
+        return; // Wait for loading to complete
+      }
+      
+      if (user && checkCount < 2) {
         setCheckCount(prev => prev + 1);
         try {
           console.log("Verifying profile completion status, attempt:", checkCount + 1);
@@ -46,7 +58,31 @@ const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }
     };
     
     verifyProfile();
-  }, [user, loading, checkCount, toast]);
+  }, [user, loading, checkCount, toast, location.pathname, lastPath]);
+  
+  // Handle offline state special case
+  useEffect(() => {
+    const handleOffline = () => {
+      // When offline, we won't be able to verify profile status
+      // Allow access to protected routes based on current state
+      setIsChecking(false);
+      
+      toast({
+        title: "You're offline",
+        description: "Some features may be limited until your connection is restored.",
+        variant: "destructive",
+      });
+    };
+    
+    // Check if already offline
+    if (!navigator.onLine && isChecking) {
+      handleOffline();
+    }
+    
+    // Listen for future offline events
+    window.addEventListener('offline', handleOffline);
+    return () => window.removeEventListener('offline', handleOffline);
+  }, [toast, isChecking]);
   
   // Show loading indicator while checking authentication and profile
   if (loading || isChecking) {
