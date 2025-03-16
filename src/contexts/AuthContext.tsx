@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useCallback, useState, useEffect } from 'react';
+import React, { createContext, useContext, useCallback, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import type { User, Session } from '@supabase/supabase-js';
@@ -27,17 +27,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { 
     isProfileComplete: profileIsComplete, 
     setIsProfileComplete: setProfileIsComplete, 
-    checkProfileCompletion: checkProfileStatus 
+    checkProfileCompletion: checkProfileStatus,
+    profileCheckError
   } = useProfile();
   
   // Expose profile completion state at the auth context level
   const [isProfileComplete, setIsProfileComplete] = useState(false);
+  const profileCheckInProgress = useRef(false);
   
-  // Handle user change
+  // Handle user change with debouncing to prevent excessive profile checks
   const handleUserChange = useCallback(async (userId: string | null) => {
-    if (userId) {
-      const isComplete = await checkProfileStatus(userId);
-      setIsProfileComplete(isComplete);
+    if (userId && !profileCheckInProgress.current) {
+      profileCheckInProgress.current = true;
+      try {
+        const isComplete = await checkProfileStatus(userId);
+        setIsProfileComplete(isComplete);
+      } catch (error) {
+        console.error("Error checking profile on user change:", error);
+      } finally {
+        profileCheckInProgress.current = false;
+      }
     }
   }, [checkProfileStatus]);
 
@@ -46,15 +55,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   // Function to check profile completion that updates both states
   const checkProfileCompletion = useCallback(async (userId: string) => {
-    const isComplete = await checkProfileStatus(userId);
-    setIsProfileComplete(isComplete);
-    return isComplete;
-  }, [checkProfileStatus]);
+    if (profileCheckInProgress.current) {
+      console.log("Profile check already in progress, using cached state");
+      return isProfileComplete;
+    }
+    
+    profileCheckInProgress.current = true;
+    try {
+      const isComplete = await checkProfileStatus(userId);
+      setIsProfileComplete(isComplete);
+      return isComplete;
+    } catch (error) {
+      console.error("Error in checkProfileCompletion:", error);
+      // On error, maintain previous state
+      return isProfileComplete;
+    } finally {
+      profileCheckInProgress.current = false;
+    }
+  }, [checkProfileStatus, isProfileComplete]);
   
   // Update local state when profile status changes
   useEffect(() => {
     setIsProfileComplete(profileIsComplete);
   }, [profileIsComplete]);
+  
+  // Show toast for persistent profile check errors
+  useEffect(() => {
+    if (profileCheckError && user) {
+      toast({
+        title: "Connection issue",
+        description: "We're having trouble verifying your profile status. Some features may be limited.",
+        variant: "destructive",
+      });
+    }
+  }, [profileCheckError, user, toast]);
 
   // Sign up handler
   const signUp = async (email: string, password: string, userData: any) => {
@@ -108,14 +142,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       // Check if profile is complete
-      const isComplete = await checkProfileCompletion(loggedInUser.id);
-      
-      // Redirect to profile setup if profile is not complete, otherwise to discover page
-      if (!isComplete) {
-        navigate('/profile-setup', { replace: true });
-      } else {
-        navigate('/discover', { replace: true });
+      let isComplete = false;
+      try {
+        isComplete = await checkProfileCompletion(loggedInUser.id);
+      } catch (error) {
+        console.error("Error checking profile on sign in:", error);
       }
+      
+      // Add a short delay to ensure state updates are processed
+      setTimeout(() => {
+        // Redirect to profile setup if profile is not complete, otherwise to discover page
+        if (!isComplete) {
+          navigate('/profile-setup', { replace: true });
+        } else {
+          navigate('/discover', { replace: true });
+        }
+      }, 300);
     };
     
     const result = await signInUser(email, password, onSignInSuccess);

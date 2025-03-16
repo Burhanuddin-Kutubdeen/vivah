@@ -1,10 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from '@/hooks/use-toast';
 
 export const useProfile = () => {
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [profileCheckError, setProfileCheckError] = useState<string | null>(null);
+  const [lastSuccessfulCheck, setLastSuccessfulCheck] = useState<number | null>(null);
+  const { toast } = useToast();
 
   // Check if user is at least 18 years old
   const isAtLeast18 = (dateOfBirth: Date): boolean => {
@@ -24,6 +27,13 @@ export const useProfile = () => {
   const checkProfileCompletion = async (userId: string): Promise<boolean> => {
     setProfileCheckError(null);
     
+    // Prevent multiple checks in quick succession (debounce)
+    const now = Date.now();
+    if (lastSuccessfulCheck && now - lastSuccessfulCheck < 3000) {
+      console.log("Using cached profile completion status");
+      return isProfileComplete;
+    }
+    
     try {
       if (!userId) {
         console.error('Cannot check profile: No user ID provided');
@@ -33,20 +43,36 @@ export const useProfile = () => {
       
       console.log(`Checking profile completion for user: ${userId}`);
       
-      // Attempt to fetch profile data
+      // Set a timeout to prevent the request from hanging indefinitely
+      const timeoutPromise = new Promise<{data: null, error: Error}>((_, reject) => {
+        setTimeout(() => reject(new Error('Request timeout')), 5000);
+      });
+      
+      // Attempt to fetch profile data with timeout
       try {
-        const { data, error } = await supabase
+        const profilePromise = supabase
           .from('profiles')
           .select('date_of_birth, gender, interests, civil_status, avatar_url, bio, location')
           .eq('id', userId)
           .maybeSingle();
         
+        const { data, error } = await Promise.race([profilePromise, timeoutPromise]);
+        
         if (error) {
           console.error('Error checking profile:', error);
-          // Default to incomplete on error
-          setIsProfileComplete(false);
+          // Default to incomplete on error but retain previous state if we had a successful check before
           setProfileCheckError(error.message);
-          return false;
+          
+          // Show toast only for the first error
+          if (!profileCheckError) {
+            toast({
+              title: "Connection issue",
+              description: "There was a problem connecting to the server. Please try again.",
+              variant: "destructive",
+            });
+          }
+          
+          return isProfileComplete;
         }
         
         if (!data) {
@@ -68,12 +94,21 @@ export const useProfile = () => {
         
         console.log('Profile completion check:', { isComplete, data });
         setIsProfileComplete(isComplete);
+        setLastSuccessfulCheck(Date.now());
         return isComplete;
       } catch (fetchError) {
         console.error('Network error in profile check:', fetchError);
         // If there's a network error, fallback to local state
         console.log('Falling back to cached profile completion state:', isProfileComplete);
         setProfileCheckError('Network error, using cached state');
+        
+        // Show toast for network errors
+        toast({
+          title: "Connection issue",
+          description: "There was a problem connecting to the server. Using cached data.",
+          variant: "destructive",
+        });
+        
         return isProfileComplete;
       }
     } catch (error) {

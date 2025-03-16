@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProfileRequiredRouteProps {
   children: React.ReactNode;
@@ -13,19 +14,31 @@ const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }
   const [isChecking, setIsChecking] = useState(true);
   const [checkCount, setCheckCount] = useState(0);
   const location = useLocation();
+  const { toast } = useToast();
   
   useEffect(() => {
-    // Only check profile if we haven't checked too many times (prevent infinite loops)
+    // More conservative approach to prevent infinite loops
     const verifyProfile = async () => {
-      if (user && !loading && checkCount < 3) {
+      if (user && !loading && checkCount < 2) {
         setCheckCount(prev => prev + 1);
         try {
           console.log("Verifying profile completion status, attempt:", checkCount + 1);
-          // We don't call checkProfileCompletion again since we're using the state from AuthContext
-          setIsChecking(false);
+          // Wait for async state to settle
+          setTimeout(() => {
+            setIsChecking(false);
+          }, 500);
         } catch (error) {
           console.error("Error verifying profile:", error);
           setIsChecking(false);
+          
+          // Only show error toast once to avoid spam
+          if (checkCount === 0) {
+            toast({
+              title: "Connection issue",
+              description: "We're having trouble verifying your profile. Using cached profile state.",
+              variant: "destructive",
+            });
+          }
         }
       } else if (!loading) {
         setIsChecking(false);
@@ -33,7 +46,7 @@ const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }
     };
     
     verifyProfile();
-  }, [user, loading, checkCount]);
+  }, [user, loading, checkCount, toast]);
   
   // Show loading indicator while checking authentication and profile
   if (loading || isChecking) {

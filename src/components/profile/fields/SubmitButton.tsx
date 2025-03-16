@@ -17,14 +17,14 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({
   return (
     <Button 
       type="submit" 
-      className="w-full rounded-full bg-matrimony-600 hover:bg-matrimony-700 mt-4"
+      className="w-full rounded-full bg-matrimony-600 hover:bg-matrimony-700 mt-4 transition-all duration-300"
       disabled={isSubmitting || disabled}
     >
       {isSubmitting ? (
-        <>
+        <div className="flex items-center justify-center">
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Saving...
-        </>
+          <span>Saving...</span>
+        </div>
       ) : (
         text
       )}

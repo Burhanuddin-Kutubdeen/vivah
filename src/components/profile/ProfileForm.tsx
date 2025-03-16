@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -63,6 +63,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,6 +76,45 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
       gender: "male"
     },
   });
+
+  // Load existing profile data if available
+  useEffect(() => {
+    const loadProfileData = async () => {
+      if (!user?.id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('date_of_birth, gender, civil_status, religion, location, bio, interests, height, weight')
+          .eq('id', user.id)
+          .single();
+          
+        if (error) {
+          console.error("Error loading profile data:", error);
+          return;
+        }
+        
+        if (data) {
+          // Only set form values if we have data
+          form.reset({
+            dateOfBirth: data.date_of_birth ? new Date(data.date_of_birth) : undefined,
+            gender: data.gender as "male" | "female" || "male",
+            civil_status: data.civil_status || "",
+            religion: data.religion || "",
+            location: data.location || "",
+            bio: data.bio || "",
+            interests: data.interests || [],
+            height: data.height ? String(data.height) : "",
+            weight: data.weight ? String(data.weight) : ""
+          });
+        }
+      } catch (error) {
+        console.error("Error loading profile data:", error);
+      }
+    };
+    
+    loadProfileData();
+  }, [user, form]);
 
   // Handle form submission
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -128,24 +168,36 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
       
       console.log("Profile updated successfully");
       
-      // Force check profile completion
-      await checkProfileCompletion(user.id);
-      setIsProfileComplete(true);
-      
+      // Show success message
       toast({
         title: "Profile updated",
         description: "Your profile has been completed successfully",
       });
       
-      // Navigate to discover page with a small delay to ensure state is updated
-      setTimeout(() => {
-        navigate('/discover', { replace: true });
-      }, 300);
+      setSaveSuccess(true);
+      
+      // Force check profile completion
+      try {
+        await checkProfileCompletion(user.id);
+        setIsProfileComplete(true);
+        
+        // Navigate to discover page with a delay to ensure state is updated
+        setTimeout(() => {
+          navigate('/discover', { replace: true });
+        }, 800);
+      } catch (checkError) {
+        console.error("Error checking profile completion:", checkError);
+        // Still navigate even if check fails
+        setTimeout(() => {
+          navigate('/discover', { replace: true });
+        }, 800);
+      }
     } catch (error: any) {
       console.error("Profile update error:", error);
+      setSaveSuccess(false);
       toast({
         title: "Update failed",
-        description: error.message || "Failed to update profile",
+        description: error.message || "Failed to update profile. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -193,7 +245,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
         )}
 
         {/* Submit Button */}
-        <SubmitButton isSubmitting={isSubmitting} />
+        <SubmitButton 
+          isSubmitting={isSubmitting} 
+          disabled={saveSuccess}
+          text={saveSuccess ? "Profile Saved!" : "Complete Profile"}
+        />
       </form>
     </Form>
   );
