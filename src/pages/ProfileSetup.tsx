@@ -9,19 +9,46 @@ import ProfilePhotoUpload from '@/components/profile/ProfilePhotoUpload';
 import ProfileForm from '@/components/profile/ProfileForm';
 import LanguageSelector from '@/components/profile/LanguageSelector';
 import { useTranslations } from '@/hooks/use-translations';
+import { supabase } from "@/integrations/supabase/client";
 
 const ProfileSetup = () => {
   const { user, isProfileComplete } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const { currentLanguage, setCurrentLanguage, translate } = useTranslations();
   const navigate = useNavigate();
+  const [redirectAttempted, setRedirectAttempted] = useState(false);
   
-  // Redirect if profile is already complete
+  // Redirect if profile is already complete, but only attempt once
   useEffect(() => {
-    if (isProfileComplete) {
+    if (isProfileComplete && !redirectAttempted) {
+      console.log("Profile is complete, navigating to discover page");
+      setRedirectAttempted(true);
       navigate('/discover', { replace: true });
     }
-  }, [isProfileComplete, navigate]);
+  }, [isProfileComplete, navigate, redirectAttempted]);
+
+  // Fetch current avatar URL if it exists
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user?.id) {
+        try {
+          const { data } = await supabase
+            .from('profiles')
+            .select('avatar_url')
+            .eq('id', user.id)
+            .single();
+            
+          if (data?.avatar_url) {
+            setAvatarUrl(data.avatar_url);
+          }
+        } catch (error) {
+          console.error("Error fetching avatar:", error);
+        }
+      }
+    };
+    
+    fetchProfile();
+  }, [user]);
 
   return (
     <AnimatedTransition>

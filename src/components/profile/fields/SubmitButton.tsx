@@ -6,17 +6,19 @@ import { Button } from "@/components/ui/button";
 interface SubmitButtonProps {
   isSubmitting: boolean;
   text?: string;
+  disabled?: boolean;
 }
 
 const SubmitButton: React.FC<SubmitButtonProps> = ({ 
   isSubmitting, 
-  text = "Complete Profile" 
+  text = "Complete Profile",
+  disabled = false
 }) => {
   return (
     <Button 
       type="submit" 
       className="w-full rounded-full bg-matrimony-600 hover:bg-matrimony-700 mt-4"
-      disabled={isSubmitting}
+      disabled={isSubmitting || disabled}
     >
       {isSubmitting ? (
         <>

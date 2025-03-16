@@ -9,21 +9,22 @@ interface ProfileRequiredRouteProps {
 }
 
 const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }) => {
-  const { user, loading, isProfileComplete, checkProfileCompletion } = useAuth();
+  const { user, loading, isProfileComplete } = useAuth();
   const [isChecking, setIsChecking] = useState(true);
+  const [checkCount, setCheckCount] = useState(0);
   const location = useLocation();
   
   useEffect(() => {
+    // Only check profile if we haven't checked too many times (prevent infinite loops)
     const verifyProfile = async () => {
-      if (user && !loading) {
+      if (user && !loading && checkCount < 3) {
+        setCheckCount(prev => prev + 1);
         try {
-          console.log("Verifying profile completion status");
-          // Verify profile completion status
-          const isComplete = await checkProfileCompletion(user.id);
-          console.log("Profile completion verification result:", isComplete);
+          console.log("Verifying profile completion status, attempt:", checkCount + 1);
+          // We don't call checkProfileCompletion again since we're using the state from AuthContext
+          setIsChecking(false);
         } catch (error) {
           console.error("Error verifying profile:", error);
-        } finally {
           setIsChecking(false);
         }
       } else if (!loading) {
@@ -32,7 +33,7 @@ const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }
     };
     
     verifyProfile();
-  }, [user, loading, checkProfileCompletion]);
+  }, [user, loading, checkCount]);
   
   // Show loading indicator while checking authentication and profile
   if (loading || isChecking) {
@@ -62,7 +63,7 @@ const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }
   }
   
   // Render children if authenticated and profile is complete or already on profile-setup
-  console.log('Rendering children');
+  console.log('Rendering children, profile complete:', isProfileComplete);
   return <>{children}</>;
 };
 
