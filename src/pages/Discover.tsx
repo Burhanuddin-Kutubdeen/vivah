@@ -3,40 +3,19 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import AnimatedTransition from '@/components/AnimatedTransition';
-import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import CuratedMatchesGrid from '@/components/CuratedMatchesGrid';
-import SwipeDiscovery from '@/components/SwipeDiscovery';
-import DiscoveryModeToggle from '@/components/DiscoveryModeToggle';
 import { useAuth } from '@/contexts/AuthContext';
-import { Progress } from "@/components/ui/progress";
+import DiscoveryLoading from '@/components/discovery/DiscoveryLoading';
+import DiscoveryContainer from '@/components/discovery/DiscoveryContainer';
+import { useOnlineStatus } from '@/hooks/use-online-status';
+import { useLoadingProgress } from '@/hooks/use-loading-progress';
 
 const Discover = () => {
-  const [isOffline, setIsOffline] = useState(false);
   const [discoveryMode, setDiscoveryMode] = useState<'curated' | 'discovery'>('curated');
   const [isPremium, setIsPremium] = useState(false); // Would be determined by user subscription status
   const [isLoading, setIsLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
-  const { toast } = useToast();
+  const isOffline = useOnlineStatus();
+  const progress = useLoadingProgress(isLoading);
   const { checkProfileCompletion, user } = useAuth();
-
-  // Simulate loading with a progress bar
-  useEffect(() => {
-    if (isLoading) {
-      const interval = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setIsLoading(false);
-            return 100;
-          }
-          return prev + 10;
-        });
-      }, 200);
-      
-      return () => clearInterval(interval);
-    }
-  }, [isLoading]);
 
   // Perform profile check on mount
   useEffect(() => {
@@ -68,96 +47,22 @@ const Discover = () => {
     return () => clearTimeout(timeout);
   }, [user, checkProfileCompletion]);
 
-  useEffect(() => {
-    // Check connection status on mount
-    const handleOnlineStatus = () => {
-      setIsOffline(false);
-      toast({
-        title: "Connection restored",
-        description: "You're back online. Profile discovery is active.",
-      });
-    };
-
-    const handleOfflineStatus = () => {
-      setIsOffline(true);
-      toast({
-        title: "Connection issue",
-        description: "You appear to be offline. Some features may be limited.",
-        variant: "destructive",
-      });
-    };
-
-    // Add event listeners for online/offline status
-    window.addEventListener('online', handleOnlineStatus);
-    window.addEventListener('offline', handleOfflineStatus);
-    
-    // Check initial status
-    if (!navigator.onLine) {
-      setIsOffline(true);
-    }
-
-    return () => {
-      window.removeEventListener('online', handleOnlineStatus);
-      window.removeEventListener('offline', handleOfflineStatus);
-    };
-  }, [toast]);
-
-  // Show a loading state with progress
-  if (isLoading) {
-    return (
-      <AnimatedTransition>
-        <div className="min-h-screen bg-gradient-to-b from-white to-matrimony-50 dark:from-gray-900 dark:to-gray-800">
-          <Navbar />
-          <main className="pt-24 pb-16 px-4 flex flex-col items-center justify-center">
-            <div className="container mx-auto max-w-md text-center">
-              <h2 className="text-2xl font-bold mb-2">Loading your matches</h2>
-              <p className="text-matrimony-600 dark:text-matrimony-300 mb-4">
-                Please wait while we find your perfect matches...
-              </p>
-              <Progress value={progress} className="h-2 mb-6" />
-            </div>
-          </main>
-          <Footer />
-        </div>
-      </AnimatedTransition>
-    );
-  }
-
   return (
     <AnimatedTransition>
       <div className="min-h-screen bg-gradient-to-b from-white to-matrimony-50 dark:from-gray-900 dark:to-gray-800">
         <Navbar />
 
         <main className="pt-24 pb-16 px-4">
-          <div className="container mx-auto">
-            {isOffline && (
-              <Alert variant="destructive" className="mb-6">
-                <AlertTitle>Connection Issue</AlertTitle>
-                <AlertDescription>
-                  You are currently offline. Some features may be limited until your connection is restored.
-                </AlertDescription>
-              </Alert>
-            )}
-            
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h1 className="text-3xl font-bold">Discover</h1>
-                <p className="text-matrimony-600 dark:text-matrimony-300">Find your perfect match</p>
-              </div>
-            </div>
-
-            <DiscoveryModeToggle 
-              mode={discoveryMode} 
-              onModeChange={setDiscoveryMode} 
+          {isLoading ? (
+            <DiscoveryLoading progress={progress} />
+          ) : (
+            <DiscoveryContainer 
               isOffline={isOffline}
+              discoveryMode={discoveryMode}
+              setDiscoveryMode={setDiscoveryMode}
+              isPremium={isPremium}
             />
-
-            {discoveryMode === 'curated' ? (
-              <CuratedMatchesGrid isOffline={isOffline} />
-            ) : (
-              <SwipeDiscovery isOffline={isOffline} isPremium={isPremium} />
-            )}
-          </div>
+          )}
         </main>
 
         <Footer />
