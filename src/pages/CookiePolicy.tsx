@@ -93,7 +93,7 @@ const CookiePolicy = () => {
                 <ul className="list-disc pl-6 space-y-2">
                   <li>Google Chrome: chrome://settings/cookies</li>
                   <li>Mozilla Firefox: about:preferences#privacy</li>
-                  <li>Safari: Settings > Privacy & Security</li>
+                  <li>Safari: Settings {'>'}  Privacy & Security</li>
                   <li>Microsoft Edge: edge://settings/content/cookies</li>
                 </ul>
 
