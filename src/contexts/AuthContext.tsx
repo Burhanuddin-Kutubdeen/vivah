@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useCallback } from 'react';
+import React, { createContext, useContext, useCallback, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import type { User, Session } from '@supabase/supabase-js';
@@ -16,7 +16,7 @@ interface AuthContextProps {
   signOut: () => Promise<void>;
   isProfileComplete: boolean;
   setIsProfileComplete: (value: boolean) => void;
-  checkProfileCompletion: (userId: string) => Promise<void>;
+  checkProfileCompletion: (userId: string) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -24,27 +24,48 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isProfileComplete, setIsProfileComplete, checkProfileCompletion } = useProfile();
+  const { 
+    isProfileComplete: profileIsComplete, 
+    setIsProfileComplete: setProfileIsComplete, 
+    checkProfileCompletion: checkProfileStatus 
+  } = useProfile();
+  
+  // Expose profile completion state at the auth context level
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
   
   // Handle user change
-  const handleUserChange = useCallback((userId: string | null) => {
+  const handleUserChange = useCallback(async (userId: string | null) => {
     if (userId) {
-      checkProfileCompletion(userId);
+      const isComplete = await checkProfileStatus(userId);
+      setIsProfileComplete(isComplete);
     }
-  }, [checkProfileCompletion]);
+  }, [checkProfileStatus]);
 
   // Auth state management
   const { user, session, loading } = useAuthState(handleUserChange);
+  
+  // Function to check profile completion that updates both states
+  const checkProfileCompletion = useCallback(async (userId: string) => {
+    const isComplete = await checkProfileStatus(userId);
+    setIsProfileComplete(isComplete);
+    return isComplete;
+  }, [checkProfileStatus]);
+  
+  // Update local state when profile status changes
+  useEffect(() => {
+    setIsProfileComplete(profileIsComplete);
+  }, [profileIsComplete]);
 
   // Sign up handler
   const signUp = async (email: string, password: string, userData: any) => {
     const onSignUpSuccess = (newUser: User, newSession: Session | null) => {
       // Set profile as incomplete and navigate to profile setup
       setIsProfileComplete(false);
+      setProfileIsComplete(false);
       
       toast({
         title: "Registration successful",
-        description: "Welcome to Mango Matrimony! Let's set up your profile.",
+        description: "Welcome to Vivah! Let's set up your profile.",
       });
       
       navigate('/profile-setup');
@@ -83,17 +104,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const onSignInSuccess = async (loggedInUser: User) => {
       toast({
         title: "Login successful",
-        description: "Welcome back!",
+        description: "Welcome to Vivah!",
       });
       
       // Check if profile is complete
-      await checkProfileCompletion(loggedInUser.id);
+      const isComplete = await checkProfileCompletion(loggedInUser.id);
       
       // Redirect to profile setup if profile is not complete, otherwise to discover page
-      if (!isProfileComplete) {
-        navigate('/profile-setup');
+      if (!isComplete) {
+        navigate('/profile-setup', { replace: true });
       } else {
-        navigate('/discover');
+        navigate('/discover', { replace: true });
       }
     };
     
@@ -113,6 +134,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Sign out handler
   const signOut = async () => {
     await signOutUser();
+    // Reset profile completion state
+    setIsProfileComplete(false);
+    setProfileIsComplete(false);
+    
     toast({
       title: "Logged out",
       description: "You have been successfully logged out.",
@@ -130,7 +155,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signIn,
         signOut,
         isProfileComplete,
-        setIsProfileComplete,
+        setIsProfileComplete: (value) => {
+          setIsProfileComplete(value);
+          setProfileIsComplete(value);
+        },
         checkProfileCompletion,
       }}
     >

@@ -61,7 +61,7 @@ interface ProfileFormProps {
 }
 
 const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
-  const { user, setIsProfileComplete } = useAuth();
+  const { user, setIsProfileComplete, checkProfileCompletion } = useAuth();
   const { isAtLeast18 } = useProfile();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -124,16 +124,24 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
         throw error;
       }
       
-      // Update profile completion status
+      // Update profile completion status and verify it was set correctly
       setIsProfileComplete(true);
+      
+      // Force check profile completion to make sure it's updated
+      if (user.id) {
+        await checkProfileCompletion(user.id);
+      }
       
       toast({
         title: "Profile updated",
         description: "Your profile has been completed successfully",
       });
       
-      // Navigate to discover page
-      navigate('/discover');
+      // Add a small delay before redirecting to ensure state is updated
+      setTimeout(() => {
+        // Navigate to discover page
+        navigate('/discover', { replace: true });
+      }, 500);
     } catch (error: any) {
       console.error("Profile update error:", error);
       toast({

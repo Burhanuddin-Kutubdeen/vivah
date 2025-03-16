@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 
 export const useProfile = () => {
@@ -22,6 +22,9 @@ export const useProfile = () => {
   // Function to check if the user's profile is complete
   const checkProfileCompletion = async (userId: string) => {
     try {
+      // Add a small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('date_of_birth, gender, interests, civil_status, avatar_url')
@@ -30,8 +33,9 @@ export const useProfile = () => {
       
       if (error) {
         console.error('Error checking profile:', error);
+        // Default to incomplete on error
         setIsProfileComplete(false);
-        return;
+        return false;
       }
       
       // Check if required fields are filled
@@ -43,10 +47,14 @@ export const useProfile = () => {
         data.avatar_url
       );
       
+      console.log('Profile completion check:', { isComplete, data });
       setIsProfileComplete(isComplete);
+      return isComplete;
     } catch (error) {
       console.error('Error in profile check:', error);
+      // Default to incomplete on error
       setIsProfileComplete(false);
+      return false;
     }
   };
 
