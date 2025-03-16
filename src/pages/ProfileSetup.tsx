@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -42,8 +41,7 @@ const ProfileSetup = () => {
         .from('profiles')
         .select('avatar_url')
         .eq('id', user.id)
-        .maybeSingle()
-        .abortSignal(controller.signal);
+        .maybeSingle();
       
       clearTimeout(timeoutId);
       

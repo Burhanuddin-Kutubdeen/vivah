@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -95,8 +94,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
           .from('profiles')
           .select('date_of_birth, gender, civil_status, religion, location, bio, interests, height, weight')
           .eq('id', user.id)
-          .maybeSingle()
-          .abortSignal(controller.signal);
+          .maybeSingle();
           
         clearTimeout(timeoutId);
         
@@ -226,8 +224,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
           avatar_url: avatarUrl,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', user.id)
-        .abortSignal(controller.signal);
+        .eq('id', user.id);
       
       clearTimeout(timeoutId);
       
