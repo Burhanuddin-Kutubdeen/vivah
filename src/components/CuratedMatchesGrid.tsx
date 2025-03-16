@@ -1,0 +1,109 @@
+
+import React from 'react';
+import { motion } from 'framer-motion';
+import MatchCard from '@/components/MatchCard';
+import { Button } from "@/components/ui/button";
+import { Grid2X2 } from 'lucide-react';
+
+// Sample curated matches data - would be fetched from API in production
+const curatedMatches = [
+  {
+    id: '1',
+    name: 'Anushka',
+    age: 28,
+    occupation: 'Software Engineer',
+    imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1064&q=80',
+    matchPercentage: 95,
+    isNewMatch: true
+  },
+  {
+    id: '2',
+    name: 'Raj',
+    age: 32,
+    occupation: 'Doctor',
+    imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
+    matchPercentage: 88,
+    isNewMatch: false
+  },
+  {
+    id: '3',
+    name: 'Priya',
+    age: 27,
+    occupation: 'Marketing Manager',
+    imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
+    matchPercentage: 92,
+    isNewMatch: true
+  },
+  {
+    id: '4',
+    name: 'Aditya',
+    age: 30,
+    occupation: 'Architect',
+    imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
+    matchPercentage: 85,
+    isNewMatch: false
+  }
+];
+
+interface CuratedMatchesGridProps {
+  isOffline: boolean;
+}
+
+const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline }) => {
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const lastRefreshDate = new Date();
+  // Format the date to show day, month name, and year
+  const formattedDate = lastRefreshDate.toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'long', 
+    year: 'numeric'
+  });
+
+  return (
+    <div className="mb-8">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold">Curated Matches</h2>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-matrimony-600 dark:text-matrimony-300">
+            Refreshes in: 3 days
+          </span>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="rounded-full border-matrimony-200 hover:border-matrimony-300 hover:bg-matrimony-50 dark:border-gray-700"
+            disabled={isOffline}
+          >
+            <Grid2X2 size={16} className="mr-1" />
+            View All
+          </Button>
+        </div>
+      </div>
+      
+      <p className="text-sm text-matrimony-500 dark:text-matrimony-400 mb-4">
+        Last refreshed: {formattedDate}
+      </p>
+
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        variants={container}
+        initial="hidden"
+        animate="show"
+      >
+        {curatedMatches.map((match) => (
+          <MatchCard key={match.id} match={match} />
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
+export default CuratedMatchesGrid;
