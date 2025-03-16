@@ -3,27 +3,25 @@ import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
-import { CalendarIcon, Loader2 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 import { useProfile } from '@/hooks/use-profile';
-import { cn } from "@/lib/utils";
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Form } from "@/components/ui/form";
 
+// Import field components
+import DateOfBirthField from './fields/DateOfBirthField';
+import GenderField from './fields/GenderField';
+import CivilStatusField from './fields/CivilStatusField';
+import ReligionField from './fields/ReligionField';
 import HeightSelector from './HeightSelector';
-import InterestSelector from './InterestSelector';
+import WeightField from './fields/WeightField';
 import LocationSearchInput from './LocationSearchInput';
+import BioField from './fields/BioField';
+import InterestSelector from './InterestSelector';
+import SubmitButton from './fields/SubmitButton';
 
 // Form schema validation
 const formSchema = z.object({
@@ -62,7 +60,6 @@ interface ProfileFormProps {
 
 const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
   const { user, setIsProfileComplete, checkProfileCompletion } = useAuth();
-  const { isAtLeast18 } = useProfile();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -159,209 +156,35 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Date of Birth */}
-          <FormField
-            control={form.control}
-            name="dateOfBirth"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date of Birth (18+ only)</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) => {
-                        // Disable future dates
-                        if (date > new Date()) return true;
-                        
-                        // Disable dates for under 18
-                        if (!isAtLeast18(date)) return true;
-                        
-                        // Disable very old dates (100+ years)
-                        const hundredYearsAgo = new Date();
-                        hundredYearsAgo.setFullYear(hundredYearsAgo.getFullYear() - 100);
-                        return date < hundredYearsAgo;
-                      }}
-                      fromYear={new Date().getFullYear() - 100}
-                      toYear={new Date().getFullYear() - 18}
-                      initialFocus
-                      className="p-3 pointer-events-auto"
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  You must be at least 18 years old
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <DateOfBirthField control={form.control} />
 
           {/* Gender */}
-          <FormField
-            control={form.control}
-            name="gender"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Gender</FormLabel>
-                <FormControl>
-                  <RadioGroup 
-                    onValueChange={field.onChange} 
-                    defaultValue={field.value}
-                    className="flex space-x-4"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="male" id="male" />
-                      <label htmlFor="male" className="cursor-pointer">Male</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="female" id="female" />
-                      <label htmlFor="female" className="cursor-pointer">Female</label>
-                    </div>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <GenderField control={form.control} />
 
           {/* Civil Status */}
-          <FormField
-            control={form.control}
-            name="civil_status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Civil Status</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select your status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="single">Single</SelectItem>
-                    <SelectItem value="divorced">Divorced</SelectItem>
-                    <SelectItem value="widowed">Widowed</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <CivilStatusField control={form.control} />
 
           {/* Religion (Optional) */}
-          <FormField
-            control={form.control}
-            name="religion"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Religion (Optional)</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select religion (optional)" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="hindu">Hindu</SelectItem>
-                    <SelectItem value="christian">Christian</SelectItem>
-                    <SelectItem value="muslim">Muslim</SelectItem>
-                    <SelectItem value="buddhist">Buddhist</SelectItem>
-                    <SelectItem value="sikh">Sikh</SelectItem>
-                    <SelectItem value="jain">Jain</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                    <SelectItem value="none">None</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <ReligionField control={form.control} />
 
           {/* Height */}
           <HeightSelector control={form.control} />
 
           {/* Weight */}
-          <FormField
-            control={form.control}
-            name="weight"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Weight (kg) (Optional)</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your weight in kg"
-                    type="number"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <WeightField control={form.control} />
         </div>
 
         {/* Location */}
         <LocationSearchInput control={form.control} />
 
         {/* Bio */}
-        <FormField
-          control={form.control}
-          name="bio"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>About Yourself</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Tell potential matches about yourself, your interests, and what you're looking for..."
-                  className="min-h-[120px]"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                Minimum 10 characters, maximum 500 characters
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <BioField control={form.control} />
 
         {/* Interests */}
         <InterestSelector control={form.control} translate={translate} />
 
-        <Button 
-          type="submit" 
-          className="w-full rounded-full bg-matrimony-600 hover:bg-matrimony-700 mt-4"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            "Complete Profile"
-          )}
-        </Button>
+        {/* Submit Button */}
+        <SubmitButton isSubmitting={isSubmitting} />
       </form>
     </Form>
   );
