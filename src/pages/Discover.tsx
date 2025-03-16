@@ -8,12 +8,65 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import CuratedMatchesGrid from '@/components/CuratedMatchesGrid';
 import SwipeDiscovery from '@/components/SwipeDiscovery';
 import DiscoveryModeToggle from '@/components/DiscoveryModeToggle';
+import { useAuth } from '@/contexts/AuthContext';
+import { Progress } from "@/components/ui/progress";
 
 const Discover = () => {
   const [isOffline, setIsOffline] = useState(false);
   const [discoveryMode, setDiscoveryMode] = useState<'curated' | 'discovery'>('curated');
   const [isPremium, setIsPremium] = useState(false); // Would be determined by user subscription status
+  const [isLoading, setIsLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
   const { toast } = useToast();
+  const { checkProfileCompletion, user } = useAuth();
+
+  // Simulate loading with a progress bar
+  useEffect(() => {
+    if (isLoading) {
+      const interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 100) {
+            clearInterval(interval);
+            setIsLoading(false);
+            return 100;
+          }
+          return prev + 10;
+        });
+      }, 200);
+      
+      return () => clearInterval(interval);
+    }
+  }, [isLoading]);
+
+  // Perform profile check on mount
+  useEffect(() => {
+    const verifyProfile = async () => {
+      if (user) {
+        try {
+          await checkProfileCompletion(user.id);
+          setIsLoading(false);
+        } catch (error) {
+          console.error("Error checking profile:", error);
+          // Even on error, we should stop loading after a timeout
+          setTimeout(() => setIsLoading(false), 1000);
+        }
+      } else {
+        setIsLoading(false);
+      }
+    };
+    
+    verifyProfile();
+    
+    // Set a maximum timeout for loading state
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        setIsLoading(false);
+        console.log("Loading timed out, showing content anyway");
+      }
+    }, 3000);
+    
+    return () => clearTimeout(timeout);
+  }, [user, checkProfileCompletion]);
 
   useEffect(() => {
     // Check connection status on mount
@@ -49,6 +102,27 @@ const Discover = () => {
     };
   }, [toast]);
 
+  // Show a loading state with progress
+  if (isLoading) {
+    return (
+      <AnimatedTransition>
+        <div className="min-h-screen bg-gradient-to-b from-white to-matrimony-50 dark:from-gray-900 dark:to-gray-800">
+          <Navbar />
+          <main className="pt-24 pb-16 px-4 flex flex-col items-center justify-center">
+            <div className="container mx-auto max-w-md text-center">
+              <h2 className="text-2xl font-bold mb-2">Loading your matches</h2>
+              <p className="text-matrimony-600 dark:text-matrimony-300 mb-4">
+                Please wait while we find your perfect matches...
+              </p>
+              <Progress value={progress} className="h-2 mb-6" />
+            </div>
+          </main>
+          <Footer />
+        </div>
+      </AnimatedTransition>
+    );
+  }
+
   return (
     <AnimatedTransition>
       <div className="min-h-screen bg-gradient-to-b from-white to-matrimony-50 dark:from-gray-900 dark:to-gray-800">
@@ -75,7 +149,7 @@ const Discover = () => {
             <DiscoveryModeToggle 
               mode={discoveryMode} 
               onModeChange={setDiscoveryMode} 
-              isOffline={isOffline} 
+              isOffline={isOffline}
             />
 
             {discoveryMode === 'curated' ? (

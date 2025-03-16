@@ -2,18 +2,29 @@
 import React from 'react';
 import { Grid2X2, Heart } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DiscoveryModeToggleProps {
   mode: 'curated' | 'discovery';
   onModeChange: (mode: 'curated' | 'discovery') => void;
   isOffline: boolean;
+  isLoading?: boolean;
 }
 
 const DiscoveryModeToggle: React.FC<DiscoveryModeToggleProps> = ({ 
   mode, 
   onModeChange,
-  isOffline
+  isOffline,
+  isLoading = false
 }) => {
+  if (isLoading) {
+    return (
+      <div className="flex justify-center mb-6">
+        <Skeleton className="h-10 w-64" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex justify-center mb-6">
       <ToggleGroup type="single" value={mode} onValueChange={(value) => value && onModeChange(value as 'curated' | 'discovery')}>

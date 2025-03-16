@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import MatchCard from '@/components/MatchCard';
 import { Button } from "@/components/ui/button";
 import { Grid2X2 } from 'lucide-react';
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Sample curated matches data - would be fetched from API in production
 const curatedMatches = [
@@ -47,9 +48,10 @@ const curatedMatches = [
 
 interface CuratedMatchesGridProps {
   isOffline: boolean;
+  isLoading?: boolean;
 }
 
-const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline }) => {
+const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLoading = false }) => {
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -67,6 +69,25 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline }) =>
     month: 'long', 
     year: 'numeric'
   });
+
+  if (isLoading) {
+    return (
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-8 w-32" />
+        </div>
+        
+        <Skeleton className="h-5 w-64 mb-4" />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-72 w-full rounded-xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mb-8">
