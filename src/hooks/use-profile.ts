@@ -5,6 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 export const useProfile = () => {
   const [isProfileComplete, setIsProfileComplete] = useState(false);
 
+  // Check if user is at least 18 years old
+  const isAtLeast18 = (dateOfBirth: Date): boolean => {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age >= 18;
+  };
+
   // Function to check if the user's profile is complete
   const checkProfileCompletion = async (userId: string) => {
     try {
@@ -39,6 +53,7 @@ export const useProfile = () => {
   return {
     isProfileComplete,
     setIsProfileComplete,
-    checkProfileCompletion
+    checkProfileCompletion,
+    isAtLeast18
   };
 };
