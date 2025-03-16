@@ -20,20 +20,31 @@ export const useProfile = () => {
   };
 
   // Function to check if the user's profile is complete
-  const checkProfileCompletion = async (userId: string) => {
+  const checkProfileCompletion = async (userId: string): Promise<boolean> => {
     try {
-      // Add a small delay to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 100));
+      if (!userId) {
+        console.error('Cannot check profile: No user ID provided');
+        setIsProfileComplete(false);
+        return false;
+      }
+      
+      console.log(`Checking profile completion for user: ${userId}`);
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('date_of_birth, gender, interests, civil_status, avatar_url')
+        .select('date_of_birth, gender, interests, civil_status, avatar_url, bio, location')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error('Error checking profile:', error);
         // Default to incomplete on error
+        setIsProfileComplete(false);
+        return false;
+      }
+      
+      if (!data) {
+        console.log('No profile data found for user');
         setIsProfileComplete(false);
         return false;
       }
@@ -44,7 +55,9 @@ export const useProfile = () => {
         data.gender && 
         data.interests?.length > 0 && 
         data.civil_status && 
-        data.avatar_url
+        data.avatar_url &&
+        data.bio &&
+        data.location
       );
       
       console.log('Profile completion check:', { isComplete, data });

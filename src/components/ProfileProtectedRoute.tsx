@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
@@ -11,13 +11,21 @@ interface ProfileRequiredRouteProps {
 const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }) => {
   const { user, loading, isProfileComplete, checkProfileCompletion } = useAuth();
   const [isChecking, setIsChecking] = useState(true);
+  const location = useLocation();
   
   useEffect(() => {
     const verifyProfile = async () => {
       if (user && !loading) {
-        // Verify profile completion status
-        await checkProfileCompletion(user.id);
-        setIsChecking(false);
+        try {
+          console.log("Verifying profile completion status");
+          // Verify profile completion status
+          const isComplete = await checkProfileCompletion(user.id);
+          console.log("Profile completion verification result:", isComplete);
+        } catch (error) {
+          console.error("Error verifying profile:", error);
+        } finally {
+          setIsChecking(false);
+        }
       } else if (!loading) {
         setIsChecking(false);
       }
@@ -41,14 +49,20 @@ const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }
     return <Navigate to="/login" replace />;
   }
   
-  // Redirect to profile setup if profile is not complete
-  if (!isProfileComplete) {
+  // Prevent infinite loop when already on profile-setup page
+  if (!isProfileComplete && location.pathname !== "/profile-setup") {
     console.log('Profile is not complete, redirecting to profile setup');
     return <Navigate to="/profile-setup" replace />;
   }
   
-  // Render children if authenticated and profile is complete
-  console.log('Profile is complete, rendering children');
+  // If on profile-setup but profile is complete, redirect to discover
+  if (isProfileComplete && location.pathname === "/profile-setup") {
+    console.log('Profile is already complete, redirecting to discover');
+    return <Navigate to="/discover" replace />;
+  }
+  
+  // Render children if authenticated and profile is complete or already on profile-setup
+  console.log('Rendering children');
   return <>{children}</>;
 };
 

@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
-import { useProfile } from '@/hooks/use-profile';
 
 import { Form } from "@/components/ui/form";
 
@@ -63,6 +62,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,6 +79,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
   // Handle form submission
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      // Validate user is logged in
       if (!user) {
         toast({
           title: "Error",
@@ -88,7 +89,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
         return;
       }
       
+      // Validate avatar is uploaded
       if (!avatarUrl) {
+        setSubmitAttempted(true);
         toast({
           title: "Photo required",
           description: "Please upload a profile photo to continue",
@@ -98,6 +101,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
       }
       
       setIsSubmitting(true);
+      console.log("Submitting profile with values:", values);
       
       // Update profile in database
       const { error } = await supabase
@@ -118,32 +122,30 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
         .eq('id', user.id);
       
       if (error) {
+        console.error("Profile update error:", error);
         throw error;
       }
       
-      // Update profile completion status and verify it was set correctly
-      setIsProfileComplete(true);
+      console.log("Profile updated successfully");
       
-      // Force check profile completion to make sure it's updated
-      if (user.id) {
-        await checkProfileCompletion(user.id);
-      }
+      // Force check profile completion
+      await checkProfileCompletion(user.id);
+      setIsProfileComplete(true);
       
       toast({
         title: "Profile updated",
         description: "Your profile has been completed successfully",
       });
       
-      // Add a small delay before redirecting to ensure state is updated
+      // Navigate to discover page with a small delay to ensure state is updated
       setTimeout(() => {
-        // Navigate to discover page
         navigate('/discover', { replace: true });
-      }, 500);
+      }, 300);
     } catch (error: any) {
       console.error("Profile update error:", error);
       toast({
         title: "Update failed",
-        description: error.message,
+        description: error.message || "Failed to update profile",
         variant: "destructive",
       });
     } finally {
@@ -182,6 +184,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate }) => {
 
         {/* Interests */}
         <InterestSelector control={form.control} translate={translate} />
+
+        {/* Photo required warning */}
+        {!avatarUrl && submitAttempted && (
+          <p className="text-red-500 text-center font-medium">
+            Please upload a profile photo before submitting
+          </p>
+        )}
 
         {/* Submit Button */}
         <SubmitButton isSubmitting={isSubmitting} />

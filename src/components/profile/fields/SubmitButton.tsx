@@ -5,9 +5,13 @@ import { Button } from "@/components/ui/button";
 
 interface SubmitButtonProps {
   isSubmitting: boolean;
+  text?: string;
 }
 
-const SubmitButton: React.FC<SubmitButtonProps> = ({ isSubmitting }) => {
+const SubmitButton: React.FC<SubmitButtonProps> = ({ 
+  isSubmitting, 
+  text = "Complete Profile" 
+}) => {
   return (
     <Button 
       type="submit" 
@@ -20,7 +24,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = ({ isSubmitting }) => {
           Saving...
         </>
       ) : (
-        "Complete Profile"
+        text
       )}
     </Button>
   );

@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -10,9 +11,17 @@ import LanguageSelector from '@/components/profile/LanguageSelector';
 import { useTranslations } from '@/hooks/use-translations';
 
 const ProfileSetup = () => {
-  const { user } = useAuth();
+  const { user, isProfileComplete } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const { currentLanguage, setCurrentLanguage, translate } = useTranslations();
+  const navigate = useNavigate();
+  
+  // Redirect if profile is already complete
+  useEffect(() => {
+    if (isProfileComplete) {
+      navigate('/discover', { replace: true });
+    }
+  }, [isProfileComplete, navigate]);
 
   return (
     <AnimatedTransition>
