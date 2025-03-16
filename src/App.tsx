@@ -13,29 +13,11 @@ import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ProfileProtectedRoute from "./components/ProfileProtectedRoute";
 
 const queryClient = new QueryClient();
-
-// Route that requires completed profile
-const ProfileRequiredRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading, isProfileComplete } = useAuth();
-  
-  if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
-  
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  if (!isProfileComplete) {
-    return <Navigate to="/profile-setup" replace />;
-  }
-  
-  return <>{children}</>;
-};
 
 // Wrapper for AnimatePresence
 const AnimatedRoutes = () => {
@@ -62,25 +44,25 @@ const AnimatedRoutes = () => {
         <Route 
           path="/discover" 
           element={
-            <ProfileRequiredRoute>
+            <ProfileProtectedRoute>
               <Discover />
-            </ProfileRequiredRoute>
+            </ProfileProtectedRoute>
           } 
         />
         <Route 
           path="/profile" 
           element={
-            <ProfileRequiredRoute>
+            <ProfileProtectedRoute>
               <Profile />
-            </ProfileRequiredRoute>
+            </ProfileProtectedRoute>
           } 
         />
         <Route 
           path="/messages" 
           element={
-            <ProfileRequiredRoute>
+            <ProfileProtectedRoute>
               <Messages />
-            </ProfileRequiredRoute>
+            </ProfileProtectedRoute>
           } 
         />
         
