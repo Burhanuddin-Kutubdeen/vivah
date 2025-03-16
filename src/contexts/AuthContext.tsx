@@ -14,6 +14,7 @@ interface AuthContextProps {
   signOut: () => Promise<void>;
   isProfileComplete: boolean;
   setIsProfileComplete: (value: boolean) => void;
+  checkProfileCompletion: (userId: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -156,8 +157,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Welcome to Mango Matrimony! Let's set up your profile.",
       });
 
-      // Automatically navigate to profile setup after successful registration
-      navigate('/profile-setup');
+      // If registration successful, auto-login the user
+      if (data.user) {
+        // Update the user state with new user
+        setUser(data.user);
+        setSession(data.session);
+        
+        // Set profile as incomplete and navigate to profile setup
+        setIsProfileComplete(false);
+        navigate('/profile-setup');
+      }
+      
       return { error: null };
     } catch (error: any) {
       console.error("Unexpected registration error:", error);
@@ -198,11 +208,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await checkProfileCompletion(data.user.id);
       }
       
-      // Redirect to profile setup if profile is not complete, otherwise to home
+      // Redirect to profile setup if profile is not complete, otherwise to discover page
       if (!isProfileComplete) {
         navigate('/profile-setup');
       } else {
-        navigate('/');
+        navigate('/discover');
       }
       
       return { error: null };
@@ -237,6 +247,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signOut,
         isProfileComplete,
         setIsProfileComplete,
+        checkProfileCompletion,
       }}
     >
       {children}
