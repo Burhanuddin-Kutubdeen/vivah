@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -75,14 +76,14 @@ const PreferencesFilter: React.FC<PreferencesFilterProps> = ({
             Religion
           </h3>
           <Select 
-            value={religion} 
-            onValueChange={setReligion}
+            value={religion || "any"} 
+            onValueChange={(value) => setReligion(value === "any" ? undefined : value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Any religion" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any religion</SelectItem>
+              <SelectItem value="any">Any religion</SelectItem>
               <SelectItem value="hindu">Hindu</SelectItem>
               <SelectItem value="christian">Christian</SelectItem>
               <SelectItem value="muslim">Muslim</SelectItem>
@@ -101,14 +102,14 @@ const PreferencesFilter: React.FC<PreferencesFilterProps> = ({
             Matrimony Status
           </h3>
           <Select 
-            value={civilStatus} 
-            onValueChange={setCivilStatus}
+            value={civilStatus || "any"} 
+            onValueChange={(value) => setCivilStatus(value === "any" ? undefined : value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Any status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any status</SelectItem>
+              <SelectItem value="any">Any status</SelectItem>
               <SelectItem value="single">Single</SelectItem>
               <SelectItem value="divorced">Divorced</SelectItem>
               <SelectItem value="widowed">Widowed</SelectItem>

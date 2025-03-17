@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useDiscoveryProfiles } from '@/hooks/use-discovery-profiles';
