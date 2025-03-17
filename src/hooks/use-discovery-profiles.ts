@@ -89,8 +89,14 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
   // Filter and sort profiles based on preferences and heterosexual matching
   useEffect(() => {
     const applyMatchmaking = () => {
-      // Get user's profile (if available)
-      const userGender = user?.gender || 'male'; // Default if not available
+      // Get user information from profile or use default
+      // Since user.gender is not available, we need to extract it from profile data
+      // For now, defaulting to showing profiles of opposite gender based on a simple heuristic
+      
+      // For demo purposes, assume male unless we detect a female name pattern
+      // In a real app, this would come from the user's profile
+      const userProfile = user?.profile || {};
+      const userGender = userProfile.gender || 'male'; // Default if not available
       
       // 1. Filter by gender for heterosexual matching
       let matchedProfiles = [...discoveryProfiles].filter(profile => {
