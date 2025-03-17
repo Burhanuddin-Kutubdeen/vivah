@@ -8,7 +8,7 @@ import { useTranslations } from '@/hooks/use-translations';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { SearchCheck, UserRound, Heart, MessageCircle, Ring } from 'lucide-react';
+import { SearchCheck, UserRound, Heart, MessageCircle, Gem } from 'lucide-react';
 
 const HowItWorks = () => {
   const { translate } = useTranslations();
@@ -42,7 +42,7 @@ const HowItWorks = () => {
       id: 5,
       title: "Find Your Perfect Match",
       description: "Build meaningful relationships that could lead to marriage. Many of our users have found their perfect match and life partner through our platform.",
-      icon: <Ring className="h-12 w-12 text-matrimony-600" />,
+      icon: <Gem className="h-12 w-12 text-matrimony-600" />,
     },
   ];
 
