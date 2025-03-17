@@ -1,102 +1,118 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { MessageCircle, User, LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useAuth } from '@/contexts/AuthContext';
+import { NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { Heart, Home, MessageCircle, Search, User, Info, BookHeart, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useTranslations } from '@/hooks/use-translations';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MobileMenuProps {
   isOpen: boolean;
+  onClose: () => void;
 }
 
-const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen }) => {
-  const { user, signOut } = useAuth();
+const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
+  const { isAuthenticated } = useAuth();
   const { translate } = useTranslations();
 
-  if (!isOpen) return null;
+  const menuVariants = {
+    closed: {
+      opacity: 0,
+      x: '100%',
+      transition: {
+        duration: 0.3,
+        ease: 'easeInOut',
+      },
+    },
+    open: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.3,
+        ease: 'easeInOut',
+      },
+    },
+  };
 
   return (
-    <div className="md:hidden fixed inset-0 z-40 bg-white dark:bg-gray-900 pt-20">
-      <nav className="container mx-auto px-4 py-5 flex flex-col space-y-5">
-        <Link 
-          to="/" 
-          className="text-xl font-medium py-2 border-b border-gray-100 dark:border-gray-800"
+    <motion.div
+      initial="closed"
+      animate={isOpen ? 'open' : 'closed'}
+      variants={menuVariants}
+      className="fixed inset-y-0 right-0 w-full max-w-xs bg-white dark:bg-gray-900 z-50 shadow-xl p-4 flex flex-col"
+    >
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-bold">Menu</h2>
+        <button
+          onClick={onClose}
+          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          aria-label="Close menu"
         >
-          {translate('home')}
-        </Link>
-        <Link 
-          to="/discover" 
-          className="text-xl font-medium py-2 border-b border-gray-100 dark:border-gray-800"
-        >
-          {translate('discover')}
-        </Link>
-        <Link 
-          to="/how-it-works" 
-          className="text-xl font-medium py-2 border-b border-gray-100 dark:border-gray-800"
-        >
-          {translate('how_it_works')}
-        </Link>
-        <Link 
-          to="/success-stories" 
-          className="text-xl font-medium py-2 border-b border-gray-100 dark:border-gray-800"
-        >
-          {translate('success_stories')}
-        </Link>
-        {user && (
-          <Link 
-            to="/messages" 
-            className="text-xl font-medium py-2 border-b border-gray-100 dark:border-gray-800"
-          >
-            <span className="flex items-center">
-              <MessageCircle className="h-5 w-5 mr-2" />
-              {translate('messages')}
-            </span>
-          </Link>
+          <X size={24} />
+        </button>
+      </div>
+
+      <nav className="flex flex-col space-y-2">
+        <MobileNavLink to="/" icon={<Home size={20} />} onClick={onClose}>
+          {translate('navbar.home')}
+        </MobileNavLink>
+        
+        {isAuthenticated && (
+          <>
+            <MobileNavLink to="/discover" icon={<Search size={20} />} onClick={onClose}>
+              {translate('navbar.discover')}
+            </MobileNavLink>
+            
+            <MobileNavLink to="/matches" icon={<Heart size={20} />} onClick={onClose}>
+              Matches
+            </MobileNavLink>
+            
+            <MobileNavLink to="/messages" icon={<MessageCircle size={20} />} onClick={onClose}>
+              {translate('navbar.messages')}
+            </MobileNavLink>
+            
+            <MobileNavLink to="/profile" icon={<User size={20} />} onClick={onClose}>
+              {translate('navbar.profile')}
+            </MobileNavLink>
+          </>
         )}
-        <div className="flex flex-col space-y-3 pt-5">
-          {user ? (
-            <>
-              <Button 
-                variant="outline" 
-                className="w-full justify-center rounded-full font-medium border-matrimony-300 text-matrimony-700"
-                asChild
-              >
-                <Link to="/profile">
-                  <User size={18} className="mr-2" />
-                  {translate('profile')}
-                </Link>
-              </Button>
-              <Button 
-                variant="outline"
-                className="w-full justify-center rounded-full font-medium border-matrimony-300 text-matrimony-700"
-                onClick={() => signOut()}
-              >
-                <LogOut size={18} className="mr-2" />
-                {translate('logout')}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button 
-                variant="outline" 
-                className="w-full justify-center rounded-full font-medium border-matrimony-300 text-matrimony-700"
-                asChild
-              >
-                <Link to="/login">{translate('login')}</Link>
-              </Button>
-              <Button 
-                className="w-full justify-center rounded-full font-medium bg-matrimony-600 hover:bg-matrimony-700"
-                asChild
-              >
-                <Link to="/register">{translate('register')}</Link>
-              </Button>
-            </>
-          )}
-        </div>
+        
+        <MobileNavLink to="/how-it-works" icon={<Info size={20} />} onClick={onClose}>
+          {translate('navbar.howItWorks')}
+        </MobileNavLink>
+        
+        <MobileNavLink to="/success-stories" icon={<BookHeart size={20} />} onClick={onClose}>
+          {translate('navbar.successStories')}
+        </MobileNavLink>
       </nav>
-    </div>
+    </motion.div>
   );
 };
+
+interface MobileNavLinkProps {
+  to: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+  children: React.ReactNode;
+}
+
+const MobileNavLink: React.FC<MobileNavLinkProps> = ({ to, icon, onClick, children }) => (
+  <NavLink
+    to={to}
+    onClick={onClick}
+    className={({ isActive }) =>
+      cn(
+        'flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors',
+        isActive
+          ? 'bg-matrimony-50 text-matrimony-900 dark:bg-matrimony-900/20 dark:text-matrimony-50'
+          : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+      )
+    }
+  >
+    <span className="text-matrimony-600 dark:text-matrimony-400">{icon}</span>
+    <span>{children}</span>
+  </NavLink>
+);
 
 export default MobileMenu;
