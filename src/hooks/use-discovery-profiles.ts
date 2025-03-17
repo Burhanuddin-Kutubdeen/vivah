@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -74,8 +73,9 @@ const discoveryProfiles = [
 export interface UseDiscoveryProfilesOptions {
   isPremium: boolean;
   preferences?: {
-    interests: string[];
     ageRange: [number, number];
+    religion?: string;
+    civilStatus?: string;
   };
 }
 
@@ -124,23 +124,18 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
         );
       }
       
-      // 3. If interests are selected, score and sort by matching interests
-      if (preferences?.interests && preferences.interests.length > 0) {
-        // Calculate interest match score for each profile
-        matchedProfiles = matchedProfiles.map(profile => {
-          const sharedInterests = preferences.interests.filter(interest => 
-            profile.interests.includes(interest)
-          );
-          
-          const score = sharedInterests.length;
-          
-          return {
-            ...profile,
-            matchScore: score
-          };
-        })
-        // Sort by match score (highest first)
-        .sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+      // 3. Apply religion filter if available
+      if (preferences?.religion && preferences.religion !== '') {
+        matchedProfiles = matchedProfiles.filter(
+          profile => profile.religion === preferences.religion
+        );
+      }
+      
+      // 4. Apply civil status filter if available
+      if (preferences?.civilStatus && preferences.civilStatus !== '') {
+        matchedProfiles = matchedProfiles.filter(
+          profile => profile.civilStatus === preferences.civilStatus
+        );
       }
       
       setFilteredProfiles(matchedProfiles);
