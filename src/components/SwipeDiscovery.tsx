@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useDiscoveryProfiles } from '@/hooks/use-discovery-profiles';
@@ -9,6 +8,7 @@ import DiscoveryLoadingSkeleton from '@/components/discovery/DiscoveryLoadingSke
 import { Button } from '@/components/ui/button';
 import { Filter } from 'lucide-react';
 import PreferencesFilter from '@/components/discovery/PreferencesFilter';
+import { DiscoveryProfilePreferences } from '@/types/discovery';
 
 interface SwipeDiscoveryProps {
   isOffline: boolean;
@@ -22,11 +22,7 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
   isLoading = false 
 }) => {
   const [showPreferences, setShowPreferences] = useState(false);
-  const [preferences, setPreferences] = useState<{
-    ageRange: [number, number];
-    religion?: string;
-    civilStatus?: string;
-  }>({
+  const [preferences, setPreferences] = useState<DiscoveryProfilePreferences>({
     ageRange: [18, 60],
     religion: undefined,
     civilStatus: undefined
@@ -41,7 +37,7 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
     applyPreferences
   } = useDiscoveryProfiles({ isPremium, preferences });
 
-  const handleApplyPreferences = (newPreferences: typeof preferences) => {
+  const handleApplyPreferences = (newPreferences: DiscoveryProfilePreferences) => {
     setPreferences(newPreferences);
     applyPreferences(newPreferences);
     setShowPreferences(false);

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,18 +10,11 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { Calendar, Heart, Church } from 'lucide-react';
+import { DiscoveryProfilePreferences } from '@/types/discovery';
 
 interface PreferencesFilterProps {
-  initialPreferences: {
-    ageRange: [number, number];
-    religion?: string;
-    civilStatus?: string;
-  };
-  onApply: (preferences: { 
-    ageRange: [number, number];
-    religion?: string;
-    civilStatus?: string;
-  }) => void;
+  initialPreferences: DiscoveryProfilePreferences;
+  onApply: (preferences: DiscoveryProfilePreferences) => void;
   onCancel: () => void;
 }
 
