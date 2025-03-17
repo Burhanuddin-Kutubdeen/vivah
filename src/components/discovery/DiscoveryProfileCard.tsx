@@ -15,6 +15,9 @@ export interface DiscoveryProfile {
   imageUrl: string;
   isOnline: boolean;
   lastActive: string;
+  religion?: string;
+  civilStatus?: string;
+  gender: string;
 }
 
 interface DiscoveryProfileCardProps {

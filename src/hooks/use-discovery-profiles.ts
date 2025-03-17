@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -14,7 +15,9 @@ const discoveryProfiles = [
     bio: 'Software engineer who loves to explore new cultures through food and travel. Looking for someone who shares my passion for learning and adventures.',
     imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1064&q=80',
     isOnline: true,
-    lastActive: '2 min ago'
+    lastActive: '2 min ago',
+    religion: 'hindu',
+    civilStatus: 'single'
   },
   {
     id: '2',
@@ -27,7 +30,9 @@ const discoveryProfiles = [
     bio: 'Doctor by profession, photographer by passion. I believe in maintaining a healthy lifestyle and finding beauty in everyday moments.',
     imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
     isOnline: false,
-    lastActive: '1 hour ago'
+    lastActive: '1 hour ago',
+    religion: 'christian',
+    civilStatus: 'single'
   },
   {
     id: '3',
@@ -40,7 +45,9 @@ const discoveryProfiles = [
     bio: 'Creative soul with a passion for arts and wellness. Looking for someone who appreciates life\'s simple pleasures and values personal growth.',
     imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
     isOnline: true,
-    lastActive: 'Just now'
+    lastActive: 'Just now',
+    religion: 'hindu',
+    civilStatus: 'single'
   },
   {
     id: '4',
@@ -53,7 +60,9 @@ const discoveryProfiles = [
     bio: 'Finance professional with a love for the outdoors. Seeking a partner to share adventures and quiet moments alike.',
     imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
     isOnline: false,
-    lastActive: '3 hours ago'
+    lastActive: '3 hours ago',
+    religion: 'muslim',
+    civilStatus: 'divorced'
   },
   {
     id: '5',
@@ -66,10 +75,13 @@ const discoveryProfiles = [
     bio: 'Creative designer who believes in the power of good design to transform lives. Looking for someone who appreciates aesthetics and thoughtful conversation.',
     imageUrl: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=928&q=80',
     isOnline: true,
-    lastActive: '5 min ago'
+    lastActive: '5 min ago',
+    religion: 'buddhist',
+    civilStatus: 'single'
   }
 ];
 
+// Let's also update the DiscoveryProfile interface in DiscoveryProfileCard.tsx to include these properties
 export interface UseDiscoveryProfilesOptions {
   isPremium: boolean;
   preferences?: {
