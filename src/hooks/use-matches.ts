@@ -35,6 +35,7 @@ export interface MatchFilters {
   maxAge?: number;
   location?: string;
   religion?: string;
+  civilStatus?: string;
   priority?: 'interests' | 'age' | 'location' | 'religion';
 }
 
