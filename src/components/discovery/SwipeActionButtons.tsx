@@ -19,6 +19,16 @@ const SwipeActionButtons: React.FC<SwipeActionButtonsProps> = ({
   isPremium,
   remainingLikes
 }) => {
+  const handleSwipeRight = () => {
+    // Check if the user can swipe right
+    if (isOffline || (!isPremium && remainingLikes <= 0)) {
+      return;
+    }
+    
+    // If we can, call the provided handler
+    onSwipeRight();
+  };
+
   return (
     <div className="flex items-center justify-center space-x-6 mt-6">
       <Button 
@@ -38,7 +48,7 @@ const SwipeActionButtons: React.FC<SwipeActionButtonsProps> = ({
           "h-16 w-16 rounded-full border-matrimony-200 hover:border-green-400 hover:bg-green-50 dark:border-gray-700 dark:hover:border-green-400 dark:hover:bg-gray-800",
           !isPremium && remainingLikes <= 0 && "opacity-50 cursor-not-allowed"
         )}
-        onClick={onSwipeRight}
+        onClick={handleSwipeRight}
         disabled={isOffline || (!isPremium && remainingLikes <= 0)}
       >
         <Heart className="h-8 w-8 text-green-500" />

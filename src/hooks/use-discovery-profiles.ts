@@ -5,6 +5,8 @@ import { discoveryProfiles } from '@/data/discovery-profiles';
 import { UseDiscoveryProfilesOptions, DiscoveryProfile } from '@/types/discovery';
 import { applyAllFilters } from '@/utils/profile-filters';
 import { getUserGender } from '@/utils/user-utils';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryProfilesOptions) {
   const [filteredProfiles, setFilteredProfiles] = useState<DiscoveryProfile[]>([]);
@@ -31,12 +33,39 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
   // Current profile to display
   const currentProfile = filteredProfiles[currentProfileIndex] || null;
 
+  // Function to notify a liked profile
+  const notifyProfileLiked = async (likedProfile: DiscoveryProfile) => {
+    try {
+      if (!user) return;
+      
+      // In a real app, we would send this to a database table or notification system
+      // For this demo, we'll just log and show a toast
+      console.log(`${user.email} liked ${likedProfile.name}'s profile`);
+      
+      // This simulates sending the notification to the liked profile
+      // In a real app, we would store this in a database
+      toast.success(`Notification sent to ${likedProfile.name}`);
+      
+      // In a production app with a proper backend, we would:
+      // 1. Create a "likes" or "matches" table in the database
+      // 2. Store the user ID and liked profile ID
+      // 3. Have a notification system to alert the liked profile
+    } catch (error) {
+      console.error("Error sending like notification:", error);
+    }
+  };
+
   const handleSwipe = (dir: 'left' | 'right') => {
     setDirection(dir);
     
     // If swiping right (like) and not premium, reduce remaining likes
     if (dir === 'right' && !isPremium) {
       setRemainingLikes(prev => Math.max(0, prev - 1));
+      
+      // When swiping right, notify the profile that was liked
+      if (currentProfile) {
+        notifyProfileLiked(currentProfile);
+      }
     }
     
     // Wait for animation to complete before changing the profile
@@ -55,6 +84,11 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
     
     // Logic for super like
     console.log('Super liked:', currentProfile?.name);
+    
+    // Also notify on super likes
+    if (currentProfile) {
+      notifyProfileLiked(currentProfile);
+    }
     
     // Move to next profile
     setTimeout(() => {
