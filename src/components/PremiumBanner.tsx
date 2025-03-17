@@ -4,8 +4,11 @@ import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
 import { Check } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
 
 const PremiumBanner: React.FC = () => {
+  const { translate } = useTranslations();
+  
   return (
     <section className="py-20 px-4 relative overflow-hidden">
       {/* Background Elements */}
@@ -101,8 +104,8 @@ const PremiumBanner: React.FC = () => {
                 <p className="text-matrimony-600 mb-6">Everything you need for successful matchmaking</p>
                 
                 <div className="mb-6">
-                  <span className="text-4xl font-bold">$14.99</span>
-                  <span className="text-matrimony-600">/month</span>
+                  <span className="text-4xl font-bold">{translate('pricing_monthly')}</span>
+                  <span className="text-matrimony-600">{translate('per_month')}</span>
                 </div>
                 
                 <div className="space-y-4 mb-8">

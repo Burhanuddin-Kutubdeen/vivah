@@ -4,9 +4,11 @@ import { NavLink } from 'react-router-dom';
 import { Heart, User, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslations } from '@/hooks/use-translations';
 
 const NavigationItems = () => {
   const { user } = useAuth();
+  const { translate } = useTranslations();
   
   if (!user) return null;
   
@@ -25,7 +27,7 @@ const NavigationItems = () => {
       >
         <span className="flex items-center">
           <Heart className="h-4 w-4 mr-1.5" />
-          Discover
+          {translate('discover')}
         </span>
       </NavLink>
       
@@ -42,7 +44,7 @@ const NavigationItems = () => {
       >
         <span className="flex items-center">
           <MessageCircle className="h-4 w-4 mr-1.5" />
-          Messages
+          {translate('messages')}
         </span>
       </NavLink>
       
@@ -59,7 +61,7 @@ const NavigationItems = () => {
       >
         <span className="flex items-center">
           <User className="h-4 w-4 mr-1.5" />
-          Profile
+          {translate('profile')}
         </span>
       </NavLink>
     </div>

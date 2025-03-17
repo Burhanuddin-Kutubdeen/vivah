@@ -17,22 +17,34 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
 import LicensesPolicy from "./pages/LicensesPolicy";
+import HowItWorks from "./pages/HowItWorks";
+import SuccessStories from "./pages/SuccessStories";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProfileProtectedRoute from "./components/ProfileProtectedRoute";
+import { useTranslations } from "./hooks/use-translations";
+import { Helmet } from "react-helmet";
 
 const queryClient = new QueryClient();
 
 // Wrapper for AnimatePresence
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const { currentLanguage } = useTranslations();
   
   return (
     <AnimatePresence mode="wait">
+      <Helmet>
+        <html lang={currentLanguage} />
+      </Helmet>
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Index />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        
+        {/* New pages */}
+        <Route path="/how-it-works" element={<HowItWorks />} />
+        <Route path="/success-stories" element={<SuccessStories />} />
         
         {/* Legal pages */}
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />

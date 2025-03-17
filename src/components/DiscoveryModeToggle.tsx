@@ -3,6 +3,7 @@ import React from 'react';
 import { Star, Heart } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslations } from '@/hooks/use-translations';
 
 interface DiscoveryModeToggleProps {
   mode: 'curated' | 'discovery';
@@ -17,6 +18,8 @@ const DiscoveryModeToggle: React.FC<DiscoveryModeToggleProps> = ({
   isOffline,
   isLoading = false
 }) => {
+  const { translate } = useTranslations();
+
   if (isLoading) {
     return (
       <div className="flex justify-center mb-6">

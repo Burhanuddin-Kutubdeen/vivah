@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -30,6 +30,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm">
+            <Globe className="h-4 w-4 mr-2" />
             {languages.find(lang => lang.code === currentLanguage)?.label || 'Language'}
           </Button>
         </DropdownMenuTrigger>

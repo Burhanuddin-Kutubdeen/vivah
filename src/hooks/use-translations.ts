@@ -1,9 +1,19 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-// Translation function (simplified for demonstration)
+// Translation function
 export const useTranslations = () => {
-  const [currentLanguage, setCurrentLanguage] = useState('en');
+  // Try to get language from localStorage first, default to 'en'
+  const [currentLanguage, setCurrentLanguage] = useState(() => {
+    return localStorage.getItem('app-language') || 'en';
+  });
+
+  // Persist language selection to localStorage
+  useEffect(() => {
+    localStorage.setItem('app-language', currentLanguage);
+    // Update html lang attribute for accessibility and SEO
+    document.documentElement.lang = currentLanguage;
+  }, [currentLanguage]);
 
   const translations: Record<string, Record<string, string>> = {
     'profile_setup_title': {
@@ -16,7 +26,66 @@ export const useTranslations = () => {
       'si': 'ඔබේ පරිපූර්ණ ගැලපීම සොයා ගැනීමට උදව් කිරීමට ඔබ ගැන තවත් අපට කියන්න',
       'ta': 'உங்களின் சரியான பொருத்தத்தைக் கண்டுபிடிக்க உதவ உங்களைப் பற்றி மேலும் எங்களுக்குச் சொல்லுங்கள்'
     },
-    // Add more translations as needed
+    'home': {
+      'en': 'Home',
+      'si': 'මුල් පිටුව',
+      'ta': 'முகப்பு'
+    },
+    'discover': {
+      'en': 'Discover',
+      'si': 'සොයාගන්න',
+      'ta': 'கண்டுபிடி'
+    },
+    'messages': {
+      'en': 'Messages',
+      'si': 'පණිවිඩ',
+      'ta': 'செய்திகள்'
+    },
+    'profile': {
+      'en': 'Profile',
+      'si': 'පැතිකඩ',
+      'ta': 'சுயவிவரம்'
+    },
+    'how_it_works': {
+      'en': 'How It Works',
+      'si': 'එය කෙසේ ක්‍රියා කරයිද',
+      'ta': 'இது எப்படி செயல்படுகிறது'
+    },
+    'success_stories': {
+      'en': 'Success Stories',
+      'si': 'සාර්ථක කතා',
+      'ta': 'வெற்றிக் கதைகள்'
+    },
+    'loading': {
+      'en': 'Loading...',
+      'si': 'පූරණය වෙමින්...',
+      'ta': 'ஏற்றுகிறது...'
+    },
+    'login': {
+      'en': 'Login',
+      'si': 'පුරන්න',
+      'ta': 'உள்நுழைய'
+    },
+    'register': {
+      'en': 'Register',
+      'si': 'ලියාපදිංචි වන්න',
+      'ta': 'பதிவு செய்யுங்கள்'
+    },
+    'logout': {
+      'en': 'Logout',
+      'si': 'පිටවීම',
+      'ta': 'வெளியேறு'
+    },
+    'pricing_monthly': {
+      'en': '5,000 LKR',
+      'si': 'රු. 5,000',
+      'ta': 'ரூ. 5,000'
+    },
+    'per_month': {
+      'en': '/month',
+      'si': '/මසකට',
+      'ta': '/மாதம்'
+    },
   };
 
   const translate = (key: string) => {
