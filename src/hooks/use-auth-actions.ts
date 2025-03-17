@@ -63,7 +63,8 @@ export const useAuthActions = (
         description: "Welcome to Vivah!",
       });
       
-      await navigateBasedOnProfile(loggedInUser.id, true);
+      // Simplified navigation - directly to discover page
+      navigate('/discover');
     };
     
     const result = await signInUser(email, password, onSignInSuccess);
@@ -77,7 +78,7 @@ export const useAuthActions = (
     }
     
     return result;
-  }, [toast, navigateBasedOnProfile]);
+  }, [toast, navigate]);
 
   // Sign out handler
   const signOut = useCallback(async () => {

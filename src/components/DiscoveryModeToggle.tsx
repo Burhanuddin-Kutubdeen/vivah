@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Grid2X2, Heart } from 'lucide-react';
+import { Star, Heart } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -34,8 +34,8 @@ const DiscoveryModeToggle: React.FC<DiscoveryModeToggleProps> = ({
           disabled={isOffline}
           className="rounded-l-full"
         >
-          <Grid2X2 className="h-4 w-4 mr-2" />
-          Curated Matches
+          <Star className="h-4 w-4 mr-2" />
+          For You
         </ToggleGroupItem>
         <ToggleGroupItem 
           value="discovery" 
@@ -44,7 +44,7 @@ const DiscoveryModeToggle: React.FC<DiscoveryModeToggleProps> = ({
           className="rounded-r-full"
         >
           <Heart className="h-4 w-4 mr-2" />
-          Discovery Mode
+          Swipe Mode
         </ToggleGroupItem>
       </ToggleGroup>
     </div>

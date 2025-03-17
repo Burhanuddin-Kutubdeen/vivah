@@ -3,7 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import MatchCard from '@/components/MatchCard';
 import { Button } from "@/components/ui/button";
-import { Grid2X2 } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Sample curated matches data - would be fetched from API in production
@@ -92,7 +92,7 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLo
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Curated Matches</h2>
+        <h2 className="text-xl font-semibold">For You</h2>
         <div className="flex items-center space-x-2">
           <span className="text-sm text-matrimony-600 dark:text-matrimony-300">
             Refreshes in: 3 days
@@ -103,7 +103,7 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLo
             className="rounded-full border-matrimony-200 hover:border-matrimony-300 hover:bg-matrimony-50 dark:border-gray-700"
             disabled={isOffline}
           >
-            <Grid2X2 size={16} className="mr-1" />
+            <Star size={16} className="mr-1" />
             View All
           </Button>
         </div>

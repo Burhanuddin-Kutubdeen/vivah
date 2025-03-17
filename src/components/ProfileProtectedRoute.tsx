@@ -31,27 +31,15 @@ const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }
         return; // Wait for loading to complete
       }
       
-      if (user && checkCount < 2) {
+      if (user && checkCount < 1) { // Reduced from 2 to 1 to minimize checks
         setCheckCount(prev => prev + 1);
-        try {
-          console.log("Verifying profile completion status, attempt:", checkCount + 1);
-          // Wait for async state to settle
-          setTimeout(() => {
-            setIsChecking(false);
-          }, 500);
-        } catch (error) {
-          console.error("Error verifying profile:", error);
+        console.log("Verifying profile completion status, attempt:", checkCount + 1);
+        
+        // Simplified approach - trust the current state more
+        // Wait for async state to settle
+        setTimeout(() => {
           setIsChecking(false);
-          
-          // Only show error toast once to avoid spam
-          if (checkCount === 0) {
-            toast({
-              title: "Connection issue",
-              description: "We're having trouble verifying your profile. Using cached profile state.",
-              variant: "destructive",
-            });
-          }
-        }
+        }, 300); // Reduced timeout
       } else if (!loading) {
         setIsChecking(false);
       }
@@ -63,8 +51,6 @@ const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }
   // Handle offline state special case
   useEffect(() => {
     const handleOffline = () => {
-      // When offline, we won't be able to verify profile status
-      // Allow access to protected routes based on current state
       setIsChecking(false);
       
       toast({

@@ -33,7 +33,7 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Discovery Mode</h2>
+        <h2 className="text-xl font-semibold">Swipe Mode</h2>
         <div className="flex items-center space-x-2">
           {!isPremium && (
             <span className="text-sm text-matrimony-600 dark:text-matrimony-300">
@@ -54,7 +54,6 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
         <SwipeActionButtons 
           onSwipeLeft={() => isOffline ? null : handleSwipe('left')}
           onSwipeRight={() => isOffline ? null : handleSwipe('right')}
-          onSuperLike={() => isOffline ? null : handleSuperLike()}
           isOffline={isOffline}
           isPremium={isPremium}
           remainingLikes={remainingLikes}
