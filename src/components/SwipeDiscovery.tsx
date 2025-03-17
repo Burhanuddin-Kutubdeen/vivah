@@ -25,9 +25,13 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
   const [preferences, setPreferences] = useState<{
     interests: string[];
     ageRange: [number, number];
+    religion?: string;
+    civilStatus?: string;
   }>({
     interests: [],
-    ageRange: [18, 60]
+    ageRange: [18, 60],
+    religion: undefined,
+    civilStatus: undefined
   });
   
   const { 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MatchFilters as MatchFiltersType } from '@/hooks/use-matches';
-import { Filter, RefreshCw } from 'lucide-react';
+import { Filter, RefreshCw, Calendar, Heart, Church } from 'lucide-react';
 
 interface MatchFiltersProps {
   filters: MatchFiltersType;
@@ -42,6 +42,13 @@ const MatchFilters: React.FC<MatchFiltersProps> = ({ filters, onApplyFilters, is
     setLocalFilters(prev => ({
       ...prev,
       religion: value
+    }));
+  };
+
+  const handleCivilStatusChange = (value: string) => {
+    setLocalFilters(prev => ({
+      ...prev,
+      civilStatus: value
     }));
   };
 
@@ -97,13 +104,16 @@ const MatchFilters: React.FC<MatchFiltersProps> = ({ filters, onApplyFilters, is
       </div>
 
       {isFilterOpen && (
-        <Card className="mb-4">
+        <Card className="mb-4 border border-gray-100 dark:border-gray-800 shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg">Match Preferences</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Age Range: {ageRange[0]} - {ageRange[1]}</label>
+            <div className="space-y-2 bg-[#F6F6F7] p-4 rounded-lg">
+              <label className="text-sm font-medium flex items-center">
+                <Calendar className="w-4 h-4 mr-2 text-gray-500" />
+                Age Range: {ageRange[0]} - {ageRange[1]}
+              </label>
               <Slider 
                 defaultValue={ageRange} 
                 min={18} 
@@ -113,6 +123,12 @@ const MatchFilters: React.FC<MatchFiltersProps> = ({ filters, onApplyFilters, is
                 onValueChange={handleAgeRangeChange}
                 className="my-4"
               />
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>18</span>
+                <span>40</span>
+                <span>60</span>
+                <span>80</span>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -125,7 +141,10 @@ const MatchFilters: React.FC<MatchFiltersProps> = ({ filters, onApplyFilters, is
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Religion</label>
+              <label className="text-sm font-medium flex items-center">
+                <Church className="w-4 h-4 mr-2 text-gray-500" />
+                Religion
+              </label>
               <Select 
                 value={localFilters.religion || ''} 
                 onValueChange={handleReligionChange}
@@ -143,6 +162,27 @@ const MatchFilters: React.FC<MatchFiltersProps> = ({ filters, onApplyFilters, is
                   <SelectItem value="jain">Jain</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                   <SelectItem value="none">None</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center">
+                <Heart className="w-4 h-4 mr-2 text-gray-500" />
+                Matrimony Status
+              </label>
+              <Select 
+                value={localFilters.civilStatus || ''} 
+                onValueChange={handleCivilStatusChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="single">Single</SelectItem>
+                  <SelectItem value="divorced">Divorced</SelectItem>
+                  <SelectItem value="widowed">Widowed</SelectItem>
                 </SelectContent>
               </Select>
             </div>

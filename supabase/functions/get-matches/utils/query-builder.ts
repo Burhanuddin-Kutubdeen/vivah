@@ -56,5 +56,10 @@ export function buildMatchingQuery(supabase: any, currentUserProfile: any, filte
     query = query.eq('religion', filters.religion);
   }
   
+  // Add filter for civil status
+  if (filters.civilStatus) {
+    query = query.eq('civil_status', filters.civilStatus);
+  }
+  
   return query;
 }

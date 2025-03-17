@@ -46,6 +46,7 @@ serve(async (req) => {
       filters.maxAge = url.searchParams.get('maxAge') ? parseInt(url.searchParams.get('maxAge') as string) : undefined;
       filters.location = url.searchParams.get('location') || undefined;
       filters.religion = url.searchParams.get('religion') || undefined;
+      filters.civilStatus = url.searchParams.get('civilStatus') || undefined;
       filters.priority = url.searchParams.get('priority') as MatchFilters['priority'] || 'interests';
     }
     
