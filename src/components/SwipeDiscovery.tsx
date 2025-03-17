@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Filter } from 'lucide-react';
 import PreferencesFilter from '@/components/discovery/PreferencesFilter';
 import { DiscoveryProfilePreferences } from '@/types/discovery';
+import { toast } from "sonner";
 
 interface SwipeDiscoveryProps {
   isOffline: boolean;
@@ -35,13 +36,17 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
     remainingLikes, 
     handleSwipe, 
     handleSuperLike,
-    applyPreferences
+    applyPreferences,
+    hasProfiles
   } = useDiscoveryProfiles({ isPremium, preferences });
 
   const handleApplyPreferences = (newPreferences: DiscoveryProfilePreferences) => {
     setPreferences(newPreferences);
     applyPreferences(newPreferences);
     setShowPreferences(false);
+    
+    // Show a feedback toast to inform the user
+    toast.success("Preferences applied successfully");
   };
 
   if (isLoading) {
@@ -79,22 +84,51 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
       )}
       
       <div className="flex flex-col items-center">
-        <AnimatePresence mode="wait">
-          <DiscoveryProfileCard 
-            profile={currentProfile} 
-            direction={direction} 
-          />
-        </AnimatePresence>
+        {hasProfiles ? (
+          <>
+            <AnimatePresence mode="wait">
+              <DiscoveryProfileCard 
+                profile={currentProfile} 
+                direction={direction} 
+              />
+            </AnimatePresence>
+            
+            <SwipeActionButtons 
+              onSwipeLeft={() => isOffline ? null : handleSwipe('left')}
+              onSwipeRight={() => isOffline ? null : handleSwipe('right')}
+              isOffline={isOffline}
+              isPremium={isPremium}
+              remainingLikes={remainingLikes}
+            />
+          </>
+        ) : (
+          <div className="p-8 text-center bg-white dark:bg-gray-800 rounded-xl shadow-sm my-8">
+            <h3 className="text-xl font-medium mb-2">No Matches Found</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
+              We couldn't find any profiles matching your current preferences.
+            </p>
+            <Button 
+              onClick={() => {
+                setPreferences({
+                  ageRange: [18, 60],
+                  religion: undefined,
+                  civilStatus: undefined
+                });
+                applyPreferences({
+                  ageRange: [18, 60],
+                  religion: undefined,
+                  civilStatus: undefined
+                });
+                toast.info("Preferences have been reset");
+              }} 
+              variant="outline"
+            >
+              Reset Preferences
+            </Button>
+          </div>
+        )}
         
-        <SwipeActionButtons 
-          onSwipeLeft={() => isOffline ? null : handleSwipe('left')}
-          onSwipeRight={() => isOffline ? null : handleSwipe('right')}
-          isOffline={isOffline}
-          isPremium={isPremium}
-          remainingLikes={remainingLikes}
-        />
-        
-        {!isPremium && (
+        {!isPremium && hasProfiles && (
           <PremiumUpgradeButton isOffline={isOffline} />
         )}
       </div>

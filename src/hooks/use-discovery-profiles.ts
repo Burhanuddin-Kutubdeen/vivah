@@ -7,11 +7,12 @@ import { applyAllFilters } from '@/utils/profile-filters';
 import { getUserGender } from '@/utils/user-utils';
 
 export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryProfilesOptions) {
-  const [filteredProfiles, setFilteredProfiles] = useState<DiscoveryProfile[]>(discoveryProfiles);
+  const [filteredProfiles, setFilteredProfiles] = useState<DiscoveryProfile[]>([]);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const [direction, setDirection] = useState<'left' | 'right' | null>(null);
   const [remainingLikes, setRemainingLikes] = useState(isPremium ? Infinity : 10);
   const { user } = useAuth();
+  const hasProfiles = filteredProfiles.length > 0;
 
   // Filter and sort profiles based on preferences and heterosexual matching
   useEffect(() => {
@@ -20,6 +21,8 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
     
     // Apply all filters based on user preferences
     const matchedProfiles = applyAllFilters(discoveryProfiles, userGender, preferences);
+    console.log("Applied filters with preferences:", preferences);
+    console.log("Matched profiles count:", matchedProfiles.length);
     
     setFilteredProfiles(matchedProfiles);
     setCurrentProfileIndex(0); // Reset to first profile after filtering
@@ -75,6 +78,7 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
     remainingLikes,
     handleSwipe,
     handleSuperLike,
-    applyPreferences
+    applyPreferences,
+    hasProfiles
   };
 }
