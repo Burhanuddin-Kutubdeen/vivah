@@ -10,6 +10,7 @@ interface AuthContextProps {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  isAuthenticated: boolean;
   signUp: (email: string, password: string, userData: any) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -54,12 +55,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [profileCheckError, user, toast]);
 
+  // Computed property to check if user is authenticated
+  const isAuthenticated = !!user;
+
   return (
     <AuthContext.Provider
       value={{
         user,
         session,
         loading,
+        isAuthenticated,
         signUp,
         signIn,
         signOut,

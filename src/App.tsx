@@ -36,16 +36,32 @@ function App() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/licenses" element={<LicensesPolicy />} />
           
-          <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/discover" element={<Discover />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/matches" element={<Matches />} />
-          </Route>
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          } />
+          <Route path="/discover" element={
+            <ProtectedRoute>
+              <Discover />
+            </ProtectedRoute>
+          } />
+          <Route path="/messages" element={
+            <ProtectedRoute>
+              <Messages />
+            </ProtectedRoute>
+          } />
+          <Route path="/matches" element={
+            <ProtectedRoute>
+              <Matches />
+            </ProtectedRoute>
+          } />
           
-          <Route element={<ProfileProtectedRoute />}>
-            <Route path="/profile-setup" element={<ProfileSetup />} />
-          </Route>
+          <Route path="/profile-setup" element={
+            <ProfileProtectedRoute>
+              <ProfileSetup />
+            </ProfileProtectedRoute>
+          } />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
