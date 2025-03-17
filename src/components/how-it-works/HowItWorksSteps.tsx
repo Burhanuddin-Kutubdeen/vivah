@@ -10,30 +10,35 @@ const HowItWorksSteps = () => {
       title: "Create Your Profile",
       description: "Complete your profile with personal details, preferences, and what you're looking for in a partner. The more information you provide, the better matches you'll receive.",
       icon: <UserRound className="h-12 w-12 text-matrimony-600" />,
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80",
     },
     {
       id: 2,
       title: "Discover Potential Matches",
       description: "Browse through our curated 'For You' matches or try the 'Swipe Mode' to discover compatible partners. Our matching algorithm considers your preferences, values, and interests.",
       icon: <SearchCheck className="h-12 w-12 text-matrimony-600" />,
+      image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?auto=format&fit=crop&q=80",
     },
     {
       id: 3,
       title: "Express Interest",
       description: "When you find someone interesting, express your interest with a 'Like'. If they like you back, it's a match! Premium members get unlimited likes and can see who liked them.",
       icon: <Heart className="h-12 w-12 text-matrimony-600" />,
+      image: "https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&q=80",
     },
     {
       id: 4,
       title: "Connect and Communicate",
       description: "Once matched, start a conversation through our secure messaging system. Build a connection and get to know each other before deciding to meet in person.",
       icon: <MessageCircle className="h-12 w-12 text-matrimony-600" />,
+      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&q=80",
     },
     {
       id: 5,
       title: "Find Your Perfect Match",
       description: "Build meaningful relationships that could lead to marriage. Many of our users have found their perfect match and life partner through our platform.",
       icon: <Gem className="h-12 w-12 text-matrimony-600" />,
+      image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&q=80",
     },
   ];
 
@@ -65,7 +70,7 @@ const HowItWorksSteps = () => {
               <div className="md:w-1/2">
                 <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-xl overflow-hidden">
                   <img 
-                    src="/placeholder.svg" 
+                    src={step.image} 
                     alt={`Illustration of ${step.title}`}
                     className="w-full h-full object-cover"
                   />

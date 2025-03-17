@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 const HowItWorksCTA = () => {
   return (
-    <section className="py-16 px-4 bg-matrimony-600 dark:bg-matrimony-900 text-white">
+    <section className="py-16 px-4 bg-matrimony-600 dark:bg-matrimony-900 text-white bg-[url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&brightness=-25%')] bg-cover bg-center bg-blend-overlay">
       <div className="container mx-auto max-w-4xl text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Find Your Perfect Match?</h2>
         <p className="text-xl mb-10 max-w-2xl mx-auto">Join thousands of others who have found their life partner through Vivah.</p>

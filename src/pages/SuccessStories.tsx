@@ -17,7 +17,7 @@ const SuccessStories = () => {
     {
       id: 1,
       title: "Anusha & Praveen: Found Love in Familiar Places",
-      image: "/placeholder.svg",
+      image: "https://images.unsplash.com/photo-1522844990619-4951c40f7eda?auto=format&fit=crop&q=80",
       couple: {
         name1: "Anusha Perera",
         name2: "Praveen Fernando",
@@ -30,7 +30,7 @@ const SuccessStories = () => {
     {
       id: 2,
       title: "Nithya & Raj: A Cross-Cultural Success Story",
-      image: "/placeholder.svg",
+      image: "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?auto=format&fit=crop&q=80",
       couple: {
         name1: "Nithya Krishnan",
         name2: "Raj Patel",
@@ -43,7 +43,7 @@ const SuccessStories = () => {
     {
       id: 3,
       title: "Dilshan & Amaya: Second Chances at Love",
-      image: "/placeholder.svg",
+      image: "https://images.unsplash.com/photo-1604072366595-e75dc92d6bdc?auto=format&fit=crop&q=80",
       couple: {
         name1: "Dilshan Jayawardena",
         name2: "Amaya Ranasinghe",
@@ -56,7 +56,7 @@ const SuccessStories = () => {
     {
       id: 4,
       title: "Lakmal & Tharushi: From Premium Members to Lifelong Partners",
-      image: "/placeholder.svg",
+      image: "https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&q=80",
       couple: {
         name1: "Lakmal Bandara",
         name2: "Tharushi Silva",
@@ -85,7 +85,7 @@ const SuccessStories = () => {
       
       <main className="pt-20">
         {/* Hero Section */}
-        <section className="py-16 md:py-24 px-4 bg-gradient-to-b from-matrimony-50 to-white dark:from-gray-900 dark:to-gray-800">
+        <section className="py-16 md:py-24 px-4 bg-gradient-to-b from-matrimony-50 to-white dark:from-gray-900 dark:to-gray-800 bg-[url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&q=80&brightness=-10%')] bg-cover bg-center bg-blend-soft-light">
           <div className="container mx-auto text-center max-w-4xl">
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
@@ -254,7 +254,7 @@ const SuccessStories = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="py-16 px-4 bg-matrimony-600 dark:bg-matrimony-900 text-white">
+        <section className="py-16 px-4 bg-matrimony-600 dark:bg-matrimony-900 text-white bg-[url('https://images.unsplash.com/photo-1603754458822-f8479f4749a5?auto=format&fit=crop&q=80&brightness=-25%')] bg-cover bg-center bg-blend-overlay">
           <div className="container mx-auto max-w-4xl text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Your Success Story Awaits</h2>
             <p className="text-xl mb-10 max-w-2xl mx-auto">Join thousands of others who found their perfect match on Sri Lanka's most trusted matrimony platform.</p>

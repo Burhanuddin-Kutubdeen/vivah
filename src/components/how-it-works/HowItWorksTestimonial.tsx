@@ -9,7 +9,7 @@ const HowItWorksTestimonial = () => {
     quote: "The guided process made it easy to find someone who shares my values and life goals. Within three months, I met my now-fiancé!",
     name: "Priya Sharma",
     role: "Engaged via Vivah",
-    image: "/placeholder.svg"
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80"
   };
 
   return (

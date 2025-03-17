@@ -9,6 +9,15 @@ import { useTranslations } from '@/hooks/use-translations';
 const PremiumBanner: React.FC = () => {
   const { translate } = useTranslations();
   
+  const features = [
+    "Unlimited messaging with all matches",
+    "Advanced filters for better matches",
+    "See who liked your profile",
+    "Priority customer support",
+    "Enhanced profile visibility",
+    "Exclusive matchmaking events",
+  ];
+  
   return (
     <section className="py-20 px-4 relative overflow-hidden">
       {/* Background Elements */}
@@ -17,7 +26,7 @@ const PremiumBanner: React.FC = () => {
       </div>
 
       <div className="container mx-auto relative z-10">
-        <div className="glass-card rounded-3xl p-10 md:p-16 overflow-hidden relative">
+        <div className="glass-card rounded-3xl p-8 md:p-12 overflow-hidden relative bg-white/90 dark:bg-gray-800/90 shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7">
               <motion.h2
@@ -27,16 +36,16 @@ const PremiumBanner: React.FC = () => {
                 transition={{ duration: 0.5 }}
                 className="text-3xl md:text-4xl font-bold mb-6"
               >
-                Unlock Premium Features for Better Matches
+                Premium Membership
               </motion.h2>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.1 }}
-                className="text-lg text-matrimony-600 mb-8"
+                className="text-lg text-matrimony-600 dark:text-matrimony-400 mb-8"
               >
-                Subscribe to our premium plan and enjoy exclusive benefits that will enhance your matchmaking experience.
+                Upgrade to Premium and get access to exclusive features that will maximize your chances of finding your perfect match.
               </motion.p>
 
               <motion.div
@@ -44,32 +53,17 @@ const PremiumBanner: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.2 }}
+                className="mb-8"
               >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                  <div className="flex items-start space-x-3">
-                    <div className="mt-1 flex-shrink-0">
-                      <Check size={16} className="text-matrimony-600" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {features.map((feature, index) => (
+                    <div key={index} className="flex items-start space-x-3">
+                      <div className="mt-1 flex-shrink-0 bg-matrimony-100 dark:bg-matrimony-800 rounded-full p-1">
+                        <Check size={14} className="text-matrimony-600 dark:text-matrimony-300" />
+                      </div>
+                      <p className="text-matrimony-600 dark:text-matrimony-300">{feature}</p>
                     </div>
-                    <p className="text-matrimony-600">Unlimited messaging with all matches</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="mt-1 flex-shrink-0">
-                      <Check size={16} className="text-matrimony-600" />
-                    </div>
-                    <p className="text-matrimony-600">Advanced filters for better matches</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="mt-1 flex-shrink-0">
-                      <Check size={16} className="text-matrimony-600" />
-                    </div>
-                    <p className="text-matrimony-600">See who liked your profile</p>
-                  </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="mt-1 flex-shrink-0">
-                      <Check size={16} className="text-matrimony-600" />
-                    </div>
-                    <p className="text-matrimony-600">Priority customer support</p>
-                  </div>
+                  ))}
                 </div>
               </motion.div>
 
@@ -78,13 +72,19 @@ const PremiumBanner: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.3 }}
+                className="mb-8 md:mb-0"
               >
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="text-4xl font-bold text-matrimony-700 dark:text-matrimony-300">{translate('pricing_monthly')}</span>
+                  <span className="text-matrimony-500 dark:text-matrimony-400">{translate('per_month')}</span>
+                </div>
+                
                 <Button 
                   size="lg" 
-                  className="rounded-full bg-matrimony-600 hover:bg-matrimony-700 text-white px-8 py-6"
+                  className="rounded-full bg-matrimony-600 hover:bg-matrimony-700 text-white px-8"
                   asChild
                 >
-                  <Link to="/pricing">View Premium Plans</Link>
+                  <Link to="/pricing">Get Premium Now</Link>
                 </Button>
               </motion.div>
             </div>
@@ -96,47 +96,20 @@ const PremiumBanner: React.FC = () => {
               transition={{ duration: 0.7, delay: 0.3 }}
               className="lg:col-span-5 relative"
             >
-              <div className="relative bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
-                <div className="absolute -top-3 -right-3">
-                  <span className="bg-secondary text-white text-xs font-semibold px-3 py-1 rounded-full">POPULAR</span>
+              <div className="relative aspect-[4/3] rounded-xl overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80" 
+                  alt="Happy couple who met through Vivah" 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6">
+                  <p className="text-white text-lg font-medium">
+                    "The premium features helped us find each other within weeks!"
+                  </p>
+                  <p className="text-white/80 text-sm mt-2">
+                    — Ravi & Meena, Married 2023
+                  </p>
                 </div>
-                <h3 className="text-2xl font-bold mb-2">Premium Membership</h3>
-                <p className="text-matrimony-600 mb-6">Everything you need for successful matchmaking</p>
-                
-                <div className="mb-6">
-                  <span className="text-4xl font-bold">{translate('pricing_monthly')}</span>
-                  <span className="text-matrimony-600">{translate('per_month')}</span>
-                </div>
-                
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center">
-                    <Check size={18} className="text-matrimony-700 mr-3" />
-                    <span>All Basic Features</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Check size={18} className="text-matrimony-700 mr-3" />
-                    <span>Unlimited Messaging</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Check size={18} className="text-matrimony-700 mr-3" />
-                    <span>See Who Likes You</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Check size={18} className="text-matrimony-700 mr-3" />
-                    <span>Advanced Filters</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Check size={18} className="text-matrimony-700 mr-3" />
-                    <span>Priority Support</span>
-                  </div>
-                </div>
-                
-                <Button 
-                  className="w-full rounded-full bg-matrimony-600 hover:bg-matrimony-700"
-                  asChild
-                >
-                  <Link to="/register">Get Started</Link>
-                </Button>
               </div>
             </motion.div>
           </div>

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 
@@ -9,7 +9,11 @@ export const useProfile = () => {
   const [lastSuccessfulCheck, setLastSuccessfulCheck] = useState<number | null>(null);
   const [checkCount, setCheckCount] = useState(0);
   const { toast } = useToast();
-
+  
+  // Use refs to prevent unnecessary re-renders
+  const isLoadingRef = useRef(false);
+  const debouncedTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   const isAtLeast18 = (dateOfBirth: Date): boolean => {
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -23,30 +27,48 @@ export const useProfile = () => {
     return age >= 18;
   };
 
-  const checkProfileCompletion = async (userId: string): Promise<boolean> => {
+  const checkProfileCompletion = useCallback(async (userId: string): Promise<boolean> => {
+    // Don't check if already loading to prevent duplicative calls
+    if (isLoadingRef.current) {
+      console.log("Already checking profile, returning cached result");
+      return isProfileComplete;
+    }
+    
     setProfileCheckError(null);
     
+    // Use caching to prevent unnecessary database calls
     const now = Date.now();
-    if (lastSuccessfulCheck && now - lastSuccessfulCheck < 5000) {
+    if (lastSuccessfulCheck && now - lastSuccessfulCheck < 10000) { // Increased cache time to 10 seconds
       console.log("Using cached profile completion status");
       return isProfileComplete;
     }
     
-    setCheckCount(prev => prev + 1);
-    if (checkCount > 5) {
-      console.log("Maximum check attempts reached, using cached state");
-      return isProfileComplete;
+    // Debouncing logic to prevent rapid successive calls
+    if (debouncedTimeoutRef.current) {
+      clearTimeout(debouncedTimeoutRef.current);
     }
     
-    if (!navigator.onLine) {
-      console.log("Device is offline, using cached profile status");
-      return isProfileComplete;
-    }
+    // Set loading state
+    isLoadingRef.current = true;
     
     try {
+      setCheckCount(prev => prev + 1);
+      if (checkCount > 5) {
+        console.log("Maximum check attempts reached, using cached state");
+        isLoadingRef.current = false;
+        return isProfileComplete;
+      }
+      
+      if (!navigator.onLine) {
+        console.log("Device is offline, using cached profile status");
+        isLoadingRef.current = false;
+        return isProfileComplete;
+      }
+      
       if (!userId) {
         console.error('Cannot check profile: No user ID provided');
         setIsProfileComplete(false);
+        isLoadingRef.current = false;
         return false;
       }
       
@@ -79,12 +101,14 @@ export const useProfile = () => {
             });
           }
           
+          isLoadingRef.current = false;
           return isProfileComplete;
         }
         
         if (!data) {
           console.log('No profile data found for user');
           setIsProfileComplete(false);
+          isLoadingRef.current = false;
           return false;
         }
         
@@ -101,6 +125,7 @@ export const useProfile = () => {
         console.log('Profile completion check:', { isComplete, data });
         setIsProfileComplete(isComplete);
         setLastSuccessfulCheck(Date.now());
+        isLoadingRef.current = false;
         return isComplete;
       } catch (fetchError: any) {
         clearTimeout(timeoutId);
@@ -121,6 +146,7 @@ export const useProfile = () => {
         console.log('Falling back to cached profile completion state:', isProfileComplete);
         setProfileCheckError('Network error, using cached state');
         
+        isLoadingRef.current = false;
         return isProfileComplete;
       }
     } catch (error: any) {
@@ -139,9 +165,10 @@ export const useProfile = () => {
         }
       }
       
+      isLoadingRef.current = false;
       return isProfileComplete;
     }
-  };
+  }, [isProfileComplete, lastSuccessfulCheck, checkCount, profileCheckError, toast]);
 
   return {
     isProfileComplete,
