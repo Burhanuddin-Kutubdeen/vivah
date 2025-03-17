@@ -1,64 +1,128 @@
 
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React from 'react';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-
-// Importing our new component files
-import Logo from './navbar/Logo';
-import DesktopNavLinks from './navbar/DesktopNavLinks';
-import LanguageSelector from './navbar/LanguageSelector';
-import AuthButtons from './navbar/AuthButtons';
-import MobileNavbar from './navbar/MobileNavbar';
-import MobileMenu from './navbar/MobileMenu';
+import { Button } from '@/components/ui/button';
+import { Heart, MessageCircle, Search, User } from 'lucide-react';
 
 const Navbar: React.FC = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    // Close mobile menu when route changes
-    setIsMenuOpen(false);
-  }, [location]);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const { user, signOut } = useAuth();
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-sm' : 'py-5 bg-transparent'
-      }`}
-    >
+    <header className="bg-white dark:bg-gray-900 shadow-sm py-4">
       <div className="container mx-auto px-4 flex items-center justify-between">
-        <Logo />
+        {/* Logo */}
+        <Link to="/" className="text-2xl font-serif font-bold text-matrimony-700 dark:text-white">
+          Vivah
+        </Link>
 
-        {/* Desktop Navigation Links */}
-        {user && <DesktopNavLinks />}
-
-        {/* Desktop Language Selector + Auth Buttons */}
-        <div className="hidden md:flex items-center space-x-4">
-          <LanguageSelector />
-          <AuthButtons />
+        {/* Navigation Links */}
+        {user ? (
+          <nav className="hidden md:flex items-center space-x-6">
+            <NavLink 
+              to="/discover" 
+              className={({ isActive }) => 
+                `flex items-center space-x-2 text-sm font-medium ${
+                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+                }`
+              }
+            >
+              <Search className="h-4 w-4" />
+              <span>Discover</span>
+            </NavLink>
+            <NavLink 
+              to="/matches" 
+              className={({ isActive }) => 
+                `flex items-center space-x-2 text-sm font-medium ${
+                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+                }`
+              }
+            >
+              <Heart className="h-4 w-4" />
+              <span>Matches</span>
+            </NavLink>
+            <NavLink 
+              to="/messages" 
+              className={({ isActive }) => 
+                `flex items-center space-x-2 text-sm font-medium ${
+                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+                }`
+              }
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span>Messages</span>
+            </NavLink>
+            <NavLink 
+              to="/profile" 
+              className={({ isActive }) => 
+                `flex items-center space-x-2 text-sm font-medium ${
+                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+                }`
+              }
+            >
+              <User className="h-4 w-4" />
+              <span>Profile</span>
+            </NavLink>
+          </nav>
+        ) : (
+          <nav className="hidden md:flex items-center space-x-6">
+            <NavLink 
+              to="/how-it-works" 
+              className={({ isActive }) => 
+                `text-sm font-medium ${
+                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+                }`
+              }
+            >
+              How It Works
+            </NavLink>
+            <NavLink 
+              to="/success-stories" 
+              className={({ isActive }) => 
+                `text-sm font-medium ${
+                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+                }`
+              }
+            >
+              Success Stories
+            </NavLink>
+          </nav>
+        )}
+        
+        {/* Auth Buttons */}
+        <div className="flex items-center space-x-4">
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="rounded-full text-sm font-medium"
+                onClick={() => signOut()}
+              >
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="rounded-full font-medium"
+                asChild
+              >
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button 
+                size="sm"
+                className="rounded-full font-medium bg-matrimony-600 hover:bg-matrimony-700 text-white"
+                asChild
+              >
+                <Link to="/register">Register</Link>
+              </Button>
+            </>
+          )}
         </div>
-
-        {/* Mobile Navigation */}
-        <MobileNavbar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
       </div>
-
-      {/* Mobile Menu */}
-      <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
     </header>
   );
 };
