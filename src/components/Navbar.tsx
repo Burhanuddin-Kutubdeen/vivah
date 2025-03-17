@@ -3,7 +3,6 @@ import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle, Search, User } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -17,77 +16,61 @@ const Navbar: React.FC = () => {
         </Link>
 
         {/* Navigation Links */}
-        {user ? (
-          <nav className="hidden md:flex items-center space-x-6">
-            <NavLink 
-              to="/discover" 
-              className={({ isActive }) => 
-                `flex items-center space-x-2 text-sm font-medium ${
-                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
-                }`
-              }
-            >
-              <Search className="h-4 w-4" />
-              <span>Discover</span>
-            </NavLink>
-            <NavLink 
-              to="/matches" 
-              className={({ isActive }) => 
-                `flex items-center space-x-2 text-sm font-medium ${
-                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
-                }`
-              }
-            >
-              <Heart className="h-4 w-4" />
-              <span>Matches</span>
-            </NavLink>
+        <nav className="hidden md:flex items-center space-x-6">
+          <NavLink 
+            to="/" 
+            className={({ isActive }) => 
+              `text-sm font-medium ${
+                isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+              }`
+            }
+            end
+          >
+            Home
+          </NavLink>
+          <NavLink 
+            to="/discover" 
+            className={({ isActive }) => 
+              `text-sm font-medium ${
+                isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+              }`
+            }
+          >
+            Discover
+          </NavLink>
+          <NavLink 
+            to="/how-it-works" 
+            className={({ isActive }) => 
+              `text-sm font-medium ${
+                isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+              }`
+            }
+          >
+            How It Works
+          </NavLink>
+          <NavLink 
+            to="/success-stories" 
+            className={({ isActive }) => 
+              `text-sm font-medium ${
+                isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+              }`
+            }
+          >
+            Success Stories
+          </NavLink>
+          {user && (
             <NavLink 
               to="/messages" 
               className={({ isActive }) => 
-                `flex items-center space-x-2 text-sm font-medium ${
-                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
-                }`
-              }
-            >
-              <MessageCircle className="h-4 w-4" />
-              <span>Messages</span>
-            </NavLink>
-            <NavLink 
-              to="/profile" 
-              className={({ isActive }) => 
-                `flex items-center space-x-2 text-sm font-medium ${
-                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
-                }`
-              }
-            >
-              <User className="h-4 w-4" />
-              <span>Profile</span>
-            </NavLink>
-          </nav>
-        ) : (
-          <nav className="hidden md:flex items-center space-x-6">
-            <NavLink 
-              to="/how-it-works" 
-              className={({ isActive }) => 
                 `text-sm font-medium ${
                   isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
                 }`
               }
             >
-              How It Works
+              Messages
             </NavLink>
-            <NavLink 
-              to="/success-stories" 
-              className={({ isActive }) => 
-                `text-sm font-medium ${
-                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
-                }`
-              }
-            >
-              Success Stories
-            </NavLink>
-          </nav>
-        )}
+          )}
+        </nav>
         
         {/* Auth Buttons */}
         <div className="flex items-center space-x-4">
@@ -97,9 +80,17 @@ const Navbar: React.FC = () => {
                 variant="outline" 
                 size="sm"
                 className="rounded-full text-sm font-medium"
+                asChild
+              >
+                <Link to="/profile">Profile</Link>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="rounded-full text-sm font-medium"
                 onClick={() => signOut()}
               >
-                Sign Out
+                Logout
               </Button>
             </div>
           ) : (
