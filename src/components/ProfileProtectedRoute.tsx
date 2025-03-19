@@ -85,14 +85,20 @@ const ProfileProtectedRoute: React.FC<ProfileRequiredRouteProps> = ({ children }
     return <Navigate to="/login" replace />;
   }
   
+  // Special case: Always allow access to profile-setup when edit=true is in the URL
+  const isEditMode = location.search.includes('edit=true');
+  if (isEditMode && location.pathname === "/profile-setup") {
+    return <>{children}</>;
+  }
+  
   // Prevent infinite loop when already on profile-setup page
   if (!isProfileComplete && location.pathname !== "/profile-setup") {
     console.log('Profile is not complete, redirecting to profile setup');
     return <Navigate to="/profile-setup" replace />;
   }
   
-  // If on profile-setup but profile is complete, redirect to discover
-  if (isProfileComplete && location.pathname === "/profile-setup") {
+  // If on profile-setup but profile is complete and not in edit mode, redirect to discover
+  if (isProfileComplete && location.pathname === "/profile-setup" && !isEditMode) {
     console.log('Profile is already complete, redirecting to discover');
     return <Navigate to="/discover" replace />;
   }

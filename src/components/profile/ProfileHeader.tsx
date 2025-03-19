@@ -20,10 +20,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const navigate = useNavigate();
   
   const handleEditProfile = () => {
+    console.log("Edit profile button clicked");
     if (onEditProfile) {
       onEditProfile();
     } else {
-      navigate('/profile-setup?edit=true');
+      // Force navigation to profile setup with edit parameter
+      navigate('/profile-setup?edit=true', { replace: true });
     }
   };
 
