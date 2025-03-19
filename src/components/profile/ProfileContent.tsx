@@ -4,6 +4,7 @@ import ProfileHeader from './ProfileHeader';
 import ProfileAbout from './ProfileAbout';
 import ProfileInterests from './ProfileInterests';
 import ProfileContact from './ProfileContact';
+import ProfileDetails from './ProfileDetails';
 
 interface ProfileData {
   first_name?: string | null;
@@ -18,6 +19,13 @@ interface ProfileData {
   avatar_url?: string | null;
   height?: number | null;
   weight?: number | null;
+  education?: string | null;
+  job?: string | null;
+  exercise?: string | null;
+  drinking?: string | null;
+  smoking?: string | null;
+  wants_kids?: string | null;
+  has_kids?: string | null;
 }
 
 interface ProfileContentProps {
@@ -36,6 +44,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({ profileData, user, calc
       />
       <div className="px-8 pb-8">
         <ProfileAbout bio={profileData?.bio} />
+        <ProfileDetails profileData={profileData} />
         <ProfileInterests interests={profileData?.interests} />
         <ProfileContact email={user?.email} />
       </div>

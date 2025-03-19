@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Control } from 'react-hook-form';
+import { ProfileFormValues } from '../ProfileFormSchema';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 
 interface JobFieldProps {
-  control: Control<any>;
+  control: Control<ProfileFormValues>;
 }
 
 const JobField: React.FC<JobFieldProps> = ({ control }) => {
@@ -15,11 +16,13 @@ const JobField: React.FC<JobFieldProps> = ({ control }) => {
       name="job"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Current Job</FormLabel>
+          <FormLabel>Occupation</FormLabel>
           <FormControl>
-            <Input
-              placeholder="Enter your current occupation"
-              {...field}
+            <Input 
+              placeholder="Enter your current job" 
+              {...field} 
+              value={field.value || ''}
+              className="w-full"
             />
           </FormControl>
           <FormMessage />

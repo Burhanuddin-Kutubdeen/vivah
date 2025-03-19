@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Control } from 'react-hook-form';
+import { ProfileFormValues } from '../ProfileFormSchema';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface KidsWantFieldProps {
-  control: Control<any>;
+  control: Control<ProfileFormValues>;
 }
 
 const KidsWantField: React.FC<KidsWantFieldProps> = ({ control }) => {
@@ -15,20 +16,23 @@ const KidsWantField: React.FC<KidsWantFieldProps> = ({ control }) => {
       name="wants_kids"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Want Kids? (Optional)</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Select your preference about kids" />
+          <FormLabel>Want Children</FormLabel>
+          <FormControl>
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Do you want children?" />
               </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem value="want_kids">Want kids</SelectItem>
-              <SelectItem value="open_to_kids">Open to kids</SelectItem>
-              <SelectItem value="dont_want_kids">Don't want kids</SelectItem>
-              <SelectItem value="not_sure">Not sure</SelectItem>
-            </SelectContent>
-          </Select>
+              <SelectContent>
+                <SelectItem value="dont_want_kids">Don't want kids</SelectItem>
+                <SelectItem value="open_to_kids">Open to kids</SelectItem>
+                <SelectItem value="want_kids">Want kids</SelectItem>
+                <SelectItem value="not_sure">Not sure</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormControl>
           <FormMessage />
         </FormItem>
       )}

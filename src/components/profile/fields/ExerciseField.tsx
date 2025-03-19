@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Control } from 'react-hook-form';
+import { ProfileFormValues } from '../ProfileFormSchema';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface ExerciseFieldProps {
-  control: Control<any>;
+  control: Control<ProfileFormValues>;
 }
 
 const ExerciseField: React.FC<ExerciseFieldProps> = ({ control }) => {
@@ -15,19 +16,22 @@ const ExerciseField: React.FC<ExerciseFieldProps> = ({ control }) => {
       name="exercise"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Exercise (Optional)</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Select your exercise habits" />
+          <FormLabel>Exercise</FormLabel>
+          <FormControl>
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="How often do you exercise?" />
               </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="sometimes">Sometimes</SelectItem>
-              <SelectItem value="almost_never">Almost Never</SelectItem>
-            </SelectContent>
-          </Select>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="sometimes">Sometimes</SelectItem>
+                <SelectItem value="almost_never">Almost Never</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormControl>
           <FormMessage />
         </FormItem>
       )}

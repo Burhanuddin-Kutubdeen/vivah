@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Control } from 'react-hook-form';
+import { ProfileFormValues } from '../ProfileFormSchema';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface SmokingFieldProps {
-  control: Control<any>;
+  control: Control<ProfileFormValues>;
 }
 
 const SmokingField: React.FC<SmokingFieldProps> = ({ control }) => {
@@ -15,20 +16,23 @@ const SmokingField: React.FC<SmokingFieldProps> = ({ control }) => {
       name="smoking"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Smoking (Optional)</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Select your smoking habits" />
+          <FormLabel>Smoking</FormLabel>
+          <FormControl>
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Smoking habits" />
               </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem value="yes_smoke">Yes, I smoke</SelectItem>
-              <SelectItem value="sometimes_smoke">I smoke sometimes</SelectItem>
-              <SelectItem value="trying_quit">I'm trying to quit</SelectItem>
-              <SelectItem value="dont_smoke">No, I don't smoke</SelectItem>
-            </SelectContent>
-          </Select>
+              <SelectContent>
+                <SelectItem value="yes_i_smoke">Yes, I smoke</SelectItem>
+                <SelectItem value="i_smoke_sometimes">I smoke sometimes</SelectItem>
+                <SelectItem value="no_i_dont_smoke">No, I don't smoke</SelectItem>
+                <SelectItem value="im_trying_to_quit">I'm trying to quit</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormControl>
           <FormMessage />
         </FormItem>
       )}

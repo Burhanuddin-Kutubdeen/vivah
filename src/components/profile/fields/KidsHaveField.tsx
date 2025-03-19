@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Control } from 'react-hook-form';
+import { ProfileFormValues } from '../ProfileFormSchema';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface KidsHaveFieldProps {
-  control: Control<any>;
+  control: Control<ProfileFormValues>;
 }
 
 const KidsHaveField: React.FC<KidsHaveFieldProps> = ({ control }) => {
@@ -15,18 +16,21 @@ const KidsHaveField: React.FC<KidsHaveFieldProps> = ({ control }) => {
       name="has_kids"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Have Kids? (Optional)</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Do you have kids?" />
+          <FormLabel>Children</FormLabel>
+          <FormControl>
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Do you have children?" />
               </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem value="have_kids">Have kids</SelectItem>
-              <SelectItem value="dont_have_kids">Don't have kids</SelectItem>
-            </SelectContent>
-          </Select>
+              <SelectContent>
+                <SelectItem value="have_kids">Have kids</SelectItem>
+                <SelectItem value="dont_have_kids">Don't have kids</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormControl>
           <FormMessage />
         </FormItem>
       )}

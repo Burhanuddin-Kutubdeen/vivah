@@ -1,11 +1,12 @@
 
 import React from 'react';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Control } from 'react-hook-form';
+import { ProfileFormValues } from '../ProfileFormSchema';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface DrinkingFieldProps {
-  control: Control<any>;
+  control: Control<ProfileFormValues>;
 }
 
 const DrinkingField: React.FC<DrinkingFieldProps> = ({ control }) => {
@@ -15,21 +16,24 @@ const DrinkingField: React.FC<DrinkingFieldProps> = ({ control }) => {
       name="drinking"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Drinking (Optional)</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Select your drinking habits" />
+          <FormLabel>Drinking</FormLabel>
+          <FormControl>
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Drinking habits" />
               </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem value="yes_drink">Yes, I drink</SelectItem>
-              <SelectItem value="sometimes_drink">I drink sometimes</SelectItem>
-              <SelectItem value="rarely_drink">I rarely drink</SelectItem>
-              <SelectItem value="dont_drink">No, I don't drink</SelectItem>
-              <SelectItem value="sober">I'm sober</SelectItem>
-            </SelectContent>
-          </Select>
+              <SelectContent>
+                <SelectItem value="yes_i_drink">Yes, I drink</SelectItem>
+                <SelectItem value="i_drink_sometimes">I drink sometimes</SelectItem>
+                <SelectItem value="i_rarely_drink">I rarely drink</SelectItem>
+                <SelectItem value="no_i_dont_drink">No, I don't drink</SelectItem>
+                <SelectItem value="im_sober">I'm sober</SelectItem>
+              </SelectContent>
+            </Select>
+          </FormControl>
           <FormMessage />
         </FormItem>
       )}

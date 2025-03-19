@@ -3,10 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import MatchCard from '@/components/MatchCard';
 import { Button } from "@/components/ui/button";
-import { Star } from 'lucide-react';
+import { Star, Heart, MessageCircle } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from "@/integrations/supabase/client";
 
 // Sample curated matches data - would be fetched from API in production
 const allMatches = [
@@ -80,6 +82,7 @@ interface CuratedMatchesGridProps {
 const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLoading = false }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [recommendedMatches, setRecommendedMatches] = useState(allMatches);
   
   useEffect(() => {
@@ -103,6 +106,59 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLo
     }
   }, [user]);
   
+  const handleViewProfile = (profileId: string) => {
+    // Navigate to the profile detail page
+    navigate(`/profile/${profileId}`);
+  };
+
+  const handleLike = async (profileId: string, name: string) => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to like profiles",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Record the like in the database
+      const { error } = await supabase
+        .from('likes')
+        .insert({
+          user_id: user.id,
+          liked_profile_id: profileId,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      // Show success toast
+      toast({
+        title: "Interest Shown",
+        description: `${name} will be notified of your interest`,
+      });
+    } catch (error) {
+      console.error("Error liking profile:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send like. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleMessage = (profileId: string, name: string) => {
+    // Show a toast explaining the messaging flow
+    toast({
+      title: "Message Request Sent",
+      description: `You'll be able to message ${name} once they accept your request`,
+    });
+    
+    // Navigate to messages page
+    navigate('/messages');
+  };
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -171,7 +227,38 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLo
         animate="show"
       >
         {recommendedMatches.map((match) => (
-          <MatchCard key={match.id} match={match} />
+          <div key={match.id} className="relative">
+            <div 
+              onClick={() => handleViewProfile(match.id)} 
+              className="cursor-pointer"
+            >
+              <MatchCard match={match} />
+            </div>
+            <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 px-4">
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLike(match.id, match.name);
+                }}
+                size="sm" 
+                className="bg-matrimony-100 hover:bg-matrimony-200 text-matrimony-700 rounded-full flex-1"
+              >
+                <Heart size={16} className="mr-1" />
+                Like
+              </Button>
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMessage(match.id, match.name);
+                }}
+                size="sm" 
+                className="bg-matrimony-600 hover:bg-matrimony-700 text-white rounded-full flex-1"
+              >
+                <MessageCircle size={16} className="mr-1" />
+                Message
+              </Button>
+            </div>
+          </div>
         ))}
       </motion.div>
     </div>
