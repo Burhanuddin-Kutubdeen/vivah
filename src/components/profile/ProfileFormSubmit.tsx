@@ -11,18 +11,25 @@ interface ProfileFormSubmitProps {
   avatarUrl: string | null;
   values: ProfileFormValues;
   isEdit: boolean;
+  onSubmit: () => void;
+  isSubmitting: boolean;
 }
 
 const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({ 
   avatarUrl, 
   values, 
-  isEdit
+  isEdit,
+  onSubmit,
+  isSubmitting: formIsSubmitting
 }) => {
   const { user, setIsProfileComplete, checkProfileCompletion } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [localIsSubmitting, setLocalIsSubmitting] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  
+  // Use either the form's isSubmitting state or our local state
+  const isSubmitting = formIsSubmitting || localIsSubmitting;
 
   const handleSubmit = async () => {
     try {
@@ -46,7 +53,7 @@ const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
         return;
       }
       
-      setIsSubmitting(true);
+      setLocalIsSubmitting(true);
       console.log("Submitting profile with values:", values);
       
       // Check if we're offline
@@ -170,7 +177,9 @@ const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
         });
       }
     } finally {
-      setIsSubmitting(false);
+      setLocalIsSubmitting(false);
+      // Trigger the onSubmit callback for the parent form
+      onSubmit();
     }
   };
 
@@ -179,6 +188,7 @@ const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
       isSubmitting={isSubmitting} 
       disabled={saveSuccess}
       text={saveSuccess ? "Profile Saved!" : isEdit ? "Update Profile" : "Complete Profile"}
+      onClick={handleSubmit}
     />
   );
 };

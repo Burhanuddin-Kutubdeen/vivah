@@ -7,18 +7,21 @@ interface SubmitButtonProps {
   isSubmitting: boolean;
   text?: string;
   disabled?: boolean;
+  onClick?: () => void;
 }
 
 const SubmitButton: React.FC<SubmitButtonProps> = ({ 
   isSubmitting, 
   text = "Complete Profile",
-  disabled = false
+  disabled = false,
+  onClick
 }) => {
   return (
     <Button 
-      type="submit" 
+      type={onClick ? "button" : "submit"}
       className="w-full rounded-full bg-matrimony-600 hover:bg-matrimony-700 mt-4 transition-all duration-300"
       disabled={isSubmitting || disabled}
+      onClick={onClick}
     >
       {isSubmitting ? (
         <div className="flex items-center justify-center">

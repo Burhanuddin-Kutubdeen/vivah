@@ -21,6 +21,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 }) => {
   const { user } = useAuth();
   const { form, submitAttempted, setSubmitAttempted } = useProfileForm(user?.id, connectionError);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
   const onSubmit = async (values: any) => {
@@ -30,7 +31,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       return;
     }
     
-    // All the submission logic is now in the ProfileFormSubmit component
+    setIsSubmitting(true);
+    // The actual submission happens in ProfileFormSubmit
+  };
+
+  const handleFormSubmitComplete = () => {
+    setIsSubmitting(false);
+    setSaveSuccess(true);
   };
 
   return (
@@ -53,7 +60,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
         <ProfileFormSubmit 
           avatarUrl={avatarUrl} 
           values={form.getValues()} 
-          isEdit={isEdit} 
+          isEdit={isEdit}
+          onSubmit={handleFormSubmitComplete}
+          isSubmitting={isSubmitting}
         />
       </form>
     </Form>
