@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,6 +21,13 @@ import LocationSearchInput from './LocationSearchInput';
 import BioField from './fields/BioField';
 import InterestSelector from './InterestSelector';
 import SubmitButton from './fields/SubmitButton';
+import EducationField from './fields/EducationField';
+import JobField from './fields/JobField';
+import ExerciseField from './fields/ExerciseField';
+import DrinkingField from './fields/DrinkingField';
+import SmokingField from './fields/SmokingField';
+import KidsWantField from './fields/KidsWantField';
+import KidsHaveField from './fields/KidsHaveField';
 
 // Form schema validation
 const formSchema = z.object({
@@ -49,15 +57,23 @@ const formSchema = z.object({
   interests: z.array(z.string()).min(1, "At least one interest is required"),
   height: z.string().optional(),
   weight: z.string().optional(),
+  education: z.string().optional(),
+  job: z.string().optional(),
+  exercise: z.string().optional(),
+  drinking: z.string().optional(),
+  smoking: z.string().optional(),
+  wants_kids: z.string().optional(),
+  has_kids: z.string().optional(),
 });
 
 interface ProfileFormProps {
   avatarUrl: string | null;
   translate: (key: string) => string;
   connectionError?: boolean;
+  isEdit?: boolean;
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connectionError = false }) => {
+const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connectionError = false, isEdit = false }) => {
   const { user, setIsProfileComplete, checkProfileCompletion } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -74,7 +90,14 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
       interests: [],
       height: "",
       weight: "",
-      gender: "male"
+      gender: "male",
+      education: "",
+      job: "",
+      exercise: "",
+      drinking: "",
+      smoking: "",
+      wants_kids: "",
+      has_kids: ""
     },
   });
 
@@ -92,7 +115,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
         
         const { data, error } = await supabase
           .from('profiles')
-          .select('date_of_birth, gender, civil_status, religion, location, bio, interests, height, weight')
+          .select('date_of_birth, gender, civil_status, religion, location, bio, interests, height, weight, education, job, exercise, drinking, smoking, wants_kids, has_kids')
           .eq('id', user.id)
           .maybeSingle();
           
@@ -124,7 +147,14 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
             bio: data.bio || "",
             interests: data.interests || [],
             height: data.height ? String(data.height) : "",
-            weight: data.weight ? String(data.weight) : ""
+            weight: data.weight ? String(data.weight) : "",
+            education: data.education || "",
+            job: data.job || "",
+            exercise: data.exercise || "",
+            drinking: data.drinking || "",
+            smoking: data.smoking || "",
+            wants_kids: data.wants_kids || "",
+            has_kids: data.has_kids || ""
           });
         }
       } catch (error) {
@@ -198,7 +228,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
         // Still allow navigation as if it succeeded
         setTimeout(() => {
           setIsProfileComplete(true);
-          navigate('/discover', { replace: true });
+          if (isEdit) {
+            navigate('/profile', { replace: true });
+          } else {
+            navigate('/discover', { replace: true });
+          }
         }, 800);
         
         return;
@@ -222,6 +256,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
           height: values.height ? parseFloat(values.height) : null,
           weight: values.weight ? parseFloat(values.weight) : null,
           avatar_url: avatarUrl,
+          education: values.education || null,
+          job: values.job || null,
+          exercise: values.exercise || null,
+          drinking: values.drinking || null,
+          smoking: values.smoking || null,
+          wants_kids: values.wants_kids || null,
+          has_kids: values.has_kids || null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id);
@@ -241,7 +282,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
       // Show success message
       toast({
         title: "Profile updated",
-        description: "Your profile has been completed successfully",
+        description: isEdit ? "Your profile has been updated successfully" : "Your profile has been completed successfully",
       });
       
       setSaveSuccess(true);
@@ -251,16 +292,24 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
         await checkProfileCompletion(user.id);
         setIsProfileComplete(true);
         
-        // Navigate to discover page with a delay to ensure state is updated
+        // Navigate based on whether this is an edit or new profile
         setTimeout(() => {
-          navigate('/discover', { replace: true });
+          if (isEdit) {
+            navigate('/profile', { replace: true });
+          } else {
+            navigate('/discover', { replace: true });
+          }
         }, 800);
       } catch (checkError) {
         console.error("Error checking profile completion:", checkError);
         // Still navigate even if check fails
         setIsProfileComplete(true);
         setTimeout(() => {
-          navigate('/discover', { replace: true });
+          if (isEdit) {
+            navigate('/profile', { replace: true });
+          } else {
+            navigate('/discover', { replace: true });
+          }
         }, 800);
       }
     } catch (error: any) {
@@ -302,11 +351,32 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
           {/* Religion (Optional) */}
           <ReligionField control={form.control} />
 
+          {/* Education */}
+          <EducationField control={form.control} />
+          
+          {/* Job */}
+          <JobField control={form.control} />
+
           {/* Height */}
           <HeightSelector control={form.control} />
 
           {/* Weight */}
           <WeightField control={form.control} />
+          
+          {/* Exercise */}
+          <ExerciseField control={form.control} />
+          
+          {/* Drinking */}
+          <DrinkingField control={form.control} />
+          
+          {/* Smoking */}
+          <SmokingField control={form.control} />
+          
+          {/* Want Kids */}
+          <KidsWantField control={form.control} />
+          
+          {/* Have Kids */}
+          <KidsHaveField control={form.control} />
         </div>
 
         {/* Location */}
@@ -329,7 +399,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ avatarUrl, translate, connect
         <SubmitButton 
           isSubmitting={isSubmitting} 
           disabled={saveSuccess}
-          text={saveSuccess ? "Profile Saved!" : "Complete Profile"}
+          text={saveSuccess ? "Profile Saved!" : isEdit ? "Update Profile" : "Complete Profile"}
         />
       </form>
     </Form>

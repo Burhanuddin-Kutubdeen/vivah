@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      likes: {
+        Row: {
+          created_at: string
+          id: string
+          liked_profile_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          liked_profile_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          liked_profile_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -16,15 +40,22 @@ export type Database = {
           civil_status: string | null
           created_at: string
           date_of_birth: string | null
+          drinking: string | null
+          education: string | null
+          exercise: string | null
           first_name: string | null
           gender: string | null
+          has_kids: string | null
           height: number | null
           id: string
           interests: string[] | null
+          job: string | null
           last_name: string | null
           location: string | null
           religion: string | null
+          smoking: string | null
           updated_at: string
+          wants_kids: string | null
           weight: number | null
         }
         Insert: {
@@ -33,15 +64,22 @@ export type Database = {
           civil_status?: string | null
           created_at?: string
           date_of_birth?: string | null
+          drinking?: string | null
+          education?: string | null
+          exercise?: string | null
           first_name?: string | null
           gender?: string | null
+          has_kids?: string | null
           height?: number | null
           id: string
           interests?: string[] | null
+          job?: string | null
           last_name?: string | null
           location?: string | null
           religion?: string | null
+          smoking?: string | null
           updated_at?: string
+          wants_kids?: string | null
           weight?: number | null
         }
         Update: {
@@ -50,15 +88,22 @@ export type Database = {
           civil_status?: string | null
           created_at?: string
           date_of_birth?: string | null
+          drinking?: string | null
+          education?: string | null
+          exercise?: string | null
           first_name?: string | null
           gender?: string | null
+          has_kids?: string | null
           height?: number | null
           id?: string
           interests?: string[] | null
+          job?: string | null
           last_name?: string | null
           location?: string | null
           religion?: string | null
+          smoking?: string | null
           updated_at?: string
+          wants_kids?: string | null
           weight?: number | null
         }
         Relationships: []

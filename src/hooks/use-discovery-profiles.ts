@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { discoveryProfiles } from '@/data/discovery-profiles';
 import { UseDiscoveryProfilesOptions, DiscoveryProfile } from '@/types/discovery';
@@ -26,41 +26,58 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
     console.log("Applied filters with preferences:", preferences);
     console.log("Matched profiles count:", matchedProfiles.length);
     
+    // Sort profiles by shared interests if user has interests
+    if (user?.interests && user.interests.length > 0) {
+      matchedProfiles.sort((a, b) => {
+        const aInterests = a.interests.filter(interest => 
+          user.interests?.includes(interest)).length;
+        const bInterests = b.interests.filter(interest => 
+          user.interests?.includes(interest)).length;
+        return bInterests - aInterests; // Descending order
+      });
+    }
+    
     setFilteredProfiles(matchedProfiles);
     setCurrentProfileIndex(0); // Reset to first profile after filtering
   }, [preferences, user]);
 
-  // Current profile to display
-  const currentProfile = filteredProfiles[currentProfileIndex] || null;
-
   // Function to notify a liked profile
-  const notifyProfileLiked = async (likedProfile: DiscoveryProfile) => {
+  const notifyProfileLiked = useCallback(async (likedProfile: DiscoveryProfile) => {
     try {
       if (!user) return;
       
-      // In a real app, we would send this to a database table or notification system
-      // For this demo, we'll just log and show a toast
       console.log(`${user.email} liked ${likedProfile.name}'s profile`);
       
-      // This simulates sending the notification to the liked profile
-      // In a real app, we would store this in a database
+      // Store the like in the database
+      const { error } = await supabase
+        .from('likes')
+        .upsert({
+          user_id: user.id,
+          liked_profile_id: likedProfile.id,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        }, { onConflict: 'user_id, liked_profile_id' });
+      
+      if (error) {
+        console.error("Error storing like:", error);
+        return;
+      }
+      
       toast.success(`Notification sent to ${likedProfile.name}`);
       
-      // In a production app with a proper backend, we would:
-      // 1. Create a "likes" or "matches" table in the database
-      // 2. Store the user ID and liked profile ID
-      // 3. Have a notification system to alert the liked profile
     } catch (error) {
       console.error("Error sending like notification:", error);
     }
-  };
+  }, [user]);
 
-  const handleSwipe = (dir: 'left' | 'right') => {
+  const handleSwipe = useCallback((dir: 'left' | 'right') => {
     setDirection(dir);
     
     // If swiping right (like) and not premium, reduce remaining likes
-    if (dir === 'right' && !isPremium) {
-      setRemainingLikes(prev => Math.max(0, prev - 1));
+    if (dir === 'right') {
+      if (!isPremium) {
+        setRemainingLikes(prev => Math.max(0, prev - 1));
+      }
       
       // When swiping right, notify the profile that was liked
       if (currentProfile) {
@@ -77,9 +94,9 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
       }
       setDirection(null);
     }, 300);
-  };
+  }, [currentProfileIndex, filteredProfiles.length, isPremium, currentProfile, notifyProfileLiked]);
 
-  const handleSuperLike = () => {
+  const handleSuperLike = useCallback(() => {
     if (!isPremium) return;
     
     // Logic for super like
@@ -98,7 +115,10 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
         setCurrentProfileIndex(0);
       }
     }, 300);
-  };
+  }, [currentProfile, currentProfileIndex, filteredProfiles.length, isPremium, notifyProfileLiked]);
+  
+  // Current profile to display
+  const currentProfile = filteredProfiles[currentProfileIndex] || null;
   
   // Function to apply new preferences directly
   const applyPreferences = (newPreferences: typeof preferences) => {

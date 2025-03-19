@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import AnimatedTransition from '@/components/AnimatedTransition';
@@ -8,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import ProfileLoading from '@/components/profile/ProfileLoading';
 import ProfileContent from '@/components/profile/ProfileContent';
 import ProfileTabs from '@/components/profile/ProfileTabs';
+import { Button } from '@/components/ui/button';
+import { Edit } from 'lucide-react';
 
 // Sample matches data (this would come from an API in a real app)
 const sampleMatches = [
@@ -54,12 +57,20 @@ interface ProfileData {
   avatar_url?: string | null;
   height?: number | null;
   weight?: number | null;
+  education?: string | null;
+  job?: string | null;
+  exercise?: string | null;
+  drinking?: string | null;
+  smoking?: string | null;
+  wants_kids?: string | null;
+  has_kids?: string | null;
 }
 
 const Profile = () => {
   const { user } = useAuth();
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   
   // Calculate age from date of birth
   const calculateAge = (dateOfBirth: string): number => {
@@ -104,6 +115,10 @@ const Profile = () => {
     fetchProfile();
   }, [user]);
 
+  const handleEditProfile = () => {
+    navigate('/profile-setup?edit=true');
+  };
+
   if (loading) {
     return <ProfileLoading />;
   }
@@ -116,6 +131,17 @@ const Profile = () => {
         <main className="pt-24 pb-16 px-4">
           <div className="container mx-auto">
             <div className="max-w-4xl mx-auto">
+              <div className="mb-4 flex justify-end">
+                <Button 
+                  onClick={handleEditProfile}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit Profile
+                </Button>
+              </div>
+
               <ProfileContent 
                 profileData={profileData} 
                 user={user} 

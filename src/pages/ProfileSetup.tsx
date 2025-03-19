@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -13,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const ProfileSetup = () => {
+  const location = useLocation();
+  const isEditMode = location.search.includes('edit=true');
   const { user, isProfileComplete } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -98,9 +101,9 @@ const ProfileSetup = () => {
     return () => window.removeEventListener('online', handleOnline);
   }, [fetchProfile, toast]);
   
-  // Redirect if profile is already complete, with improved state handling
+  // Redirect if profile is already complete and not in edit mode
   useEffect(() => {
-    if (isProfileComplete && !redirectAttempted && !isLoading) {
+    if (isProfileComplete && !redirectAttempted && !isLoading && !isEditMode) {
       console.log("Profile is complete, navigating to discover page");
       setRedirectAttempted(true);
       
@@ -111,7 +114,7 @@ const ProfileSetup = () => {
       
       return () => clearTimeout(redirectTimer);
     }
-  }, [isProfileComplete, navigate, redirectAttempted, isLoading]);
+  }, [isProfileComplete, navigate, redirectAttempted, isLoading, isEditMode]);
 
   return (
     <AnimatedTransition>
@@ -137,9 +140,15 @@ const ProfileSetup = () => {
             
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 border border-gray-100 dark:border-gray-700">
               <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold mb-2">{translate('profile_setup_title')}</h1>
+                <h1 className="text-3xl font-bold mb-2">
+                  {isEditMode 
+                    ? translate('profile_edit_title') || 'Edit Profile' 
+                    : translate('profile_setup_title')}
+                </h1>
                 <p className="text-matrimony-600 dark:text-matrimony-300">
-                  {translate('profile_setup_subtitle')}
+                  {isEditMode 
+                    ? translate('profile_edit_subtitle') || 'Update your profile information' 
+                    : translate('profile_setup_subtitle')}
                 </p>
               </div>
 
@@ -153,6 +162,7 @@ const ProfileSetup = () => {
                 avatarUrl={avatarUrl} 
                 translate={translate} 
                 connectionError={connectionError}
+                isEdit={isEditMode}
               />
             </div>
           </div>

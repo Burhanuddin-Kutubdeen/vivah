@@ -1,13 +1,14 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import MatchCard from '@/components/MatchCard';
 import { Button } from "@/components/ui/button";
 import { Star } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from '@/contexts/AuthContext';
 
 // Sample curated matches data - would be fetched from API in production
-const curatedMatches = [
+const allMatches = [
   {
     id: '1',
     name: 'Anushka',
@@ -15,7 +16,8 @@ const curatedMatches = [
     occupation: 'Software Engineer',
     imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1064&q=80',
     matchPercentage: 95,
-    isNewMatch: true
+    isNewMatch: true,
+    interests: ["Technology", "Reading", "Travel", "Music"]
   },
   {
     id: '2',
@@ -24,7 +26,8 @@ const curatedMatches = [
     occupation: 'Doctor',
     imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
     matchPercentage: 88,
-    isNewMatch: false
+    isNewMatch: false,
+    interests: ["Fitness", "Travel", "Art", "Cooking"]
   },
   {
     id: '3',
@@ -33,7 +36,8 @@ const curatedMatches = [
     occupation: 'Marketing Manager',
     imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
     matchPercentage: 92,
-    isNewMatch: true
+    isNewMatch: true,
+    interests: ["Photography", "Travel", "Music", "Dancing"]
   },
   {
     id: '4',
@@ -42,7 +46,28 @@ const curatedMatches = [
     occupation: 'Architect',
     imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
     matchPercentage: 85,
-    isNewMatch: false
+    isNewMatch: false,
+    interests: ["Art", "Design", "Architecture", "History"]
+  },
+  {
+    id: '5',
+    name: 'Maya',
+    age: 26,
+    occupation: 'Teacher',
+    imageUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80',
+    matchPercentage: 78,
+    isNewMatch: true,
+    interests: ["Reading", "Education", "Writing", "Music"]
+  },
+  {
+    id: '6',
+    name: 'Vikram',
+    age: 33,
+    occupation: 'Financial Analyst',
+    imageUrl: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1248&q=80',
+    matchPercentage: 82,
+    isNewMatch: false,
+    interests: ["Finance", "Technology", "Travel", "Sports"]
   }
 ];
 
@@ -52,6 +77,25 @@ interface CuratedMatchesGridProps {
 }
 
 const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLoading = false }) => {
+  const { user } = useAuth();
+  const [recommendedMatches, setRecommendedMatches] = useState(allMatches);
+  
+  useEffect(() => {
+    if (user?.interests && user.interests.length > 0) {
+      // Sort profiles by shared interests if user has interests
+      const sortedMatches = [...allMatches].sort((a, b) => {
+        const aInterests = a.interests.filter(interest => 
+          user.interests?.includes(interest)).length;
+        const bInterests = b.interests.filter(interest => 
+          user.interests?.includes(interest)).length;
+        return bInterests - aInterests; // Descending order
+      });
+      
+      // Take the top 4 matches
+      setRecommendedMatches(sortedMatches.slice(0, 4));
+    }
+  }, [user]);
+  
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -110,7 +154,7 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLo
       </div>
       
       <p className="text-sm text-matrimony-500 dark:text-matrimony-400 mb-4">
-        Last refreshed: {formattedDate}
+        Last refreshed: {formattedDate} • Sorted by shared interests
       </p>
 
       <motion.div 
@@ -119,7 +163,7 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLo
         initial="hidden"
         animate="show"
       >
-        {curatedMatches.map((match) => (
+        {recommendedMatches.map((match) => (
           <MatchCard key={match.id} match={match} />
         ))}
       </motion.div>

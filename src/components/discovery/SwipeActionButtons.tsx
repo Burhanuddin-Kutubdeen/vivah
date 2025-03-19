@@ -1,12 +1,13 @@
 
 import React from 'react';
-import { Heart, X } from 'lucide-react';
+import { Heart, X, Star } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface SwipeActionButtonsProps {
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
+  onSuperLike?: () => void;
   isOffline: boolean;
   isPremium: boolean;
   remainingLikes: number;
@@ -15,6 +16,7 @@ interface SwipeActionButtonsProps {
 const SwipeActionButtons: React.FC<SwipeActionButtonsProps> = ({
   onSwipeLeft,
   onSwipeRight,
+  onSuperLike,
   isOffline,
   isPremium,
   remainingLikes
@@ -40,6 +42,18 @@ const SwipeActionButtons: React.FC<SwipeActionButtonsProps> = ({
       >
         <X className="h-8 w-8 text-red-500" />
       </Button>
+      
+      {isPremium && onSuperLike && (
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-16 w-16 rounded-full border-matrimony-200 hover:border-blue-400 hover:bg-blue-50 dark:border-gray-700 dark:hover:border-blue-400 dark:hover:bg-gray-800"
+          onClick={onSuperLike}
+          disabled={isOffline}
+        >
+          <Star className="h-8 w-8 text-blue-500" />
+        </Button>
+      )}
       
       <Button 
         variant="outline" 
