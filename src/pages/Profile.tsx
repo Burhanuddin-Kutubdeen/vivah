@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -12,7 +11,6 @@ import ProfileTabs from '@/components/profile/ProfileTabs';
 import { Button } from '@/components/ui/button';
 import { Edit } from 'lucide-react';
 
-// Sample matches data (this would come from an API in a real app)
 const sampleMatches = [
   {
     id: '1',
@@ -43,7 +41,6 @@ const sampleMatches = [
   },
 ];
 
-// Define the profile data structure
 interface ProfileData {
   first_name?: string | null;
   last_name?: string | null;
@@ -72,7 +69,6 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   
-  // Calculate age from date of birth
   const calculateAge = (dateOfBirth: string): number => {
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -86,7 +82,6 @@ const Profile = () => {
     return age;
   };
 
-  // Fetch user profile data
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;

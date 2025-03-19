@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Star } from 'lucide-react';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 // Sample curated matches data - would be fetched from API in production
 const allMatches = [
@@ -78,6 +79,7 @@ interface CuratedMatchesGridProps {
 
 const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLoading = false }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [recommendedMatches, setRecommendedMatches] = useState(allMatches);
   
   useEffect(() => {
@@ -93,10 +95,10 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLo
           userInterests.includes(interest)).length;
         const bInterests = b.interests.filter(interest => 
           userInterests.includes(interest)).length;
-        return bInterests - aInterests; // Descending order
+        return bInterests - aInterests; // Descending order - most shared interests first
       });
       
-      // Take the top 4 matches
+      // Take the top 4 matches with most shared interests
       setRecommendedMatches(sortedMatches.slice(0, 4));
     }
   }, [user]);
