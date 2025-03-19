@@ -81,13 +81,18 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLo
   const [recommendedMatches, setRecommendedMatches] = useState(allMatches);
   
   useEffect(() => {
-    if (user?.interests && user.interests.length > 0) {
+    // We'll check if the user has any interests stored in their metadata or profile
+    const userInterests = user?.user_metadata?.interests || 
+                          user?.user_metadata?.profile?.interests || 
+                          [];
+    
+    if (userInterests && userInterests.length > 0) {
       // Sort profiles by shared interests if user has interests
       const sortedMatches = [...allMatches].sort((a, b) => {
         const aInterests = a.interests.filter(interest => 
-          user.interests?.includes(interest)).length;
+          userInterests.includes(interest)).length;
         const bInterests = b.interests.filter(interest => 
-          user.interests?.includes(interest)).length;
+          userInterests.includes(interest)).length;
         return bInterests - aInterests; // Descending order
       });
       

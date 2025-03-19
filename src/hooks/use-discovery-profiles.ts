@@ -15,6 +15,9 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
   const [remainingLikes, setRemainingLikes] = useState(isPremium ? Infinity : 10);
   const { user } = useAuth();
   const hasProfiles = filteredProfiles.length > 0;
+  
+  // Define currentProfile here to avoid variable use before declaration
+  const currentProfile = filteredProfiles[currentProfileIndex] || null;
 
   // Filter and sort profiles based on preferences and heterosexual matching
   useEffect(() => {
@@ -27,12 +30,16 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
     console.log("Matched profiles count:", matchedProfiles.length);
     
     // Sort profiles by shared interests if user has interests
-    if (user?.interests && user.interests.length > 0) {
+    const userInterests = user?.user_metadata?.interests || 
+                         user?.user_metadata?.profile?.interests || 
+                         [];
+                         
+    if (userInterests && userInterests.length > 0) {
       matchedProfiles.sort((a, b) => {
         const aInterests = a.interests.filter(interest => 
-          user.interests?.includes(interest)).length;
+          userInterests.includes(interest)).length;
         const bInterests = b.interests.filter(interest => 
-          user.interests?.includes(interest)).length;
+          userInterests.includes(interest)).length;
         return bInterests - aInterests; // Descending order
       });
     }
@@ -116,9 +123,6 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
       }
     }, 300);
   }, [currentProfile, currentProfileIndex, filteredProfiles.length, isPremium, notifyProfileLiked]);
-  
-  // Current profile to display
-  const currentProfile = filteredProfiles[currentProfileIndex] || null;
   
   // Function to apply new preferences directly
   const applyPreferences = (newPreferences: typeof preferences) => {
