@@ -1,14 +1,14 @@
-
 import { DiscoveryProfile, DiscoveryProfilePreferences } from "@/types/discovery";
 
 /**
  * Filters profiles based on user's gender for heterosexual matching
  */
 export function filterByGender(profiles: DiscoveryProfile[], userGender: string): DiscoveryProfile[] {
+  // Ensure we only show opposite gender profiles for heterosexual matching
   return profiles.filter(profile => {
     if (userGender === 'male') return profile.gender === 'female';
     if (userGender === 'female') return profile.gender === 'male';
-    return true; // Fallback if gender not specified
+    return false; // If gender is not specified, don't show any profiles
   });
 }
 
@@ -54,17 +54,13 @@ export function applyAllFilters(
   userGender: string,
   preferences?: DiscoveryProfilePreferences
 ): DiscoveryProfile[] {
-  // Apply gender filter (heterosexual matching)
+  // Apply gender filter (heterosexual matching) FIRST
   let filteredProfiles = filterByGender(profiles, userGender);
   
   if (preferences) {
-    // Apply age filter
+    // Then apply other filters
     filteredProfiles = filterByAge(filteredProfiles, preferences.ageRange);
-    
-    // Apply religion filter
     filteredProfiles = filterByReligion(filteredProfiles, preferences.religion);
-    
-    // Apply civil status filter
     filteredProfiles = filterByCivilStatus(filteredProfiles, preferences.civilStatus);
   }
   

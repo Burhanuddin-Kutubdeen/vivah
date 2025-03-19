@@ -2,18 +2,19 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Camera, Edit } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 interface ProfileHeaderProps {
   profileData: any;
   user: any;
   calculateAge: (dateOfBirth: string) => number;
+  onEditProfile?: () => void;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ 
   profileData, 
   user,
-  calculateAge
+  calculateAge,
+  onEditProfile
 }) => {
   return (
     <>
@@ -63,16 +64,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               {profileData?.religion && ` • ${profileData.religion.charAt(0).toUpperCase() + profileData.religion.slice(1)}`}
             </p>
           </div>
-          <Button 
-            variant="outline" 
-            className="rounded-full border-matrimony-200 hover:border-matrimony-300"
-            asChild
-          >
-            <Link to="/profile-setup">
+          {onEditProfile && (
+            <Button 
+              variant="outline" 
+              className="rounded-full border-matrimony-200 hover:border-matrimony-300"
+              onClick={onEditProfile}
+            >
               <Edit className="h-4 w-4 mr-2" />
               Edit Profile
-            </Link>
-          </Button>
+            </Button>
+          )}
         </div>
       </div>
     </>

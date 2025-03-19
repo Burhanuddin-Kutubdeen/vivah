@@ -32,15 +32,22 @@ interface ProfileContentProps {
   profileData: ProfileData | null;
   user: any;
   calculateAge: (dateOfBirth: string) => number;
+  onEditProfile?: () => void;
 }
 
-const ProfileContent: React.FC<ProfileContentProps> = ({ profileData, user, calculateAge }) => {
+const ProfileContent: React.FC<ProfileContentProps> = ({ 
+  profileData, 
+  user, 
+  calculateAge,
+  onEditProfile 
+}) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
       <ProfileHeader 
         profileData={profileData} 
         user={user} 
-        calculateAge={calculateAge} 
+        calculateAge={calculateAge}
+        onEditProfile={onEditProfile}
       />
       <div className="px-8 pb-8">
         <ProfileAbout bio={profileData?.bio} />

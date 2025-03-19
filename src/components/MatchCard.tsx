@@ -63,9 +63,11 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   
   const handleMessage = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
+    
+    // Navigate to the messages page with this specific user's conversation open
+    navigate(`/messages?userId=${match.id}&name=${encodeURIComponent(match.name)}`);
+    
     toast.info(`Waiting for ${match.name} to accept your message request`);
-    // In a real app, we would navigate to the messages page
-    // navigate('/messages/${match.id}');
   };
 
   return (

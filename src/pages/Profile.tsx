@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -9,8 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 import ProfileLoading from '@/components/profile/ProfileLoading';
 import ProfileContent from '@/components/profile/ProfileContent';
 import ProfileTabs from '@/components/profile/ProfileTabs';
-import { Button } from '@/components/ui/button';
-import { Edit } from 'lucide-react';
 
 const sampleMatches = [
   {
@@ -127,21 +124,11 @@ const Profile = () => {
         <main className="pt-24 pb-16 px-4">
           <div className="container mx-auto">
             <div className="max-w-4xl mx-auto">
-              <div className="mb-4 flex justify-end">
-                <Button 
-                  onClick={handleEditProfile}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <Edit className="h-4 w-4" />
-                  Edit Profile
-                </Button>
-              </div>
-
               <ProfileContent 
                 profileData={profileData} 
                 user={user} 
-                calculateAge={calculateAge} 
+                calculateAge={calculateAge}
+                onEditProfile={handleEditProfile} 
               />
 
               <ProfileTabs matches={sampleMatches} />
