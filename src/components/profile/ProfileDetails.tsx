@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Briefcase, Ruler, Activity, Wine, Cigarette, Baby } from 'lucide-react';
+import { Briefcase, Ruler, Activity, Wine, Cigarette, Baby, GraduationCap, Weight } from 'lucide-react';
 
 interface ProfileData {
   education?: string | null;
@@ -33,14 +33,24 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ profileData }) => {
   
   const details = [
     {
+      icon: <GraduationCap size={18} />,
+      label: "Education",
+      value: formatValue(profileData.education)
+    },
+    {
       icon: <Briefcase size={18} />,
-      label: "Education & Work",
-      value: `${formatValue(profileData.education)} • ${profileData.job || 'Not specified'}`
+      label: "Occupation",
+      value: profileData.job || 'Not specified'
     },
     {
       icon: <Ruler size={18} />,
-      label: "Height & Weight",
-      value: `${profileData.height ? `${profileData.height} cm` : 'Not specified'} • ${profileData.weight ? `${profileData.weight} kg` : 'Not specified'}`
+      label: "Height",
+      value: profileData.height ? `${profileData.height} cm` : 'Not specified'
+    },
+    {
+      icon: <Weight size={18} />,
+      label: "Weight",
+      value: profileData.weight ? `${profileData.weight} kg` : 'Not specified'
     },
     {
       icon: <Activity size={18} />,
@@ -59,8 +69,13 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ profileData }) => {
     },
     {
       icon: <Baby size={18} />,
-      label: "Children",
-      value: `${formatValue(profileData.has_kids)} • ${formatValue(profileData.wants_kids)}`
+      label: "Have Children",
+      value: formatValue(profileData.has_kids)
+    },
+    {
+      icon: <Baby size={18} />,
+      label: "Want Children",
+      value: formatValue(profileData.wants_kids)
     }
   ];
 

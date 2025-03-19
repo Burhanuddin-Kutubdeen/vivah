@@ -3,7 +3,6 @@ import React from 'react';
 import ProfileHeader from './ProfileHeader';
 import ProfileAbout from './ProfileAbout';
 import ProfileInterests from './ProfileInterests';
-import ProfileContact from './ProfileContact';
 import ProfileDetails from './ProfileDetails';
 
 interface ProfileData {
@@ -53,7 +52,6 @@ const ProfileContent: React.FC<ProfileContentProps> = ({
         <ProfileAbout bio={profileData?.bio} />
         <ProfileDetails profileData={profileData} />
         <ProfileInterests interests={profileData?.interests} />
-        <ProfileContact email={user?.email} />
       </div>
     </div>
   );
