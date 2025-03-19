@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Camera, Edit } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface ProfileHeaderProps {
   profileData: any;
@@ -16,6 +17,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   calculateAge,
   onEditProfile
 }) => {
+  const navigate = useNavigate();
+  
+  const handleEditProfile = () => {
+    if (onEditProfile) {
+      onEditProfile();
+    } else {
+      navigate('/profile-setup?edit=true');
+    }
+  };
+
   return (
     <>
       {/* Profile Header */}
@@ -64,16 +75,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               {profileData?.religion && ` • ${profileData.religion.charAt(0).toUpperCase() + profileData.religion.slice(1)}`}
             </p>
           </div>
-          {onEditProfile && (
-            <Button 
-              variant="outline" 
-              className="rounded-full border-matrimony-200 hover:border-matrimony-300"
-              onClick={onEditProfile}
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Profile
-            </Button>
-          )}
+          <Button 
+            variant="outline" 
+            className="rounded-full border-matrimony-200 hover:border-matrimony-300"
+            onClick={handleEditProfile}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            Edit Profile
+          </Button>
         </div>
       </div>
     </>

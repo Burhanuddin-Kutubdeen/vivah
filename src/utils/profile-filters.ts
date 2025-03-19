@@ -1,3 +1,4 @@
+
 import { DiscoveryProfile, DiscoveryProfilePreferences } from "@/types/discovery";
 
 /**
@@ -54,8 +55,11 @@ export function applyAllFilters(
   userGender: string,
   preferences?: DiscoveryProfilePreferences
 ): DiscoveryProfile[] {
-  // Apply gender filter (heterosexual matching) FIRST
+  // Apply gender filter (heterosexual matching) FIRST - prioritizing this filter
   let filteredProfiles = filterByGender(profiles, userGender);
+  
+  // Log the filtered profiles count for debugging
+  console.log(`After gender filtering for ${userGender} user: ${filteredProfiles.length} profiles remaining`);
   
   if (preferences) {
     // Then apply other filters

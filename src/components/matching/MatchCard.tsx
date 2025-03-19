@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from 'framer-motion';
 import { Match } from '@/hooks/use-matches';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface MatchCardProps {
   match: Match;
@@ -14,6 +16,19 @@ interface MatchCardProps {
 
 const MatchCard: React.FC<MatchCardProps> = ({ match, onLike, onMessage }) => {
   const { profile, matchDetails } = match;
+  const navigate = useNavigate();
+  
+  const handleMessage = () => {
+    if (onMessage) {
+      onMessage(profile.id);
+    } else {
+      // Navigate to messages page with this specific conversation open
+      navigate(`/messages?userId=${profile.id}&name=${encodeURIComponent(profile.name)}`);
+      toast(`Starting conversation with ${profile.name}`, {
+        description: "Waiting for them to accept your message request"
+      });
+    }
+  };
   
   return (
     <motion.div 
@@ -85,7 +100,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onLike, onMessage }) => {
             variant="outline" 
             size="sm" 
             className="flex-1 rounded-full border-matrimony-200 hover:text-matrimony-700 hover:border-matrimony-300 dark:border-gray-700"
-            onClick={() => onMessage && onMessage(profile.id)}
+            onClick={handleMessage}
           >
             <MessageCircle className="h-4 w-4 mr-1" />
             <span>Message</span>
