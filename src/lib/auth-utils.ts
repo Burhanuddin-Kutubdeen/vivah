@@ -22,7 +22,8 @@ export const signUpUser = async (
       return { 
         error: { 
           message: "Invalid email format" 
-        } 
+        },
+        data: null
       };
     }
     
@@ -39,7 +40,7 @@ export const signUpUser = async (
 
     if (error) {
       console.error("Registration error:", error);
-      return { error };
+      return { error, data: null };
     }
 
     // If registration successful, call the onSuccess callback
@@ -51,7 +52,7 @@ export const signUpUser = async (
     return { error: null, data };
   } catch (error: any) {
     console.error("Unexpected registration error:", error);
-    return { error };
+    return { error, data: null };
   }
 };
 
@@ -69,7 +70,7 @@ export const signInUser = async (
 
     if (error) {
       console.error("Login error:", error);
-      return { error };
+      return { error, data: null };
     }
 
     // If logged in successfully, call the onSuccess callback
@@ -81,7 +82,7 @@ export const signInUser = async (
     return { error: null, data };
   } catch (error: any) {
     console.error("Unexpected login error:", error);
-    return { error };
+    return { error, data: null };
   }
 };
 
@@ -108,7 +109,8 @@ export const resetPassword = async (email: string) => {
       return { 
         error: { 
           message: "Invalid email format" 
-        } 
+        },
+        data: null 
       };
     }
     
@@ -118,12 +120,12 @@ export const resetPassword = async (email: string) => {
 
     if (error) {
       console.error("Password reset error:", error);
-      return { error };
+      return { error, data: null };
     }
     
     return { error: null, data };
   } catch (error: any) {
     console.error("Unexpected password reset error:", error);
-    return { error };
+    return { error, data: null };
   }
 };

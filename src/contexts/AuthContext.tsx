@@ -11,10 +11,10 @@ interface AuthContextProps {
   session: Session | null;
   loading: boolean;
   isAuthenticated: boolean;
-  signUp: (email: string, password: string, userData: any) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, userData: any) => Promise<{ error: any; data: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any; data: any }>;
   signOut: () => Promise<void>;
-  forgotPassword: (email: string) => Promise<{ error: any } | undefined>;
+  forgotPassword: (email: string) => Promise<{ error: any; data: any } | undefined>;
   isProfileComplete: boolean;
   setIsProfileComplete: (value: boolean) => void;
   checkProfileCompletion: (userId: string) => Promise<boolean>;

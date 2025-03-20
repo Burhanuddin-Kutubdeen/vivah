@@ -52,8 +52,8 @@ export const useAuthActions = (
           variant: "destructive",
         });
       }
-    } else if (!result.data?.user) {
-      // If no error but also no user, likely email confirmation required
+    } else if (result.data?.user) {
+      // User object exists but no session, likely email confirmation required
       toast({
         title: "Check your email",
         description: "Please check your email to confirm your registration.",

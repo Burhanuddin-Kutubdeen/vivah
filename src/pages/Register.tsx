@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -65,7 +64,7 @@ const Register = () => {
         setError(error.message);
       } else {
         // Check if email confirmation is required
-        if (data && !data.session) {
+        if (data && data.user && !data.session) {
           setRegistered(true);
           setRegisteredEmail(values.email);
           form.reset();
