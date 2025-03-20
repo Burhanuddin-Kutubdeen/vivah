@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -11,7 +10,7 @@ import { useProfileData } from './hooks/useProfileData';
 import { useProfileLike } from '@/hooks/use-profile-like';
 import { useProfileMessage } from '@/hooks/use-profile-message';
 import { toast } from 'sonner';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ProfilePopupProps {
   profileId: string;
@@ -22,7 +21,7 @@ const ProfilePopup: React.FC<ProfilePopupProps> = ({
   profileId, 
   onClose 
 }) => {
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const { profile, isLoading, error } = useProfileData(profileId);
   const { isLiking, hasLiked, handleLike } = useProfileLike(profileId);
   const { handleMessage } = useProfileMessage(profileId);
@@ -94,7 +93,6 @@ const ProfilePopup: React.FC<ProfilePopupProps> = ({
   );
 };
 
-// Mobile version of the profile content
 const MobileProfileContent = ({ 
   profile, 
   isLoading, 
@@ -198,7 +196,6 @@ const MobileProfileContent = ({
   );
 };
 
-// Desktop version of the profile content
 const DesktopProfileContent = ({ 
   profile, 
   isLoading, 
@@ -312,7 +309,6 @@ const ProfileDetail = ({ label, value }) => {
   );
 };
 
-// Helper function to calculate age
 function calculateAge(dateOfBirth: string): number {
   const today = new Date();
   const birthDate = new Date(dateOfBirth);

@@ -1,10 +1,13 @@
 
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { isValidUUID } from '@/utils/validation';
 
 export const useProfileMessage = (profileId?: string) => {
   const navigate = useNavigate();
+  const [isMessaging, setIsMessaging] = useState(false);
+  const [messageSent, setMessageSent] = useState(false);
 
   const handleMessage = (id: string, name: string) => {
     if (!isValidUUID(id)) {
@@ -19,8 +22,36 @@ export const useProfileMessage = (profileId?: string) => {
       description: "You can now message each other"
     });
     
+    setMessageSent(true);
     return true;
   };
 
-  return { handleMessage };
+  const handleMessageRequest = async () => {
+    setIsMessaging(true);
+    
+    try {
+      if (!profileId || !isValidUUID(profileId)) {
+        return { success: false, error: "Invalid profile ID" };
+      }
+      
+      // In a real app, we would make an API call here to send the message request
+      // For now, we'll just simulate a successful request
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setMessageSent(true);
+      return { success: true };
+    } catch (error) {
+      console.error("Error sending message request:", error);
+      return { success: false, error: "Failed to send message request" };
+    } finally {
+      setIsMessaging(false);
+    }
+  };
+
+  return { 
+    isMessaging, 
+    messageSent, 
+    handleMessage,
+    handleMessageRequest 
+  };
 };
