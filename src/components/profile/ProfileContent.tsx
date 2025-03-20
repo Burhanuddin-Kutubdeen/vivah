@@ -4,6 +4,7 @@ import ProfileHeader from './ProfileHeader';
 import ProfileAbout from './ProfileAbout';
 import ProfileInterests from './ProfileInterests';
 import ProfileDetails from './ProfileDetails';
+import ProfileAdmirers from './ProfileAdmirers';
 
 interface ProfileData {
   first_name?: string | null;
@@ -52,6 +53,7 @@ const ProfileContent: React.FC<ProfileContentProps> = ({
         <ProfileAbout bio={profileData?.bio} />
         <ProfileDetails profileData={profileData} />
         <ProfileInterests interests={profileData?.interests} />
+        <ProfileAdmirers calculateAge={calculateAge} />
       </div>
     </div>
   );

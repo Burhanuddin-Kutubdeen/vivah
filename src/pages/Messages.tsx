@@ -6,14 +6,20 @@ import Footer from '@/components/Footer';
 import AnimatedTransition from '@/components/AnimatedTransition';
 import ConversationList, { Conversation } from '@/components/messages/ConversationList';
 import ConversationArea from '@/components/messages/ConversationArea';
+import MessageRequests from '@/components/messages/MessageRequests';
 import { Message } from '@/components/messages/MessageList';
 import { sampleConversations, sampleMessages } from '@/components/messages/messagesData';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Messages = () => {
   const [searchParams] = useSearchParams();
   const [conversations, setConversations] = useState<Conversation[]>(sampleConversations);
-  const [selectedConversation, setSelectedConversation] = useState<Conversation>(sampleConversations[0]);
+  const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>(sampleMessages);
+  const { user } = useAuth();
+  const navigate = useNavigate();
   
   // Handle URL parameters for opening specific conversations
   useEffect(() => {
@@ -44,14 +50,25 @@ const Messages = () => {
         setSelectedConversation(newConversation);
         setMessages([]);
       }
+    } else if (conversations.length > 0 && !selectedConversation) {
+      // Select the first conversation by default
+      setSelectedConversation(conversations[0]);
     }
-  }, [searchParams, conversations]);
+  }, [searchParams, conversations, selectedConversation]);
 
   const handleSelectConversation = (conversation: Conversation) => {
     setSelectedConversation(conversation);
+    
+    // Update URL without navigating
+    const url = new URL(window.location.href);
+    url.searchParams.set('userId', conversation.id);
+    url.searchParams.set('name', conversation.person.name);
+    window.history.pushState({}, '', url);
   };
 
   const handleSendMessage = (messageText: string) => {
+    if (!selectedConversation) return;
+    
     const newMessage: Message = {
       id: Date.now().toString(),
       senderId: 'user',
@@ -75,6 +92,32 @@ const Messages = () => {
       )
     );
   };
+  
+  const handleAcceptRequest = (userId: string, name: string) => {
+    // Navigate to open the conversation with this user
+    navigate(`/messages?userId=${userId}&name=${encodeURIComponent(name)}`);
+  };
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    return (
+      <AnimatedTransition>
+        <div className="min-h-screen bg-white dark:bg-gray-900">
+          <Navbar />
+          <main className="pt-24 pb-16 px-4">
+            <div className="container mx-auto max-w-6xl">
+              <Alert>
+                <AlertDescription>
+                  Please log in to access your messages.
+                </AlertDescription>
+              </Alert>
+            </div>
+          </main>
+          <Footer />
+        </div>
+      </AnimatedTransition>
+    );
+  }
 
   return (
     <AnimatedTransition>
@@ -85,17 +128,25 @@ const Messages = () => {
           <div className="container mx-auto max-w-6xl">
             <h1 className="text-2xl font-bold mb-6">Messages</h1>
             
+            <MessageRequests onAccept={handleAcceptRequest} />
+            
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex h-[calc(100vh-200px)] max-h-[800px]">
               <ConversationList 
                 conversations={conversations}
                 selectedConversation={selectedConversation}
                 onSelectConversation={handleSelectConversation}
               />
-              <ConversationArea 
-                conversation={selectedConversation}
-                messages={messages}
-                onSendMessage={handleSendMessage}
-              />
+              {selectedConversation ? (
+                <ConversationArea 
+                  conversation={selectedConversation}
+                  messages={messages}
+                  onSendMessage={handleSendMessage}
+                />
+              ) : (
+                <div className="flex-1 flex items-center justify-center">
+                  <p className="text-gray-500">Select a conversation to start messaging</p>
+                </div>
+              )}
             </div>
           </div>
         </main>
