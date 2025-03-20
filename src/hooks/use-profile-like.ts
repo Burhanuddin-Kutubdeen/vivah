@@ -12,7 +12,16 @@ export const useProfileLike = (profileId: string) => {
   // Check if the user has already liked this profile
   useEffect(() => {
     const checkExistingLike = async () => {
-      if (!user || !isValidUUID(profileId)) return;
+      if (!user) return;
+      
+      // For numeric IDs (sample profiles), just return false
+      if (/^\d+$/.test(profileId)) {
+        setHasLiked(false);
+        return;
+      }
+      
+      // Only check database for valid UUIDs
+      if (!isValidUUID(profileId)) return;
       
       try {
         const { data, error } = await supabase
@@ -42,8 +51,14 @@ export const useProfileLike = (profileId: string) => {
     if (!user) {
       return { success: false, error: "User not authenticated" };
     }
+    
+    // For numeric IDs (sample profiles), just simulate success
+    if (/^\d+$/.test(profileId)) {
+      setHasLiked(true);
+      return { success: true };
+    }
 
-    // Validate UUID format
+    // Validate UUID format for real profiles
     if (!isValidUUID(profileId)) {
       return { success: false, error: "Invalid profile ID format" };
     }

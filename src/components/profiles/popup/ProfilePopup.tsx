@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MobileProfileContent } from './MobileProfileContent';
@@ -9,6 +9,7 @@ import { useProfileData } from '../hooks/useProfileData';
 import { useProfileLike } from '@/hooks/use-profile-like';
 import { useProfileMessage } from '@/hooks/use-profile-message';
 import { toast } from 'sonner';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface ProfilePopupProps {
   profileId: string;
@@ -22,7 +23,7 @@ const ProfilePopup: React.FC<ProfilePopupProps> = ({
   const isMobile = useIsMobile();
   const { profile, isLoading, error } = useProfileData(profileId);
   const { isLiking, hasLiked, handleLike } = useProfileLike(profileId);
-  const { handleMessage } = useProfileMessage(profileId);
+  const { handleMessage } = useProfileMessage();
   const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
@@ -73,9 +74,13 @@ const ProfilePopup: React.FC<ProfilePopupProps> = ({
     );
   }
 
+  // Add DialogTitle with VisuallyHidden to resolve accessibility issue
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="sm:max-w-[800px] p-0 overflow-hidden max-h-[90vh]">
+        <VisuallyHidden>
+          <DialogTitle>Profile Details</DialogTitle>
+        </VisuallyHidden>
         <DesktopProfileContent 
           profile={profile}
           isLoading={isLoading}
