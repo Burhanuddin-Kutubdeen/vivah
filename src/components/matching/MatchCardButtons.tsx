@@ -4,8 +4,8 @@ import { Heart, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 interface MatchCardButtonsProps {
-  onLike: () => void;
-  onMessage: () => void;
+  onLike: (e: React.MouseEvent) => void;
+  onMessage: (e: React.MouseEvent) => void;
 }
 
 const MatchCardButtons: React.FC<MatchCardButtonsProps> = ({ onLike, onMessage }) => {
