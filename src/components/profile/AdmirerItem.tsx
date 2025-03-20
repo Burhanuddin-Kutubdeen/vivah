@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Admirer } from './hooks/useAdmirers';
+import { isValidUUID } from '@/utils/validation';
 
 interface AdmirerItemProps {
   admirer: Admirer;
@@ -11,11 +11,6 @@ interface AdmirerItemProps {
   onViewProfile: (id: string) => void;
   onMessage: (id: string, name: string) => void;
 }
-
-// Helper function to validate UUID
-const isValidUUID = (id: string): boolean => {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-};
 
 const AdmirerItem: React.FC<AdmirerItemProps> = ({ 
   admirer, 

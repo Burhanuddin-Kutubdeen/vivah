@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Heart, MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { isValidUUID } from '@/utils/validation';
 
 interface MatchCardProps {
   match: {
@@ -19,11 +19,6 @@ interface MatchCardProps {
     isNewMatch: boolean;
   };
 }
-
-// Helper function to validate UUID
-const isValidUUID = (id: string): boolean => {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-};
 
 const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   const navigate = useNavigate();

@@ -1,0 +1,87 @@
+
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from "@/integrations/supabase/client";
+import { isValidUUID } from '@/utils/validation';
+
+export const useProfileLike = (profileId: string) => {
+  const [isLiking, setIsLiking] = useState(false);
+  const [hasLiked, setHasLiked] = useState(false);
+  const { user } = useAuth();
+
+  // Check if the user has already liked this profile
+  useEffect(() => {
+    const checkExistingLike = async () => {
+      if (!user || !isValidUUID(profileId)) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('likes')
+          .select('status')
+          .eq('user_id', user.id)
+          .eq('liked_profile_id', profileId)
+          .single();
+          
+        if (error && error.code !== 'PGRST116') {
+          console.error("Error checking like status:", error);
+          return;
+        }
+        
+        if (data) {
+          setHasLiked(true);
+        }
+      } catch (error) {
+        console.error("Error in checkExistingLike:", error);
+      }
+    };
+    
+    checkExistingLike();
+  }, [user, profileId]);
+
+  const handleLike = async () => {
+    if (!user) {
+      return { success: false, error: "User not authenticated" };
+    }
+
+    // Validate UUID format
+    if (!isValidUUID(profileId)) {
+      return { success: false, error: "Invalid profile ID format" };
+    }
+
+    // Prevent multiple clicks or if already liked
+    if (isLiking || hasLiked) {
+      return { success: false, error: "Already processing or liked" };
+    }
+    
+    setIsLiking(true);
+
+    try {
+      // Record the like in the database
+      const { error } = await supabase
+        .from('likes')
+        .insert({
+          user_id: user.id,
+          liked_profile_id: profileId,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      // Update state
+      setHasLiked(true);
+      setIsLiking(false);
+      
+      return { success: true };
+    } catch (error) {
+      console.error("Error liking profile:", error);
+      setIsLiking(false);
+      return { success: false, error: "Failed to send like" };
+    }
+  };
+
+  return {
+    isLiking,
+    hasLiked,
+    handleLike
+  };
+};
