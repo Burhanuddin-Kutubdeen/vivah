@@ -48,7 +48,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
       return;
     }
     
-    // Validate UUID format
+    // Validate ID format
     if (!isValidUUID(match.id)) {
       toast.error("Cannot like profile - invalid ID format");
       return;
@@ -81,7 +81,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   const handleMessage = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
     
-    // Validate UUID format
+    // Validate ID format
     if (!isValidUUID(match.id)) {
       toast.error("Cannot message profile - invalid ID format");
       return;
