@@ -8,16 +8,33 @@ import { getUserGender } from '@/utils/user-utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+// Key for storing remaining likes in localStorage
+const REMAINING_LIKES_KEY = 'matrimony_remaining_likes';
+
 export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryProfilesOptions) {
   const [filteredProfiles, setFilteredProfiles] = useState<DiscoveryProfile[]>([]);
   const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
   const [direction, setDirection] = useState<'left' | 'right' | null>(null);
-  const [remainingLikes, setRemainingLikes] = useState(isPremium ? Infinity : 10);
   const { user } = useAuth();
   const hasProfiles = filteredProfiles.length > 0;
   
+  // Initialize remaining likes from localStorage or default to 10
+  const [remainingLikes, setRemainingLikes] = useState<number>(() => {
+    if (isPremium) return Infinity;
+    
+    const storedLikes = localStorage.getItem(REMAINING_LIKES_KEY);
+    return storedLikes ? parseInt(storedLikes, 10) : 10;
+  });
+  
   // Define currentProfile here to avoid variable use before declaration
   const currentProfile = filteredProfiles[currentProfileIndex] || null;
+
+  // Save remaining likes to localStorage whenever it changes
+  useEffect(() => {
+    if (!isPremium && remainingLikes !== Infinity) {
+      localStorage.setItem(REMAINING_LIKES_KEY, remainingLikes.toString());
+    }
+  }, [remainingLikes, isPremium]);
 
   // Filter and sort profiles based on preferences and heterosexual matching
   useEffect(() => {
@@ -54,6 +71,14 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
       if (!user) return;
       
       console.log(`${user.email} liked ${likedProfile.name}'s profile`);
+      
+      // Ensure the ID is a valid UUID before storing in the database
+      if (!likedProfile.id || typeof likedProfile.id !== 'string' || 
+          !likedProfile.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+        console.error("Invalid profile ID format. Expected UUID format.");
+        toast.error("Could not save like - profile ID format is invalid");
+        return;
+      }
       
       // Store the like in the database
       const { error } = await supabase

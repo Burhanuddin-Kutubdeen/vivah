@@ -20,11 +20,21 @@ interface MatchCardProps {
   };
 }
 
+// Helper function to validate UUID
+const isValidUUID = (id: string): boolean => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+};
+
 const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   
   const handleCardClick = () => {
+    if (!isValidUUID(match.id)) {
+      console.error("Invalid profile ID format:", match.id);
+      toast.error("Cannot view profile - invalid ID format");
+      return;
+    }
     // Navigate to a profile view page
     navigate(`/profile-view/${match.id}`);
   };
@@ -34,6 +44,12 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
     
     if (!user) {
       toast.error("Please log in to like profiles");
+      return;
+    }
+    
+    // Validate UUID format
+    if (!isValidUUID(match.id)) {
+      toast.error("Cannot like profile - invalid ID format");
       return;
     }
     
@@ -63,6 +79,12 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   
   const handleMessage = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
+    
+    // Validate UUID format
+    if (!isValidUUID(match.id)) {
+      toast.error("Cannot message profile - invalid ID format");
+      return;
+    }
     
     // Navigate to the messages page with this specific user's conversation open
     navigate(`/messages?userId=${match.id}&name=${encodeURIComponent(match.name)}`);

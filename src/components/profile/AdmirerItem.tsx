@@ -12,6 +12,11 @@ interface AdmirerItemProps {
   onMessage: (id: string, name: string) => void;
 }
 
+// Helper function to validate UUID
+const isValidUUID = (id: string): boolean => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+};
+
 const AdmirerItem: React.FC<AdmirerItemProps> = ({ 
   admirer, 
   age, 
@@ -20,11 +25,27 @@ const AdmirerItem: React.FC<AdmirerItemProps> = ({
 }) => {
   const fullName = `${admirer.first_name || ''} ${admirer.last_name || ''}`.trim();
   
+  const handleViewProfile = () => {
+    if (!isValidUUID(admirer.id)) {
+      console.error("Invalid profile ID format:", admirer.id);
+      return;
+    }
+    onViewProfile(admirer.id);
+  };
+  
+  const handleMessage = () => {
+    if (!isValidUUID(admirer.id)) {
+      console.error("Invalid profile ID format:", admirer.id);
+      return;
+    }
+    onMessage(admirer.id, fullName);
+  };
+  
   return (
     <div className="flex items-center p-3 border border-matrimony-100 dark:border-matrimony-700 rounded-lg">
       <Avatar 
         className="h-12 w-12 mr-3 cursor-pointer" 
-        onClick={() => onViewProfile(admirer.id)}
+        onClick={handleViewProfile}
       >
         <AvatarImage src={admirer.avatar_url || ''} alt={fullName} />
         <AvatarFallback>{fullName.substring(0, 2).toUpperCase()}</AvatarFallback>
@@ -32,7 +53,7 @@ const AdmirerItem: React.FC<AdmirerItemProps> = ({
       
       <div 
         className="flex-1 min-w-0 cursor-pointer" 
-        onClick={() => onViewProfile(admirer.id)}
+        onClick={handleViewProfile}
       >
         <h3 className="font-medium">
           {fullName}
@@ -47,7 +68,7 @@ const AdmirerItem: React.FC<AdmirerItemProps> = ({
         size="sm" 
         variant="outline" 
         className="ml-2"
-        onClick={() => onMessage(admirer.id, fullName)}
+        onClick={handleMessage}
       >
         <MessageCircle className="h-4 w-4 mr-1" />
         Message

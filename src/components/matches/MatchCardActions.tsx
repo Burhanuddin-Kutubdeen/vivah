@@ -13,6 +13,11 @@ interface MatchCardActionsProps {
   name: string;
 }
 
+// Helper function to validate UUID
+const isValidUUID = (id: string): boolean => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+};
+
 const MatchCardActions: React.FC<MatchCardActionsProps> = ({ profileId, name }) => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -25,7 +30,7 @@ const MatchCardActions: React.FC<MatchCardActionsProps> = ({ profileId, name }) 
   // Check if the user has already liked this profile
   useEffect(() => {
     const checkExistingLike = async () => {
-      if (!user) return;
+      if (!user || !isValidUUID(profileId)) return;
       
       try {
         const { data, error } = await supabase
@@ -50,7 +55,7 @@ const MatchCardActions: React.FC<MatchCardActionsProps> = ({ profileId, name }) 
     
     // Also check if message request has been sent
     const checkMessageRequest = async () => {
-      if (!user) return;
+      if (!user || !isValidUUID(profileId)) return;
       
       try {
         // For now, we'll use likes as a proxy for message requests
@@ -85,6 +90,16 @@ const MatchCardActions: React.FC<MatchCardActionsProps> = ({ profileId, name }) 
       toast({
         title: "Login Required",
         description: "Please login to like profiles",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate UUID format
+    if (!isValidUUID(profileId)) {
+      toast({
+        title: "Error",
+        description: "Invalid profile ID format",
         variant: "destructive",
       });
       return;
@@ -132,6 +147,16 @@ const MatchCardActions: React.FC<MatchCardActionsProps> = ({ profileId, name }) 
       toast({
         title: "Login Required",
         description: "Please login to message profiles",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate UUID format
+    if (!isValidUUID(profileId)) {
+      toast({
+        title: "Error",
+        description: "Invalid profile ID format",
         variant: "destructive",
       });
       return;
