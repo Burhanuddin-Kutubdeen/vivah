@@ -27,7 +27,10 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   const { user } = useAuth();
   const [showProfile, setShowProfile] = useState(false);
   
-  const handleCardClick = () => {
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent default to avoid navigation
+    e.preventDefault();
+    
     if (!isValidUUID(match.id)) {
       console.error("Invalid profile ID format:", match.id);
       toast.error("Cannot view profile - invalid ID format");
