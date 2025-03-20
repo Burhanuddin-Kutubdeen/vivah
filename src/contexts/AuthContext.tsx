@@ -14,6 +14,7 @@ interface AuthContextProps {
   signUp: (email: string, password: string, userData: any) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<{ error: any } | undefined>;
   isProfileComplete: boolean;
   setIsProfileComplete: (value: boolean) => void;
   checkProfileCompletion: (userId: string) => Promise<boolean>;
@@ -38,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { user, session, loading } = useAuthState(handleUserChange);
   
   // Auth actions (sign up, sign in, sign out)
-  const { signUp, signIn, signOut } = useAuthActions(
+  const { signUp, signIn, signOut, forgotPassword } = useAuthActions(
     setIsProfileComplete,
     checkProfileCompletion,
     navigateBasedOnProfile
@@ -68,6 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         signIn,
         signOut,
+        forgotPassword,
         isProfileComplete,
         setIsProfileComplete,
         checkProfileCompletion,

@@ -69,7 +69,7 @@ function App() {
             </ProfileProtectedRoute>
           } />
           
-          {/* Catch-all route - ensure profile/{id} routes go to NotFound */}
+          {/* Catch-all route for NotFound */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

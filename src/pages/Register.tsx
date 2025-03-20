@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
 // Form schema validation
 const formSchema = z.object({
@@ -35,8 +35,10 @@ const formSchema = z.object({
 
 const Register = () => {
   const { signUp } = useAuth();
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [registered, setRegistered] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string>("");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -53,16 +55,27 @@ const Register = () => {
     setIsSubmitting(true);
     setError(null);
 
-    const { error } = await signUp(values.email, values.password, {
-      firstName: values.firstName,
-      lastName: values.lastName,
-    });
+    try {
+      const { error, data } = await signUp(values.email, values.password, {
+        firstName: values.firstName,
+        lastName: values.lastName,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (error) {
+        setError(error.message);
+      } else {
+        // Check if email confirmation is required
+        if (data && !data.session) {
+          setRegistered(true);
+          setRegisteredEmail(values.email);
+          form.reset();
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred during registration");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
   return (
@@ -73,123 +86,148 @@ const Register = () => {
         <main className="pt-24 pb-16 px-4">
           <div className="container mx-auto max-w-md">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-8 border border-gray-100 dark:border-gray-700">
-              <div className="text-center mb-6">
-                <h1 className="text-3xl font-bold mb-2">Create an Account</h1>
-                <p className="text-matrimony-600 dark:text-matrimony-300">
-                  Join Mango Matrimony and start your journey
-                </p>
-              </div>
-
-              {error && (
-                <Alert variant="destructive" className="mb-6">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>First Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="John" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Last Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Doe" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="email" 
-                            placeholder="your.email@example.com" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="password" 
-                            placeholder="Your secure password" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="confirmPassword"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="password" 
-                            placeholder="Confirm your password" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <Button 
-                    type="submit" 
-                    className="w-full rounded-full bg-matrimony-600 hover:bg-matrimony-700 mt-2"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Creating account..." : "Create Account"}
-                  </Button>
-
-                  <div className="text-center mt-4">
-                    <p className="text-sm text-matrimony-600 dark:text-matrimony-300">
-                      Already have an account?{" "}
-                      <Link to="/login" className="text-matrimony-700 dark:text-matrimony-400 font-medium hover:underline">
-                        Log In
-                      </Link>
+              {!registered ? (
+                <>
+                  <div className="text-center mb-6">
+                    <h1 className="text-3xl font-bold mb-2">Create an Account</h1>
+                    <p className="text-matrimony-600 dark:text-matrimony-300">
+                      Join Mango Matrimony and start your journey
                     </p>
                   </div>
-                </form>
-              </Form>
+
+                  {error && (
+                    <Alert variant="destructive" className="mb-6">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="firstName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>First Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="John" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Last Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Doe" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="email" 
+                                placeholder="your.email@example.com" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="password" 
+                                placeholder="Your secure password" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirm Password</FormLabel>
+                            <FormControl>
+                              <Input 
+                                type="password" 
+                                placeholder="Confirm your password" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <Button 
+                        type="submit" 
+                        className="w-full rounded-full bg-matrimony-600 hover:bg-matrimony-700 mt-2"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? "Creating account..." : "Create Account"}
+                      </Button>
+
+                      <div className="text-center mt-4">
+                        <p className="text-sm text-matrimony-600 dark:text-matrimony-300">
+                          Already have an account?{" "}
+                          <Link to="/login" className="text-matrimony-700 dark:text-matrimony-400 font-medium hover:underline">
+                            Log In
+                          </Link>
+                        </p>
+                      </div>
+                    </form>
+                  </Form>
+                </>
+              ) : (
+                <div className="text-center py-6">
+                  <CheckCircle className="mx-auto h-16 w-16 text-green-500 mb-4" />
+                  <h2 className="text-2xl font-bold mb-4">Registration Successful!</h2>
+                  <Alert className="mb-6 bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border-blue-200">
+                    <AlertTitle>Check your email</AlertTitle>
+                    <AlertDescription>
+                      We've sent a confirmation email to <strong>{registeredEmail}</strong>. 
+                      Please check your inbox and click the confirmation link to activate your account.
+                    </AlertDescription>
+                  </Alert>
+                  <div className="mt-6">
+                    <Link to="/login">
+                      <Button 
+                        className="rounded-full bg-matrimony-600 hover:bg-matrimony-700"
+                      >
+                        Go to Login
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </main>

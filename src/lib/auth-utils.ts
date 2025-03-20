@@ -1,6 +1,5 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from '@/hooks/use-toast';
 import type { User, Session } from '@supabase/supabase-js';
 
 // Authentication utility functions
@@ -45,10 +44,11 @@ export const signUpUser = async (
 
     // If registration successful, call the onSuccess callback
     if (data.user) {
+      console.log("User registered successfully:", data.user.id);
       onSuccess(data.user, data.session);
     }
     
-    return { error: null };
+    return { error: null, data };
   } catch (error: any) {
     console.error("Unexpected registration error:", error);
     return { error };
@@ -74,10 +74,11 @@ export const signInUser = async (
 
     // If logged in successfully, call the onSuccess callback
     if (data.user) {
+      console.log("User logged in successfully:", data.user.id);
       onSuccess(data.user);
     }
     
-    return { error: null };
+    return { error: null, data };
   } catch (error: any) {
     console.error("Unexpected login error:", error);
     return { error };
@@ -85,5 +86,44 @@ export const signInUser = async (
 };
 
 export const signOutUser = async () => {
-  return await supabase.auth.signOut();
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Logout error:", error);
+      return { error };
+    }
+    return { error: null };
+  } catch (error: any) {
+    console.error("Unexpected logout error:", error);
+    return { error };
+  }
+};
+
+export const resetPassword = async (email: string) => {
+  try {
+    console.log("Requesting password reset for:", email);
+    
+    // Validate email format before sending to Supabase
+    if (!validateEmail(email)) {
+      return { 
+        error: { 
+          message: "Invalid email format" 
+        } 
+      };
+    }
+    
+    const { error, data } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/reset-password',
+    });
+
+    if (error) {
+      console.error("Password reset error:", error);
+      return { error };
+    }
+    
+    return { error: null, data };
+  } catch (error: any) {
+    console.error("Unexpected password reset error:", error);
+    return { error };
+  }
 };
