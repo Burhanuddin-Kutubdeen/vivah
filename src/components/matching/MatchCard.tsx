@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Match } from '@/hooks/use-matches';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,7 @@ import MatchCardImage from './MatchCardImage';
 import MatchCardInfo from './MatchCardInfo';
 import MatchCardButtons from './MatchCardButtons';
 import { isValidUUID } from '@/utils/validation';
+import ProfilePopup from '@/components/profiles/ProfilePopup';
 
 interface MatchCardProps {
   match: Match;
@@ -18,9 +19,14 @@ interface MatchCardProps {
 const MatchCard: React.FC<MatchCardProps> = ({ match, onLike, onMessage }) => {
   const { profile, matchDetails } = match;
   const navigate = useNavigate();
+  const [showProfile, setShowProfile] = useState(false);
   
   const handleCardClick = () => {
-    navigate(`/profile-view/${profile.id}`);
+    if (!isValidUUID(profile.id)) {
+      toast.error("Cannot view profile - invalid ID format");
+      return;
+    }
+    setShowProfile(true);
   };
   
   const handleLike = (e: React.MouseEvent) => {
@@ -56,34 +62,43 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onLike, onMessage }) => {
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-      className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden"
-      onClick={handleCardClick}
-    >
-      <MatchCardImage 
-        imageUrl={profile.imageUrl}
-        name={profile.name}
-        isNewMatch={matchDetails.isNewMatch}
-        matchPercentage={matchDetails.score}
-      />
-
-      <MatchCardInfo
-        name={profile.name}
-        age={profile.age}
-        location={profile.location}
-        sharedInterests={matchDetails.sharedInterests}
-      />
-      
-      <div className="px-4 pb-4">
-        <MatchCardButtons 
-          onLike={handleLike}
-          onMessage={handleMessage}
+    <>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden cursor-pointer"
+        onClick={handleCardClick}
+      >
+        <MatchCardImage 
+          imageUrl={profile.imageUrl}
+          name={profile.name}
+          isNewMatch={matchDetails.isNewMatch}
+          matchPercentage={matchDetails.score}
         />
-      </div>
-    </motion.div>
+
+        <MatchCardInfo
+          name={profile.name}
+          age={profile.age}
+          location={profile.location}
+          sharedInterests={matchDetails.sharedInterests}
+        />
+        
+        <div className="px-4 pb-4">
+          <MatchCardButtons 
+            onLike={handleLike}
+            onMessage={handleMessage}
+          />
+        </div>
+      </motion.div>
+
+      {showProfile && (
+        <ProfilePopup 
+          profileId={profile.id} 
+          onClose={() => setShowProfile(false)} 
+        />
+      )}
+    </>
   );
 };
 

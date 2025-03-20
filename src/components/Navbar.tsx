@@ -38,6 +38,30 @@ const Navbar: React.FC = () => {
           >
             Discover
           </NavLink>
+          {user && (
+            <>
+              <NavLink 
+                to="/liked-you" 
+                className={({ isActive }) => 
+                  `text-sm font-medium ${
+                    isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+                  }`
+                }
+              >
+                Liked You
+              </NavLink>
+              <NavLink 
+                to="/messages" 
+                className={({ isActive }) => 
+                  `text-sm font-medium ${
+                    isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
+                  }`
+                }
+              >
+                Messages
+              </NavLink>
+            </>
+          )}
           <NavLink 
             to="/how-it-works" 
             className={({ isActive }) => 
@@ -58,18 +82,6 @@ const Navbar: React.FC = () => {
           >
             Success Stories
           </NavLink>
-          {user && (
-            <NavLink 
-              to="/messages" 
-              className={({ isActive }) => 
-                `text-sm font-medium ${
-                  isActive ? 'text-matrimony-600 dark:text-matrimony-400' : 'text-gray-600 dark:text-gray-300 hover:text-matrimony-600 dark:hover:text-matrimony-400'
-                }`
-              }
-            >
-              Messages
-            </NavLink>
-          )}
         </nav>
         
         {/* Auth Buttons */}

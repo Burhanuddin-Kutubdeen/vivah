@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslations } from '@/hooks/use-translations';
 import { cn } from '@/lib/utils';
-import { Heart, MessageCircle, Search, User } from 'lucide-react';
+import { Heart, MessageCircle, Search, User, ThumbsUp } from 'lucide-react';
 
 interface NavLinkProps {
   to: string;
@@ -63,6 +63,17 @@ const DesktopNavLinks: React.FC = () => {
           >
             <Heart className="h-4 w-4" />
             Matches
+          </NavLink>
+          
+          <NavLink
+            to="/liked-you"
+            className={({ isActive }) => cn(
+              "transition-colors hover:text-primary px-3 py-1.5 flex items-center gap-1.5 text-sm font-medium",
+              isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+            )}
+          >
+            <ThumbsUp className="h-4 w-4" />
+            Liked You
           </NavLink>
           
           <NavLink

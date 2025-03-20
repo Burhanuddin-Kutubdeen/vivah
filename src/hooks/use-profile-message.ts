@@ -1,88 +1,26 @@
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { isValidUUID } from '@/utils/validation';
 
-export const useProfileMessage = (profileId: string) => {
-  const [isMessaging, setIsMessaging] = useState(false);
-  const [messageSent, setMessageSent] = useState(false);
-  const { user } = useAuth();
+export const useProfileMessage = (profileId?: string) => {
+  const navigate = useNavigate();
 
-  // Check if message request has been sent
-  useEffect(() => {
-    const checkMessageRequest = async () => {
-      if (!user || !isValidUUID(profileId)) return;
-      
-      try {
-        // For now, we'll use likes as a proxy for message requests
-        const { data, error } = await supabase
-          .from('likes')
-          .select('status')
-          .eq('user_id', user.id)
-          .eq('liked_profile_id', profileId)
-          .single();
-          
-        if (error && error.code !== 'PGRST116') {
-          console.error("Error checking message status:", error);
-          return;
-        }
-        
-        if (data) {
-          setMessageSent(true);
-        }
-      } catch (error) {
-        console.error("Error in checkMessageRequest:", error);
-      }
-    };
-    
-    checkMessageRequest();
-  }, [user, profileId]);
-
-  const handleMessageRequest = async () => {
-    if (!user) {
-      return { success: false, error: "User not authenticated" };
+  const handleMessage = (id: string, name: string) => {
+    if (!isValidUUID(id)) {
+      toast.error("Cannot message profile - invalid ID format");
+      return false;
     }
     
-    // Validate UUID format
-    if (!isValidUUID(profileId)) {
-      return { success: false, error: "Invalid profile ID format" };
-    }
+    // Navigate to messages page with this specific conversation open
+    navigate(`/messages?userId=${id}&name=${encodeURIComponent(name)}`);
     
-    // Prevent multiple clicks or if already sent
-    if (isMessaging || messageSent) {
-      return { success: false, error: "Already processing or sent" };
-    }
+    toast(`Starting conversation with ${name}`, {
+      description: "You can now message each other"
+    });
     
-    setIsMessaging(true);
-    
-    try {
-      // Record the message request using the likes table for now
-      const { error } = await supabase
-        .from('likes')
-        .upsert({
-          user_id: user.id,
-          liked_profile_id: profileId,
-          status: 'pending'
-        }, { onConflict: 'user_id,liked_profile_id' });
-        
-      if (error) throw error;
-      
-      // Set message sent state
-      setMessageSent(true);
-      setIsMessaging(false);
-      
-      return { success: true };
-    } catch (error) {
-      console.error("Error sending message request:", error);
-      setIsMessaging(false);
-      return { success: false, error: "Failed to send message request" };
-    }
+    return true;
   };
 
-  return {
-    isMessaging,
-    messageSent,
-    handleMessageRequest
-  };
+  return { handleMessage };
 };

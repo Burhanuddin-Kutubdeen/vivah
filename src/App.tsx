@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import Discover from './pages/Discover';
 import Messages from './pages/Messages';
 import Matches from './pages/Matches';
+import LikedYou from './pages/LikedYou';
 import ProfileSetup from './pages/ProfileSetup';
 import HowItWorks from './pages/HowItWorks';
 import SuccessStories from './pages/SuccessStories';
@@ -54,6 +55,11 @@ function App() {
           <Route path="/matches" element={
             <ProtectedRoute>
               <Matches />
+            </ProtectedRoute>
+          } />
+          <Route path="/liked-you" element={
+            <ProtectedRoute>
+              <LikedYou />
             </ProtectedRoute>
           } />
           
