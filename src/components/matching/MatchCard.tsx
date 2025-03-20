@@ -24,6 +24,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onLike, onMessage }) => {
   const handleCardClick = (e: React.MouseEvent) => {
     // Prevent default to avoid navigation
     e.preventDefault();
+    e.stopPropagation(); // Also stop propagation
     
     if (!isValidUUID(profile.id)) {
       toast.error("Cannot view profile - invalid ID format");

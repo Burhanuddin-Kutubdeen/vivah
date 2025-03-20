@@ -30,6 +30,7 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   const handleCardClick = (e: React.MouseEvent) => {
     // Prevent default to avoid navigation
     e.preventDefault();
+    e.stopPropagation(); // Also stop propagation
     
     if (!isValidUUID(match.id)) {
       console.error("Invalid profile ID format:", match.id);
