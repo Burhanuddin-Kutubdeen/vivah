@@ -7,18 +7,20 @@ import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+interface Sender {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  avatar_url: string | null;
+}
+
 interface MessageRequest {
   id: string;
   sender_id: string;
   receiver_id: string;
   status: string;
   created_at: string;
-  sender: {
-    id: string;
-    first_name: string | null;
-    last_name: string | null;
-    avatar_url: string | null;
-  };
+  sender: Sender;
 }
 
 interface MessageRequestsProps {
@@ -36,35 +38,46 @@ const MessageRequests: React.FC<MessageRequestsProps> = ({ onAccept }) => {
       if (!user) return;
       
       try {
-        // Simulate fetch from message_requests table (we'll create this later)
-        // For now, we'll use the likes table to show the concept
-        const { data, error } = await supabase
+        // First get the likes data
+        const { data: likesData, error: likesError } = await supabase
           .from('likes')
-          .select(`
-            id,
-            user_id as sender_id,
-            liked_profile_id as receiver_id,
-            status,
-            created_at,
-            profiles:user_id(
-              id, 
-              first_name, 
-              last_name, 
-              avatar_url
-            )
-          `)
+          .select('id, user_id, liked_profile_id, status, created_at')
           .eq('liked_profile_id', user.id)
           .eq('status', 'pending');
           
-        if (error) throw error;
+        if (likesError) throw likesError;
         
-        // Transform the data
-        const messageRequests = data.map(item => ({
-          ...item,
-          sender: item.profiles
-        }));
+        // If we have likes data, fetch the sender profiles
+        if (likesData && likesData.length > 0) {
+          const messageRequests: MessageRequest[] = [];
           
-        setRequests(messageRequests);
+          // For each like, get the sender profile
+          for (const like of likesData) {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('id, first_name, last_name, avatar_url')
+              .eq('id', like.user_id)
+              .single();
+              
+            if (profileError) {
+              console.error('Error fetching profile:', profileError);
+              continue;
+            }
+            
+            if (profileData) {
+              messageRequests.push({
+                id: like.id,
+                sender_id: like.user_id,
+                receiver_id: like.liked_profile_id,
+                status: like.status,
+                created_at: like.created_at,
+                sender: profileData as Sender
+              });
+            }
+          }
+          
+          setRequests(messageRequests);
+        }
       } catch (err) {
         console.error('Error fetching message requests:', err);
         toast({
@@ -78,9 +91,6 @@ const MessageRequests: React.FC<MessageRequestsProps> = ({ onAccept }) => {
     };
     
     fetchMessageRequests();
-    
-    // Set up a subscription for real-time updates (future implementation)
-    
   }, [user]);
   
   const handleAccept = async (request: MessageRequest) => {
