@@ -43,7 +43,18 @@ export const DesktopProfileContent: React.FC<DesktopProfileContentProps> = ({
   }
 
   const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(' ');
+  const displayName = fullName.trim() || "No Name Provided";
   const age = profile.date_of_birth ? calculateAge(profile.date_of_birth) : null;
+
+  // Format profile values to be more readable
+  const formatProfileValue = (value: string | null): string => {
+    if (!value) return "Not specified";
+    
+    return value
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
 
   return (
     <div className="flex h-[600px]">
@@ -59,13 +70,13 @@ export const DesktopProfileContent: React.FC<DesktopProfileContentProps> = ({
       <div className="w-1/2 h-full">
         <img 
           src={profile.avatar_url || '/placeholder.svg'} 
-          alt={fullName} 
+          alt={displayName} 
           className="w-full h-full object-cover"
         />
       </div>
       
       <div className="w-1/2 h-full overflow-auto p-6">
-        <h2 className="text-2xl font-bold mb-1">{fullName}{age ? `, ${age}` : ''}</h2>
+        <h2 className="text-2xl font-bold mb-1">{displayName}{age ? `, ${age}` : ''}</h2>
         <p className="text-matrimony-600 dark:text-matrimony-400 mb-6">
           {profile.job || 'No occupation specified'} • {profile.location || 'No location specified'}
         </p>
@@ -91,11 +102,11 @@ export const DesktopProfileContent: React.FC<DesktopProfileContentProps> = ({
         <Separator className="my-6" />
         
         <div className="space-y-3 mb-8">
-          <ProfileDetail label="Religion" value={profile.religion} />
-          <ProfileDetail label="Civil Status" value={profile.civil_status} />
-          <ProfileDetail label="Education" value={profile.education} />
-          <ProfileDetail label="Has Children" value={profile.has_kids} />
-          <ProfileDetail label="Wants Children" value={profile.wants_kids} />
+          <ProfileDetail label="Religion" value={formatProfileValue(profile.religion)} />
+          <ProfileDetail label="Civil Status" value={formatProfileValue(profile.civil_status)} />
+          <ProfileDetail label="Education" value={formatProfileValue(profile.education)} />
+          <ProfileDetail label="Has Children" value={formatProfileValue(profile.has_kids)} />
+          <ProfileDetail label="Wants Children" value={formatProfileValue(profile.wants_kids)} />
         </div>
         
         <div className="flex gap-3">

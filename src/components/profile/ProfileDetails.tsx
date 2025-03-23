@@ -21,7 +21,8 @@ interface ProfileDetailsProps {
 const formatValue = (value: string | null): string => {
   if (!value) return "Not specified";
   
-  // Format values for better readability
+  // Format values for better readability by splitting on underscores,
+  // capitalizing first letter of each word, and joining with spaces
   return value
     .split('_')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))

@@ -29,6 +29,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   };
 
+  // Create a display name that doesn't show as blank
+  const firstName = profileData?.first_name || '';
+  const lastName = profileData?.last_name || '';
+  const fullName = [firstName, lastName].filter(Boolean).join(' ');
+  const displayName = fullName.trim() || (user?.email?.split('@')[0] || 'User');
+
   return (
     <>
       {/* Profile Header */}
@@ -60,7 +66,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-bold">
-              {profileData?.first_name || user?.email?.split('@')[0] || 'User'}
+              {displayName}
               {profileData?.date_of_birth && `, ${calculateAge(profileData.date_of_birth)}`}
             </h1>
             <p className="text-matrimony-600 dark:text-matrimony-300 flex items-center mt-1">
@@ -73,8 +79,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               </span>
             </p>
             <p className="text-matrimony-600 dark:text-matrimony-300 mt-1">
-              {profileData?.civil_status && `${profileData.civil_status.charAt(0).toUpperCase() + profileData.civil_status.slice(1)}`}
-              {profileData?.religion && ` • ${profileData.religion.charAt(0).toUpperCase() + profileData.religion.slice(1)}`}
+              {profileData?.civil_status && `${profileData.civil_status.charAt(0).toUpperCase() + profileData.civil_status.slice(1).replace(/_/g, ' ')}`}
+              {profileData?.religion && ` • ${profileData.religion.charAt(0).toUpperCase() + profileData.religion.slice(1).replace(/_/g, ' ')}`}
             </p>
           </div>
           <Button 
