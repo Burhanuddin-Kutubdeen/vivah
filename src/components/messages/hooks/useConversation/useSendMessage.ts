@@ -10,8 +10,8 @@ interface UseSendMessageProps {
 
 export const useSendMessage = ({ conversationId, user }: UseSendMessageProps) => {
   // Send message function
-  const sendMessage = async (text: string) => {
-    if (!conversationId || !user || !text.trim()) return false;
+  const sendMessage = async (text: string, imageUrl?: string) => {
+    if (!conversationId || !user || (!text.trim() && !imageUrl)) return false;
 
     try {
       console.log("Sending message to:", conversationId);
@@ -22,6 +22,7 @@ export const useSendMessage = ({ conversationId, user }: UseSendMessageProps) =>
         sender_id: user.id,
         receiver_id: conversationId, // In our model, conversation_id is the receiver's user ID
         text: text.trim(),
+        image_url: imageUrl || null,
         created_at: new Date().toISOString(),
         read: false
       };

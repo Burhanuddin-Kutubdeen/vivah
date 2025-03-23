@@ -25,6 +25,7 @@ export interface Message {
   sender_id: string;
   receiver_id: string;
   text: string;
+  image_url?: string | null;
   created_at: string;
   read: boolean;
 }

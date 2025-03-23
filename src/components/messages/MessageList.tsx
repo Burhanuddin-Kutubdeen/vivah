@@ -88,7 +88,23 @@ const MessageList: React.FC<MessageListProps> = ({
                   {conversationName}
                 </div>
               )}
-              <p className="break-words">{message.text}</p>
+              
+              {/* Image attachment */}
+              {message.image_url && (
+                <div className="mb-2">
+                  <img 
+                    src={message.image_url} 
+                    alt="Attachment" 
+                    className="rounded-lg max-h-48 max-w-full object-contain"
+                    onClick={() => window.open(message.image_url!, '_blank')}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </div>
+              )}
+              
+              {/* Message text */}
+              {message.text && <p className="break-words">{message.text}</p>}
+              
               <div className="flex items-center justify-end mt-1">
                 <span className={`text-xs ${
                   isCurrentUser 
