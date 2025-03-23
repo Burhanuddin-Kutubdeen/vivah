@@ -77,7 +77,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex justify-between">
-                <h3 className="font-medium truncate">{conversation.person.name}</h3>
+                <h3 className="font-medium truncate">{conversation.person.name || "Anonymous"}</h3>
                 <span className="text-xs text-matrimony-500 dark:text-matrimony-400">{conversation.lastMessageTime}</span>
               </div>
               <p className={`text-sm truncate mt-1 ${conversation.unread ? 'font-medium text-matrimony-700 dark:text-matrimony-300' : 'text-matrimony-500 dark:text-matrimony-400'}`}>

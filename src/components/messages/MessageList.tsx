@@ -18,7 +18,7 @@ const MessageList: React.FC<MessageListProps> = ({
   messages, 
   isLoading, 
   isTyping = false,
-  conversationName = "User"
+  conversationName = "Anonymous"
 }) => {
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);

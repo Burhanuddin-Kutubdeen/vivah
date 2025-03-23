@@ -53,7 +53,7 @@ const ConversationArea: React.FC<ConversationAreaProps> = ({
         messages={messages} 
         isLoading={isLoading} 
         isTyping={isTyping}
-        conversationName={conversation.person.name} 
+        conversationName={conversation.person.name || "Anonymous"} 
       />
       <MessageInput 
         onSendMessage={sendMessage}
