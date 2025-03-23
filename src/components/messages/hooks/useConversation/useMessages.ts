@@ -68,8 +68,9 @@ export const useMessages = ({ conversationId, userId }: UseMessagesProps) => {
             }
 
             // Format messages for the UI
-            const formattedMessages = data ? data.map(msg => ({
+            const formattedMessages: Message[] = data ? data.map(msg => ({
               id: msg.id,
+              conversation_id: msg.conversation_id,
               text: msg.text,
               sender_id: msg.sender_id,
               receiver_id: msg.receiver_id,
@@ -84,8 +85,9 @@ export const useMessages = ({ conversationId, userId }: UseMessagesProps) => {
             setError(err.message || 'Failed to load messages');
             
             // Fallback demo data
-            const demoMessages = Array(5).fill(null).map((_, i) => ({
+            const demoMessages: Message[] = Array(5).fill(null).map((_, i) => ({
               id: `demo-${i}`,
+              conversation_id: conversationId,
               text: `This is a sample message ${i + 1}`,
               sender_id: i % 2 === 0 ? userId : conversationId,
               receiver_id: i % 2 === 0 ? conversationId : userId,

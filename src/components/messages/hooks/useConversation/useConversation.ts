@@ -10,7 +10,7 @@ interface UseConversationProps {
 
 export const useConversation = ({ conversationId }: UseConversationProps) => {
   const { user } = useAuth();
-  const { messages, isLoading } = useMessages({ conversationId, user });
+  const { messages, isLoading } = useMessages({ conversationId, userId: user?.id || null });
   const { sendMessage } = useSendMessage({ conversationId, user });
   const { isTyping, startTyping, stopTyping } = useTypingIndicator({ conversationId, user });
 
