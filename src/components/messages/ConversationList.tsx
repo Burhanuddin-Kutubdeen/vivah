@@ -18,7 +18,7 @@ export interface Conversation {
 
 interface ConversationListProps {
   conversations: Conversation[];
-  selectedConversation: Conversation;
+  selectedConversation: Conversation | null;
   onSelectConversation: (conversation: Conversation) => void;
 }
 
@@ -36,7 +36,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
         {conversations.map((conversation) => (
           <button
             key={conversation.id}
-            className={`w-full text-left p-4 flex items-start space-x-3 border-b border-gray-100 dark:border-gray-700 hover:bg-matrimony-50 dark:hover:bg-gray-700 transition-colors ${selectedConversation.id === conversation.id ? 'bg-matrimony-50 dark:bg-gray-700' : ''}`}
+            className={`w-full text-left p-4 flex items-start space-x-3 border-b border-gray-100 dark:border-gray-700 hover:bg-matrimony-50 dark:hover:bg-gray-700 transition-colors ${selectedConversation && selectedConversation.id === conversation.id ? 'bg-matrimony-50 dark:bg-gray-700' : ''}`}
             onClick={() => onSelectConversation(conversation)}
           >
             <div className="relative flex-shrink-0">
