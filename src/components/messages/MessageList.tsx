@@ -11,9 +11,15 @@ interface MessageListProps {
   messages: Message[];
   isLoading: boolean;
   isTyping?: boolean;
+  conversationName?: string;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, isTyping = false }) => {
+const MessageList: React.FC<MessageListProps> = ({ 
+  messages, 
+  isLoading, 
+  isTyping = false,
+  conversationName = "User"
+}) => {
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
@@ -74,6 +80,11 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, isTyping
                   : 'bg-matrimony-100 dark:bg-gray-700 text-matrimony-800 dark:text-matrimony-200'
               }`}
             >
+              {!isCurrentUser && (
+                <div className="text-xs font-medium text-matrimony-600 dark:text-matrimony-300 mb-1">
+                  {conversationName}
+                </div>
+              )}
               <p className="break-words">{message.text}</p>
               <div className="flex items-center justify-end mt-1">
                 <span className={`text-xs ${
