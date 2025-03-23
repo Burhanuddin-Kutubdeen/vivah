@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Message } from '../../types/messageTypes';
+import { Message, isSuapabaseMessage } from '../../types/messageTypes';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UseMessagesProps {
@@ -67,7 +67,7 @@ export const useMessages = ({ conversationId, userId }: UseMessagesProps) => {
               }
             }
 
-            // Format messages for the UI
+            // Format messages for the UI - handle image_url which might not exist in the database
             const formattedMessages: Message[] = data ? data.map(msg => ({
               id: msg.id,
               conversation_id: msg.conversation_id,
@@ -76,7 +76,7 @@ export const useMessages = ({ conversationId, userId }: UseMessagesProps) => {
               receiver_id: msg.receiver_id,
               created_at: msg.created_at,
               read: msg.read,
-              image_url: msg.image_url || null
+              image_url: null // Since image_url doesn't exist in the database, default to null
             })) : [];
 
             setMessages(formattedMessages);
@@ -119,7 +119,12 @@ export const useMessages = ({ conversationId, userId }: UseMessagesProps) => {
           table: 'messages',
           filter: `or(and(sender_id=eq.${userId},receiver_id=eq.${conversationId}),and(sender_id=eq.${conversationId},receiver_id=eq.${userId}))`
         }, (payload) => {
-          const newMessage = payload.new as Message;
+          // For real-time messages, ensure they match our Message type
+          const newMessage = {
+            ...payload.new as any,
+            image_url: null // Add image_url field if missing
+          } as Message;
+          
           setMessages(prev => [...prev, newMessage]);
         })
         .subscribe() : null;
