@@ -23,9 +23,6 @@ const MessageList: React.FC<MessageListProps> = ({
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  console.log("MessageList - conversationName:", conversationName);
-  console.log("MessageList - messages:", messages);
-  
   // Scroll to bottom when messages change
   useEffect(() => {
     if (messagesEndRef.current) {

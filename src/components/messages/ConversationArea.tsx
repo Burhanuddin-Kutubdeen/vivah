@@ -21,9 +21,6 @@ const ConversationArea: React.FC<ConversationAreaProps> = ({
     conversationId: conversation?.id || null 
   });
 
-  console.log("ConversationArea - conversation:", conversation);
-  console.log("ConversationArea - messages:", messages);
-
   // Temporarily remove premium wall - allow all messaging
   const canSendMessages = true;
   
