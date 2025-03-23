@@ -29,6 +29,22 @@ const formatValue = (value: string | null): string => {
     .join(' ');
 };
 
+const formatKidsValue = (value: string | null): string => {
+  if (!value) return "Not specified";
+  
+  // Special formatting for kids preferences to make them more professional
+  const mapping: Record<string, string> = {
+    'have_kids': 'Yes, I have children',
+    'dont_have_kids': 'No children',
+    'want_kids': 'Want children in the future',
+    'dont_want_kids': 'Do not want children',
+    'open_to_kids': 'Open to having children',
+    'not_sure': 'Not sure about having children'
+  };
+  
+  return mapping[value] || formatValue(value);
+};
+
 const ProfileDetails: React.FC<ProfileDetailsProps> = ({ profileData }) => {
   if (!profileData) return null;
   
@@ -71,12 +87,12 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ profileData }) => {
     {
       icon: <Baby size={18} />,
       label: "Have Children",
-      value: formatValue(profileData.has_kids)
+      value: formatKidsValue(profileData.has_kids)
     },
     {
       icon: <Baby size={18} />,
       label: "Want Children",
-      value: formatValue(profileData.wants_kids)
+      value: formatKidsValue(profileData.wants_kids)
     }
   ];
 

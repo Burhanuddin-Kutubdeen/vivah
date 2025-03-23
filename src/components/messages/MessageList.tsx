@@ -1,37 +1,97 @@
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-
-export interface Message {
-  id: string;
-  senderId: string;
-  text: string;
-  timestamp: string;
-}
+import { useAuth } from '@/contexts/AuthContext';
+import { Message } from './types/messageTypes';
+import { format } from 'date-fns';
+import { Loader2 } from 'lucide-react';
 
 interface MessageListProps {
   messages: Message[];
+  isLoading: boolean;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ messages }) => {
+const MessageList: React.FC<MessageListProps> = ({ messages, isLoading }) => {
+  const { user } = useAuth();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
+  
+  const formatMessageTime = (timestamp: string) => {
+    try {
+      const date = new Date(timestamp);
+      return format(date, 'h:mm a');
+    } catch (e) {
+      return '';
+    }
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-matrimony-500" />
+      </div>
+    );
+  }
+
+  if (messages.length === 0) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-4 text-center">
+        <div className="max-w-md">
+          <h3 className="text-lg font-medium mb-2">No messages yet</h3>
+          <p className="text-matrimony-500">
+            Send a message to start the conversation
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
-      {messages.map((message) => (
-        <motion.div
-          key={message.id}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className={`flex ${message.senderId === 'user' ? 'justify-end' : 'justify-start'}`}
-        >
-          <div className={`max-w-[80%] ${message.senderId === 'user' ? 'bg-matrimony-600 text-white' : 'bg-matrimony-100 dark:bg-gray-700 text-matrimony-800 dark:text-matrimony-200'} rounded-2xl px-4 py-3`}>
-            <p>{message.text}</p>
-            <p className={`text-xs mt-1 ${message.senderId === 'user' ? 'text-matrimony-200' : 'text-matrimony-500 dark:text-matrimony-400'}`}>
-              {message.timestamp}
-            </p>
-          </div>
-        </motion.div>
-      ))}
+      {messages.map((message) => {
+        const isCurrentUser = message.sender_id === user?.id;
+        
+        return (
+          <motion.div
+            key={message.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
+          >
+            <div 
+              className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                isCurrentUser 
+                  ? 'bg-matrimony-600 text-white' 
+                  : 'bg-matrimony-100 dark:bg-gray-700 text-matrimony-800 dark:text-matrimony-200'
+              }`}
+            >
+              <p className="break-words">{message.text}</p>
+              <div className="flex items-center justify-end mt-1">
+                <span className={`text-xs ${
+                  isCurrentUser 
+                    ? 'text-matrimony-200' 
+                    : 'text-matrimony-500 dark:text-matrimony-400'
+                }`}>
+                  {formatMessageTime(message.created_at)}
+                </span>
+                {isCurrentUser && (
+                  <span className="ml-1 text-xs text-matrimony-200">
+                    {message.read ? '• Read' : ''}
+                  </span>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        );
+      })}
+      <div ref={messagesEndRef} />
     </div>
   );
 };

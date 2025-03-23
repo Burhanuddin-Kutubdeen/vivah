@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
+import { useConversationList } from './hooks/useConversationList';
 
 interface Person {
   name: string;
@@ -17,16 +19,40 @@ export interface Conversation {
 }
 
 interface ConversationListProps {
-  conversations: Conversation[];
   selectedConversation: Conversation | null;
   onSelectConversation: (conversation: Conversation) => void;
 }
 
 const ConversationList: React.FC<ConversationListProps> = ({
-  conversations,
   selectedConversation,
   onSelectConversation
 }) => {
+  const { conversations, isLoading } = useConversationList();
+
+  if (isLoading) {
+    return (
+      <div className="w-1/3 border-r border-gray-200 dark:border-gray-700 flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-matrimony-500" />
+      </div>
+    );
+  }
+
+  if (conversations.length === 0) {
+    return (
+      <div className="w-1/3 border-r border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-medium">Messages</h2>
+        </div>
+        <div className="p-6 text-center">
+          <p className="text-matrimony-500 dark:text-matrimony-400 mb-2">No conversations yet</p>
+          <p className="text-sm text-matrimony-400 dark:text-matrimony-500">
+            When you match with someone, you'll be able to message them here
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-1/3 border-r border-gray-200 dark:border-gray-700">
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
