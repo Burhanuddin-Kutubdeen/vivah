@@ -34,7 +34,7 @@ export const useMessages = ({ conversationId, userId }: UseMessagesProps) => {
               .from('profiles')
               .select('first_name, last_name, avatar_url')
               .eq('id', conversationId)
-              .single();
+              .maybeSingle();
 
             if (profileError) throw profileError;
 
@@ -67,7 +67,7 @@ export const useMessages = ({ conversationId, userId }: UseMessagesProps) => {
               }
             }
 
-            // Format messages for the UI - handle image_url which might not exist in the database
+            // Format messages for the UI - adding image_url with null value since it's in our Message type
             const formattedMessages: Message[] = data ? data.map(msg => ({
               id: msg.id,
               conversation_id: msg.conversation_id,

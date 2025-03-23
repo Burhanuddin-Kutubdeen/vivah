@@ -87,8 +87,10 @@ const Navbar: React.FC = () => {
         </nav>
         
         {/* Auth Buttons and Language Selector */}
-        <div className="flex items-center space-x-4">
-          <LanguageSelector />
+        <div className="flex items-center space-x-3 md:space-x-4">
+          <div className="hidden sm:block">
+            <LanguageSelector />
+          </div>
           <AuthButtons />
         </div>
       </div>
