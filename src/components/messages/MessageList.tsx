@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Message } from './types/messageTypes';
 import { format } from 'date-fns';
 import { Loader2, Check, CheckCheck } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface MessageListProps {
   messages: Message[];
@@ -84,10 +85,19 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, isTyping
                 </span>
                 {isCurrentUser && (
                   <span className="ml-1 text-xs text-matrimony-200 flex items-center">
-                    {message.read ? 
-                      <CheckCheck className="h-3 w-3 ml-1" title="Read" /> : 
-                      <Check className="h-3 w-3 ml-1" title="Delivered" />
-                    }
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          {message.read ? 
+                            <CheckCheck className="h-3 w-3 ml-1" /> : 
+                            <Check className="h-3 w-3 ml-1" />
+                          }
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {message.read ? 'Read' : 'Delivered'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </span>
                 )}
               </div>
