@@ -1,7 +1,5 @@
 
-import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Message } from '../../types/messageTypes';
 import { useMessages } from './useMessages';
 import { useSendMessage } from './useSendMessage';
 import { useTypingIndicator } from './useTypingIndicator';
