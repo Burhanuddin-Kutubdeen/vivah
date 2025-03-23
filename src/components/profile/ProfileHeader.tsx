@@ -29,10 +29,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   };
 
-  // Create a display name that doesn't show as blank
+  // Create a display name that uses only the profile data
   const firstName = profileData?.first_name || '';
   const lastName = profileData?.last_name || '';
   const fullName = [firstName, lastName].filter(Boolean).join(' ');
+  
+  // Only fall back to email or 'User' if we have no name data at all
   const displayName = fullName.trim() || (user?.email?.split('@')[0] || 'User');
 
   return (
