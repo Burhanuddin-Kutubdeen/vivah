@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Send, Image, Paperclip, Smile, Loader2 } from 'lucide-react';
@@ -23,7 +22,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const debouncedIsTyping = useDebounce(isTyping, 1000);
 
-  // Auto-resize the textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -31,14 +29,12 @@ const MessageInput: React.FC<MessageInputProps> = ({
     }
   }, [messageInput]);
   
-  // Handle typing indicator
   useEffect(() => {
     if (isTyping && onStartTyping) {
       onStartTyping();
     }
   }, [isTyping, onStartTyping]);
   
-  // Stop typing when debounced value changes to false
   useEffect(() => {
     if (!debouncedIsTyping && onStopTyping) {
       onStopTyping();
@@ -70,7 +66,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
   
   const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessageInput(e.target.value);
-    // Set typing indicator when user types
     if (e.target.value.length > 0 && !isTyping) {
       setIsTyping(true);
     } else if (e.target.value.length === 0 && isTyping) {
@@ -85,7 +80,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           <textarea
             ref={textareaRef}
             className="bg-transparent border-0 w-full resize-none focus:outline-none focus:ring-0 min-h-[40px] max-h-[150px] p-2"
-            placeholder={isDisabled ? "Premium required to send messages" : "Type your message..."}
+            placeholder="Type your message..."
             value={messageInput}
             onChange={handleMessageChange}
             onKeyDown={handleKeyPress}
@@ -119,18 +114,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
           }
         </Button>
       </div>
-      
-      {isDisabled && (
-        <div className="mt-2 text-center">
-          <Button 
-            variant="link" 
-            className="text-matrimony-600 text-xs font-medium"
-            onClick={() => window.location.href = '/premium'}
-          >
-            Upgrade to Premium to unlock unlimited messaging
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

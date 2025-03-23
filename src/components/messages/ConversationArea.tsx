@@ -1,4 +1,3 @@
-
 import React from 'react';
 import ConversationHeader from './ConversationHeader';
 import MessageList from './MessageList';
@@ -21,8 +20,8 @@ const ConversationArea: React.FC<ConversationAreaProps> = ({
     conversationId: conversation?.id || null 
   });
 
-  // Check if messaging is allowed
-  const canSendMessages = isPremium || (messages.length > 0);
+  // Temporarily remove premium wall - allow all messaging
+  const canSendMessages = true;
   
   if (!conversation) {
     return (
@@ -50,7 +49,7 @@ const ConversationArea: React.FC<ConversationAreaProps> = ({
         onSendMessage={sendMessage}
         onStartTyping={startTyping}
         onStopTyping={stopTyping}
-        isDisabled={!canSendMessages && !isPremium}
+        isDisabled={false} // Remove the disabled state completely
       />
     </div>
   );

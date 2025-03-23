@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -24,16 +23,14 @@ const Messages = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const isOffline = useOnlineStatus();
-  const isOnline = !isOffline; // Fix the type issue by directly using the boolean value
+  const isOnline = !isOffline;
   const { requests } = useMessageRequests();
   
-  // Check for URL parameters and set initial conversation
   useEffect(() => {
     const userId = searchParams.get('userId');
     const name = searchParams.get('name');
     
     if (userId && name) {
-      // Create a temporary conversation from URL params until the real one loads
       const conversation: Conversation = {
         id: userId,
         person: {
@@ -47,7 +44,6 @@ const Messages = () => {
       };
       
       setSelectedConversation(conversation);
-      // Switch to messages tab if coming from a direct link
       setActiveTab('messages');
     }
   }, [searchParams]);
@@ -55,7 +51,6 @@ const Messages = () => {
   const handleSelectConversation = (conversation: Conversation) => {
     setSelectedConversation(conversation);
     
-    // Update URL without navigating
     const url = new URL(window.location.href);
     url.searchParams.set('userId', conversation.id);
     url.searchParams.set('name', conversation.person.name);
@@ -63,16 +58,12 @@ const Messages = () => {
   };
   
   const handleAcceptRequest = (userId: string, name: string) => {
-    // Navigate to open the conversation with this user
     navigate(`/messages?userId=${userId}&name=${encodeURIComponent(name)}`);
-    // Switch to conversations tab
     setActiveTab('messages');
   };
 
-  // Check if user is premium - for now just set to false, will implement later
-  const isPremium = false;
+  const isPremium = true;
 
-  // Redirect to login if not authenticated
   if (!user) {
     return (
       <AnimatedTransition>
@@ -108,12 +99,6 @@ const Messages = () => {
                   You're currently offline. Some features may be limited until your connection is restored.
                 </AlertDescription>
               </Alert>
-            )}
-            
-            {!isPremium && (
-              <div className="mb-6">
-                <PremiumUpgradeButton isOffline={!isOnline} />
-              </div>
             )}
             
             <Tabs defaultValue="messages" value={activeTab} onValueChange={setActiveTab} className="w-full">
