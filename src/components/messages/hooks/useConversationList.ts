@@ -1,8 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Conversation } from '../ConversationList';
 import { toast } from 'sonner';
+import { isSuapabaseMessage } from '../types/messageTypes';
 
 export const useConversationList = () => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -63,17 +65,19 @@ export const useConversationList = () => {
         
         for (const profile of profiles) {
           // Get the latest message between these users
-          const { data: latestMessage, error: messageError } = await supabase
+          const { data: latestMessageData, error: messageError } = await supabase
             .from('messages')
             .select('*')
             .or(`and(sender_id.eq.${user.id},receiver_id.eq.${profile.id}),and(sender_id.eq.${profile.id},receiver_id.eq.${user.id})`)
             .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
+            .limit(1);
             
-          if (messageError && messageError.code !== 'PGRST116') {
+          if (messageError) {
             console.error('Error fetching latest message:', messageError);
           }
+
+          const latestMessage = latestMessageData && latestMessageData.length > 0 && 
+            isSuapabaseMessage(latestMessageData[0]) ? latestMessageData[0] : null;
           
           // Format the name
           const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(' ');

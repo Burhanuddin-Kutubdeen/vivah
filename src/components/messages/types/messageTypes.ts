@@ -28,3 +28,17 @@ export interface Message {
   created_at: string;
   read: boolean;
 }
+
+// Type-safe way to handle Supabase typing issues
+export const isSuapabaseMessage = (obj: any): obj is Message => {
+  return (
+    obj &&
+    typeof obj.id === 'string' &&
+    typeof obj.conversation_id === 'string' &&
+    typeof obj.sender_id === 'string' &&
+    typeof obj.receiver_id === 'string' &&
+    typeof obj.text === 'string' &&
+    typeof obj.created_at === 'string' &&
+    typeof obj.read === 'boolean'
+  );
+};

@@ -19,7 +19,8 @@ const Messages = () => {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { isOnline } = useOnlineStatus();
+  const isOnlineStatus = useOnlineStatus();
+  const isOnline = isOnlineStatus.isOnline; // Fix the type issue by accessing the property directly
   
   // Check for URL parameters and set initial conversation
   useEffect(() => {

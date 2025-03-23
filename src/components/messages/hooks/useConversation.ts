@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Message } from '../types/messageTypes';
+import { Message, isSuapabaseMessage } from '../types/messageTypes';
 import { toast } from 'sonner';
 
 interface UseConversationProps {
@@ -33,12 +33,16 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
           console.error('Error fetching messages:', error);
           return;
         }
-
-        setMessages(data || []);
+        
+        // Type guard to ensure we only set valid message objects
+        const validMessages = Array.isArray(data) ? 
+          data.filter(isSuapabaseMessage) : [];
+        
+        setMessages(validMessages);
 
         // Mark messages as read
-        if (data && data.length > 0) {
-          const unreadMessages = data.filter(
+        if (validMessages.length > 0) {
+          const unreadMessages = validMessages.filter(
             msg => msg.receiver_id === user.id && !msg.read
           );
 
@@ -77,17 +81,19 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
           },
           (payload) => {
             const newMessage = payload.new as Message;
-            setMessages(prev => [...prev, newMessage]);
+            if (isSuapabaseMessage(newMessage)) {
+              setMessages(prev => [...prev, newMessage]);
 
-            // If the message is received (not sent by current user), mark as read
-            if (newMessage.receiver_id === user.id) {
-              supabase
-                .from('messages')
-                .update({ read: true })
-                .eq('id', newMessage.id)
-                .then(({ error }) => {
-                  if (error) console.error('Error marking message as read:', error);
-                });
+              // If the message is received (not sent by current user), mark as read
+              if (newMessage.receiver_id === user.id) {
+                supabase
+                  .from('messages')
+                  .update({ read: true })
+                  .eq('id', newMessage.id)
+                  .then(({ error }) => {
+                    if (error) console.error('Error marking message as read:', error);
+                  });
+              }
             }
           }
         )
@@ -104,14 +110,11 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
     if (!conversationId || !user || !text.trim()) return false;
 
     try {
-      // Get the receiver ID from the conversation
-      const receiverId = conversationId;
-
       // Create a new message
       const newMessage = {
         conversation_id: conversationId,
         sender_id: user.id,
-        receiver_id: receiverId,
+        receiver_id: conversationId, // In our model, conversation_id is the receiver's user ID
         text: text.trim(),
         created_at: new Date().toISOString(),
         read: false
@@ -120,7 +123,7 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
       // Insert into database
       const { error } = await supabase
         .from('messages')
-        .insert(newMessage);
+        .insert(newMessage as any); // Type assertion needed due to Supabase typings issue
 
       if (error) {
         console.error('Error sending message:', error);
