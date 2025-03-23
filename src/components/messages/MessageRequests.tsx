@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, UserX } from 'lucide-react';
 import { MessageRequestsProps } from './types/messageTypes';
 import { useMessageRequests } from './hooks/useMessageRequests';
 import MessageRequestItem from './MessageRequestItem';
@@ -23,7 +23,15 @@ const MessageRequests: React.FC<MessageRequestsProps> = ({ onAccept }) => {
   }
   
   if (requests.length === 0) {
-    return null;
+    return (
+      <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+        <UserX className="h-12 w-12 text-matrimony-300 mb-4" />
+        <h3 className="text-lg font-medium mb-1">No message requests</h3>
+        <p className="text-matrimony-500 dark:text-matrimony-400 max-w-md">
+          When someone wants to message you, their request will appear here for you to accept or decline.
+        </p>
+      </div>
+    );
   }
   
   const onAcceptRequest = (request) => {
@@ -31,19 +39,16 @@ const MessageRequests: React.FC<MessageRequestsProps> = ({ onAccept }) => {
   };
 
   return (
-    <div className="mb-6">
-      <h2 className="text-lg font-medium mb-3">Message Requests</h2>
-      <div className="space-y-3">
-        {requests.map((request) => (
-          <MessageRequestItem
-            key={request.id}
-            request={request}
-            processingId={processingId}
-            onAccept={onAcceptRequest}
-            onDecline={handleDecline}
-          />
-        ))}
-      </div>
+    <div className="space-y-3">
+      {requests.map((request) => (
+        <MessageRequestItem
+          key={request.id}
+          request={request}
+          processingId={processingId}
+          onAccept={onAcceptRequest}
+          onDecline={handleDecline}
+        />
+      ))}
     </div>
   );
 };

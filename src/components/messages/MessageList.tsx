@@ -4,14 +4,15 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { Message } from './types/messageTypes';
 import { format } from 'date-fns';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Check, CheckCheck } from 'lucide-react';
 
 interface MessageListProps {
   messages: Message[];
   isLoading: boolean;
+  isTyping?: boolean;
 }
 
-const MessageList: React.FC<MessageListProps> = ({ messages, isLoading }) => {
+const MessageList: React.FC<MessageListProps> = ({ messages, isLoading, isTyping = false }) => {
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
@@ -20,7 +21,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading }) => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages, isTyping]);
   
   const formatMessageTime = (timestamp: string) => {
     try {
@@ -82,8 +83,11 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading }) => {
                   {formatMessageTime(message.created_at)}
                 </span>
                 {isCurrentUser && (
-                  <span className="ml-1 text-xs text-matrimony-200">
-                    {message.read ? '• Read' : ''}
+                  <span className="ml-1 text-xs text-matrimony-200 flex items-center">
+                    {message.read ? 
+                      <CheckCheck className="h-3 w-3 ml-1" title="Read" /> : 
+                      <Check className="h-3 w-3 ml-1" title="Delivered" />
+                    }
                   </span>
                 )}
               </div>
@@ -91,6 +95,24 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading }) => {
           </motion.div>
         );
       })}
+      
+      {/* Typing indicator */}
+      {isTyping && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-start"
+        >
+          <div className="bg-matrimony-100 dark:bg-gray-700 text-matrimony-800 dark:text-matrimony-200 rounded-2xl px-4 py-3">
+            <div className="flex space-x-1">
+              <div className="w-2 h-2 rounded-full bg-matrimony-500 animate-bounce" style={{animationDelay: '0ms'}} />
+              <div className="w-2 h-2 rounded-full bg-matrimony-500 animate-bounce" style={{animationDelay: '150ms'}} />
+              <div className="w-2 h-2 rounded-full bg-matrimony-500 animate-bounce" style={{animationDelay: '300ms'}} />
+            </div>
+          </div>
+        </motion.div>
+      )}
+      
       <div ref={messagesEndRef} />
     </div>
   );

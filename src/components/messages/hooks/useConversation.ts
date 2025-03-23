@@ -55,6 +55,15 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
 
             if (updateError) {
               console.error('Error marking messages as read:', updateError);
+            } else {
+              // Update local state to show messages as read
+              setMessages(prev => 
+                prev.map(msg => 
+                  unreadMessages.some(unread => unread.id === msg.id) 
+                    ? { ...msg, read: true } 
+                    : msg
+                )
+              );
             }
           }
         }
@@ -94,6 +103,26 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
                     if (error) console.error('Error marking message as read:', error);
                   });
               }
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'messages',
+            filter: `conversation_id=eq.${conversationId}`
+          },
+          (payload) => {
+            const updatedMessage = payload.new as Message;
+            if (isSuapabaseMessage(updatedMessage)) {
+              // Update the message in our local state
+              setMessages(prev => 
+                prev.map(msg => 
+                  msg.id === updatedMessage.id ? updatedMessage : msg
+                )
+              );
             }
           }
         )
@@ -140,10 +169,30 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
     }
   };
 
+  // Start typing indicator
+  const startTyping = async () => {
+    if (!conversationId || !user) return;
+    
+    // In a real implementation, we would send a typing indicator to the server
+    // For now, just set the local state
+    setIsTyping(true);
+  };
+
+  // Stop typing indicator
+  const stopTyping = async () => {
+    if (!conversationId || !user) return;
+    
+    // In a real implementation, we would send a typing stop indicator to the server
+    // For now, just set the local state
+    setIsTyping(false);
+  };
+
   return {
     messages,
     isLoading,
     isTyping,
-    sendMessage
+    sendMessage,
+    startTyping,
+    stopTyping
   };
 };

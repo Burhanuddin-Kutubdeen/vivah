@@ -17,7 +17,7 @@ const ConversationArea: React.FC<ConversationAreaProps> = ({
   isPremium = false
 }) => {
   const { user } = useAuth();
-  const { messages, isLoading, sendMessage } = useConversation({ 
+  const { messages, isLoading, isTyping, sendMessage, startTyping, stopTyping } = useConversation({ 
     conversationId: conversation?.id || null 
   });
 
@@ -40,9 +40,15 @@ const ConversationArea: React.FC<ConversationAreaProps> = ({
   return (
     <div className="flex-1 flex flex-col">
       <ConversationHeader conversation={conversation} />
-      <MessageList messages={messages} isLoading={isLoading} />
+      <MessageList 
+        messages={messages} 
+        isLoading={isLoading} 
+        isTyping={isTyping} 
+      />
       <MessageInput 
-        onSendMessage={sendMessage} 
+        onSendMessage={sendMessage}
+        onStartTyping={startTyping}
+        onStopTyping={stopTyping}
         isDisabled={!canSendMessages && !isPremium}
       />
     </div>

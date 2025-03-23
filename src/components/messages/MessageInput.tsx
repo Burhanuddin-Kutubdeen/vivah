@@ -2,16 +2,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Send, Image, Paperclip, Smile, Loader2 } from 'lucide-react';
+import { useDebounce } from '@/hooks/use-debounce';
 
 interface MessageInputProps {
   onSendMessage: (message: string) => Promise<boolean>;
+  onStartTyping?: () => void;
+  onStopTyping?: () => void;
   isDisabled?: boolean;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isDisabled = false }) => {
+const MessageInput: React.FC<MessageInputProps> = ({ 
+  onSendMessage, 
+  onStartTyping,
+  onStopTyping,
+  isDisabled = false 
+}) => {
   const [messageInput, setMessageInput] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const debouncedIsTyping = useDebounce(isTyping, 1000);
 
   // Auto-resize the textarea
   useEffect(() => {
@@ -20,6 +30,20 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isDisabled =
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 150)}px`;
     }
   }, [messageInput]);
+  
+  // Handle typing indicator
+  useEffect(() => {
+    if (isTyping && onStartTyping) {
+      onStartTyping();
+    }
+  }, [isTyping, onStartTyping]);
+  
+  // Stop typing when debounced value changes to false
+  useEffect(() => {
+    if (!debouncedIsTyping && onStopTyping) {
+      onStopTyping();
+    }
+  }, [debouncedIsTyping, onStopTyping]);
 
   const sendMessage = async () => {
     if (messageInput.trim() === '' || isSending || isDisabled) return;
@@ -29,6 +53,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isDisabled =
       const success = await onSendMessage(messageInput);
       if (success) {
         setMessageInput('');
+        setIsTyping(false);
+        if (onStopTyping) onStopTyping();
       }
     } finally {
       setIsSending(false);
@@ -41,6 +67,16 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isDisabled =
       sendMessage();
     }
   };
+  
+  const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessageInput(e.target.value);
+    // Set typing indicator when user types
+    if (e.target.value.length > 0 && !isTyping) {
+      setIsTyping(true);
+    } else if (e.target.value.length === 0 && isTyping) {
+      setIsTyping(false);
+    }
+  };
 
   return (
     <div className="p-4 border-t border-gray-200 dark:border-gray-700">
@@ -51,7 +87,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSendMessage, isDisabled =
             className="bg-transparent border-0 w-full resize-none focus:outline-none focus:ring-0 min-h-[40px] max-h-[150px] p-2"
             placeholder={isDisabled ? "Premium required to send messages" : "Type your message..."}
             value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
+            onChange={handleMessageChange}
             onKeyDown={handleKeyPress}
             disabled={isDisabled}
             rows={1}
