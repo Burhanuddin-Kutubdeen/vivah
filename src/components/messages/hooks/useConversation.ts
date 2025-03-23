@@ -23,7 +23,7 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
       console.log("Fetching messages for conversation:", conversationId);
       setIsLoading(true);
       try {
-        // Get messages where the conversation_id matches
+        // Get messages where the sender_id and receiver_id match the conversation
         const { data, error } = await supabase
           .from('messages')
           .select('*')
