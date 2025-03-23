@@ -92,6 +92,8 @@ const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
       const { error } = await supabase
         .from('profiles')
         .update({
+          first_name: values.first_name,
+          last_name: values.last_name,
           date_of_birth: values.dateOfBirth.toISOString().split('T')[0],
           gender: values.gender,
           civil_status: values.civil_status,
