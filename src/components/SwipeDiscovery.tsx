@@ -7,7 +7,7 @@ import SwipeActionButtons from '@/components/discovery/SwipeActionButtons';
 import PremiumUpgradeButton from '@/components/discovery/PremiumUpgradeButton';
 import DiscoveryLoadingSkeleton from '@/components/discovery/DiscoveryLoadingSkeleton';
 import { Button } from '@/components/ui/button';
-import { Filter } from 'lucide-react';
+import { Filter, Loader2 } from 'lucide-react';
 import PreferencesFilter from '@/components/discovery/PreferencesFilter';
 import { DiscoveryProfilePreferences } from '@/types/discovery';
 import { toast } from "sonner";
@@ -21,7 +21,7 @@ interface SwipeDiscoveryProps {
 const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({ 
   isOffline, 
   isPremium = false, 
-  isLoading = false 
+  isLoading: parentLoading = false 
 }) => {
   const [showPreferences, setShowPreferences] = useState(false);
   const [preferences, setPreferences] = useState<DiscoveryProfilePreferences>({
@@ -37,8 +37,11 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
     handleSwipe, 
     handleSuperLike,
     applyPreferences,
-    hasProfiles
+    hasProfiles,
+    isLoading: profilesLoading
   } = useDiscoveryProfiles({ isPremium, preferences });
+
+  const isLoading = parentLoading || profilesLoading;
 
   const handleApplyPreferences = (newPreferences: DiscoveryProfilePreferences) => {
     setPreferences(newPreferences);
@@ -50,7 +53,16 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
   };
 
   if (isLoading) {
-    return <DiscoveryLoadingSkeleton />;
+    return (
+      <div className="py-8">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-center">
+            <Loader2 className="h-10 w-10 animate-spin text-matrimony-500 mx-auto mb-4" />
+            <p className="text-matrimony-600 dark:text-matrimony-300">Loading profiles...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -103,9 +115,9 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
           </>
         ) : (
           <div className="p-8 text-center bg-white dark:bg-gray-800 rounded-xl shadow-sm my-8">
-            <h3 className="text-xl font-medium mb-2">No Matches Found</h3>
+            <h3 className="text-xl font-medium mb-2">No Profiles Found</h3>
             <p className="text-gray-500 dark:text-gray-400 mb-4">
-              We couldn't find any profiles matching your current preferences.
+              We couldn't find any profiles matching your current preferences or there may not be any other users registered yet.
             </p>
             <Button 
               onClick={() => {
