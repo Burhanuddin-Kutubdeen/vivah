@@ -20,13 +20,14 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
     const fetchMessages = async () => {
       if (!conversationId || !user) return;
 
+      console.log("Fetching messages for conversation:", conversationId);
       setIsLoading(true);
       try {
         // Get messages where the conversation_id matches
         const { data, error } = await supabase
           .from('messages')
           .select('*')
-          .eq('conversation_id', conversationId)
+          .or(`and(sender_id.eq.${user.id},receiver_id.eq.${conversationId}),and(sender_id.eq.${conversationId},receiver_id.eq.${user.id})`)
           .order('created_at', { ascending: true });
 
         if (error) {
@@ -34,10 +35,13 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
           return;
         }
         
+        console.log("Messages data from DB:", data);
+        
         // Type guard to ensure we only set valid message objects
         const validMessages = Array.isArray(data) ? 
           data.filter(isSuapabaseMessage) : [];
         
+        console.log("Valid messages after filtering:", validMessages);
         setMessages(validMessages);
 
         // Mark messages as read
@@ -86,9 +90,10 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
             event: 'INSERT',
             schema: 'public',
             table: 'messages',
-            filter: `conversation_id=eq.${conversationId}`
+            filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${conversationId}),and(sender_id.eq.${conversationId},receiver_id.eq.${user.id}))`
           },
           (payload) => {
+            console.log("New message received:", payload);
             const newMessage = payload.new as Message;
             if (isSuapabaseMessage(newMessage)) {
               setMessages(prev => [...prev, newMessage]);
@@ -112,9 +117,10 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
             event: 'UPDATE',
             schema: 'public',
             table: 'messages',
-            filter: `conversation_id=eq.${conversationId}`
+            filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${conversationId}),and(sender_id.eq.${conversationId},receiver_id.eq.${user.id}))`
           },
           (payload) => {
+            console.log("Message updated:", payload);
             const updatedMessage = payload.new as Message;
             if (isSuapabaseMessage(updatedMessage)) {
               // Update the message in our local state
@@ -139,6 +145,8 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
     if (!conversationId || !user || !text.trim()) return false;
 
     try {
+      console.log("Sending message to:", conversationId);
+      
       // Create a new message
       const newMessage = {
         conversation_id: conversationId,
@@ -160,6 +168,7 @@ export const useConversation = ({ conversationId }: UseConversationProps) => {
         return false;
       }
 
+      console.log("Message sent successfully");
       // Message sent successfully
       return true;
     } catch (error) {

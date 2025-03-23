@@ -32,6 +32,7 @@ const Messages = () => {
     const name = searchParams.get('name');
     
     if (userId && name) {
+      console.log("URL params - userId:", userId, "name:", name);
       const conversation: Conversation = {
         id: userId,
         person: {
@@ -44,13 +45,14 @@ const Messages = () => {
         unread: false,
       };
       
+      console.log("Creating conversation from URL params:", conversation);
       setSelectedConversation(conversation);
       setActiveTab('messages');
     }
   }, [searchParams]);
   
   const handleSelectConversation = (conversation: Conversation) => {
-    console.log("Selected conversation:", conversation); // Debug log
+    console.log("Selected conversation:", conversation);
     setSelectedConversation(conversation);
     
     const url = new URL(window.location.href);
@@ -60,6 +62,7 @@ const Messages = () => {
   };
   
   const handleAcceptRequest = (userId: string, name: string) => {
+    console.log("Accepting request from:", name, "userId:", userId);
     navigate(`/messages?userId=${userId}&name=${encodeURIComponent(name)}`);
     setActiveTab('messages');
   };
