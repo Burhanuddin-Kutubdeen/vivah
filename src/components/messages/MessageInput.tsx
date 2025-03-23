@@ -1,6 +1,7 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Send, Image, Paperclip, Smile, Loader2 } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
 
 interface MessageInputProps {
@@ -87,20 +88,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
             disabled={isDisabled}
             rows={1}
           />
-          
-          <div className="flex justify-between items-center px-2">
-            <div className="flex space-x-2">
-              <button className="text-matrimony-400 hover:text-matrimony-600 dark:hover:text-matrimony-300 p-1 rounded-full" disabled={isDisabled}>
-                <Paperclip className="h-5 w-5" />
-              </button>
-              <button className="text-matrimony-400 hover:text-matrimony-600 dark:hover:text-matrimony-300 p-1 rounded-full" disabled={isDisabled}>
-                <Image className="h-5 w-5" />
-              </button>
-              <button className="text-matrimony-400 hover:text-matrimony-600 dark:hover:text-matrimony-300 p-1 rounded-full" disabled={isDisabled}>
-                <Smile className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
         </div>
         
         <Button 

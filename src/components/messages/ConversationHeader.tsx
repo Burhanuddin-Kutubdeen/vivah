@@ -1,8 +1,14 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Phone, Video, InfoIcon, MoreVertical } from 'lucide-react';
+import { MoreVertical } from 'lucide-react';
 import { Conversation } from './ConversationList';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface ConversationHeaderProps {
   conversation: Conversation;
@@ -24,19 +30,22 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({ conversation })
           </p>
         </div>
       </div>
-      <div className="flex space-x-2">
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Phone className="h-5 w-5 text-matrimony-600 dark:text-matrimony-300" />
-        </Button>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Video className="h-5 w-5 text-matrimony-600 dark:text-matrimony-300" />
-        </Button>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <InfoIcon className="h-5 w-5 text-matrimony-600 dark:text-matrimony-300" />
-        </Button>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <MoreVertical className="h-5 w-5 text-matrimony-600 dark:text-matrimony-300" />
-        </Button>
+      <div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <MoreVertical className="h-5 w-5 text-matrimony-600 dark:text-matrimony-300" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem className="text-red-500 cursor-pointer">
+              Block User
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-yellow-500 cursor-pointer">
+              Report User
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );

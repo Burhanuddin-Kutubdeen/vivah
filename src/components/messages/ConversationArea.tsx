@@ -40,9 +40,18 @@ const ConversationArea: React.FC<ConversationAreaProps> = ({
     );
   }
 
+  // Make sure to set the correct online status from the API or source
+  const updatedConversation = {
+    ...conversation,
+    person: {
+      ...conversation.person,
+      isOnline: true // Set to true to show as online
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col">
-      <ConversationHeader conversation={conversation} />
+      <ConversationHeader conversation={updatedConversation} />
       <MessageList 
         messages={messages} 
         isLoading={isLoading} 
