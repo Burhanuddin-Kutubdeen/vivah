@@ -4,6 +4,7 @@ import { Control } from 'react-hook-form';
 import { ProfileFormValues } from './ProfileFormSchema';
 
 // Import field components
+import NameFields from './fields/NameFields';
 import DateOfBirthField from './fields/DateOfBirthField';
 import GenderField from './fields/GenderField';
 import CivilStatusField from './fields/CivilStatusField';
@@ -26,45 +27,50 @@ interface BasicInfoSectionProps {
 }
 
 export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ control }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {/* Date of Birth */}
-    <DateOfBirthField control={control} />
+  <div className="space-y-6">
+    {/* Name Fields (First and Last Name) */}
+    <NameFields control={control} />
 
-    {/* Gender */}
-    <GenderField control={control} />
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Date of Birth */}
+      <DateOfBirthField control={control} />
 
-    {/* Civil Status */}
-    <CivilStatusField control={control} />
+      {/* Gender */}
+      <GenderField control={control} />
 
-    {/* Religion (Optional) */}
-    <ReligionField control={control} />
+      {/* Civil Status */}
+      <CivilStatusField control={control} />
 
-    {/* Education */}
-    <EducationField control={control} />
-    
-    {/* Job */}
-    <JobField control={control} />
+      {/* Religion (Optional) */}
+      <ReligionField control={control} />
 
-    {/* Height */}
-    <HeightSelector control={control} />
+      {/* Education */}
+      <EducationField control={control} />
+      
+      {/* Job */}
+      <JobField control={control} />
 
-    {/* Weight */}
-    <WeightField control={control} />
-    
-    {/* Exercise */}
-    <ExerciseField control={control} />
-    
-    {/* Drinking */}
-    <DrinkingField control={control} />
-    
-    {/* Smoking */}
-    <SmokingField control={control} />
-    
-    {/* Want Kids */}
-    <KidsWantField control={control} />
-    
-    {/* Have Kids */}
-    <KidsHaveField control={control} />
+      {/* Height */}
+      <HeightSelector control={control} />
+
+      {/* Weight */}
+      <WeightField control={control} />
+      
+      {/* Exercise */}
+      <ExerciseField control={control} />
+      
+      {/* Drinking */}
+      <DrinkingField control={control} />
+      
+      {/* Smoking */}
+      <SmokingField control={control} />
+      
+      {/* Want Kids */}
+      <KidsWantField control={control} />
+      
+      {/* Have Kids */}
+      <KidsHaveField control={control} />
+    </div>
   </div>
 );
 

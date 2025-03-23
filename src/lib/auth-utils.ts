@@ -31,6 +31,7 @@ export const signUpUser = async (
     const domain = window.location.origin;
     console.log("Current domain for redirect:", domain);
 
+    // Make sure to include first_name and last_name in metadata
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
@@ -48,9 +49,24 @@ export const signUpUser = async (
       return { error, data: null };
     }
 
-    // If registration successful, call the onSuccess callback
+    // If registration successful and we have user data, update the profiles table
     if (data.user) {
       console.log("User registered successfully:", data.user.id);
+      
+      // Also update the profiles table with first and last name
+      try {
+        await supabase
+          .from('profiles')
+          .update({
+            first_name: userData.firstName,
+            last_name: userData.lastName
+          })
+          .eq('id', data.user.id);
+      } catch (profileError) {
+        console.error("Error updating profile:", profileError);
+        // We don't fail the signup if profile update fails
+      }
+      
       onSuccess(data.user, data.session);
     }
     

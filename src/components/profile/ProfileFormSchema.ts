@@ -3,6 +3,8 @@ import * as z from "zod";
 
 // Form schema validation
 export const profileFormSchema = z.object({
+  first_name: z.string().min(2, "First name must be at least 2 characters").max(50),
+  last_name: z.string().min(2, "Last name must be at least 2 characters").max(50),
   dateOfBirth: z.date({
     required_error: "Date of birth is required",
   }).refine((date) => {

@@ -14,6 +14,8 @@ export const useProfileForm = (userId: string | undefined, connectionError: bool
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
+      first_name: "",
+      last_name: "",
       location: "",
       bio: "",
       interests: [],
@@ -44,7 +46,7 @@ export const useProfileForm = (userId: string | undefined, connectionError: bool
         
         const { data, error } = await supabase
           .from('profiles')
-          .select('date_of_birth, gender, civil_status, religion, location, bio, interests, height, weight, education, job, exercise, drinking, smoking, wants_kids, has_kids')
+          .select('first_name, last_name, date_of_birth, gender, civil_status, religion, location, bio, interests, height, weight, education, job, exercise, drinking, smoking, wants_kids, has_kids')
           .eq('id', userId)
           .maybeSingle();
           
@@ -68,6 +70,8 @@ export const useProfileForm = (userId: string | undefined, connectionError: bool
         if (data) {
           // Only set form values if we have data
           form.reset({
+            first_name: data.first_name || "",
+            last_name: data.last_name || "",
             dateOfBirth: data.date_of_birth ? new Date(data.date_of_birth) : undefined,
             gender: data.gender as "male" | "female" || "male",
             civil_status: data.civil_status || "",
