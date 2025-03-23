@@ -3,9 +3,11 @@ import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import LanguageSelector from '@/components/navbar/LanguageSelector';
+import AuthButtons from '@/components/navbar/AuthButtons';
 
 const Navbar: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
 
   return (
     <header className="bg-white dark:bg-gray-900 shadow-sm py-4">
@@ -84,46 +86,10 @@ const Navbar: React.FC = () => {
           </NavLink>
         </nav>
         
-        {/* Auth Buttons */}
+        {/* Auth Buttons and Language Selector */}
         <div className="flex items-center space-x-4">
-          {user ? (
-            <div className="flex items-center space-x-4">
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="rounded-full text-sm font-medium"
-                asChild
-              >
-                <Link to="/profile">Profile</Link>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="rounded-full text-sm font-medium"
-                onClick={() => signOut()}
-              >
-                Logout
-              </Button>
-            </div>
-          ) : (
-            <>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="rounded-full font-medium"
-                asChild
-              >
-                <Link to="/login">Login</Link>
-              </Button>
-              <Button 
-                size="sm"
-                className="rounded-full font-medium bg-matrimony-600 hover:bg-matrimony-700 text-white"
-                asChild
-              >
-                <Link to="/register">Register</Link>
-              </Button>
-            </>
-          )}
+          <LanguageSelector />
+          <AuthButtons />
         </div>
       </div>
     </header>
