@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -49,11 +50,12 @@ const Messages = () => {
   }, [searchParams]);
   
   const handleSelectConversation = (conversation: Conversation) => {
+    console.log("Selected conversation:", conversation); // Debug log
     setSelectedConversation(conversation);
     
     const url = new URL(window.location.href);
     url.searchParams.set('userId', conversation.id);
-    url.searchParams.set('name', conversation.person.name);
+    url.searchParams.set('name', encodeURIComponent(conversation.person.name));
     window.history.pushState({}, '', url);
   };
   

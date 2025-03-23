@@ -23,6 +23,9 @@ const MessageList: React.FC<MessageListProps> = ({
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
+  console.log("MessageList - conversationName:", conversationName);
+  console.log("MessageList - messages:", messages);
+  
   // Scroll to bottom when messages change
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -53,7 +56,7 @@ const MessageList: React.FC<MessageListProps> = ({
         <div className="max-w-md">
           <h3 className="text-lg font-medium mb-2">No messages yet</h3>
           <p className="text-matrimony-500">
-            Send a message to start the conversation
+            Send a message to start the conversation with {conversationName}
           </p>
         </div>
       </div>
