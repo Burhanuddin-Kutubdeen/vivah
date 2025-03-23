@@ -27,6 +27,10 @@ export const signUpUser = async (
       };
     }
     
+    // Get the current domain for redirecting email verification
+    const domain = window.location.origin;
+    console.log("Current domain for redirect:", domain);
+
     const { error, data } = await supabase.auth.signUp({
       email,
       password,
@@ -35,6 +39,7 @@ export const signUpUser = async (
           first_name: userData.firstName,
           last_name: userData.lastName,
         },
+        emailRedirectTo: `${domain}/login?verified=true`,
       },
     });
 
