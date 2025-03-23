@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -19,8 +18,8 @@ const Messages = () => {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
-  const isOnlineStatus = useOnlineStatus();
-  const isOnline = isOnlineStatus.isOnline; // Fix the type issue by accessing the property directly
+  const isOffline = useOnlineStatus();
+  const isOnline = !isOffline; // Fix the type issue by directly using the boolean value
   
   // Check for URL parameters and set initial conversation
   useEffect(() => {

@@ -40,5 +40,5 @@ export function useOnlineStatus() {
     };
   }, [toast]);
 
-  return isOffline;
+  return isOffline; // Return just the boolean value
 }
