@@ -30,10 +30,10 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ isMobile = false })
         <Button
           variant="ghost"
           size="sm"
-          className="px-2 text-matrimony-600"
+          className="px-2 text-matrimony-600 hover:bg-matrimony-50 dark:hover:bg-matrimony-900/20 dark:text-matrimony-300"
         >
           <Globe className="h-4 w-4 mr-1" />
-          <span className={isMobile ? "sr-only" : "sr-only md:not-sr-only md:inline-block"}>
+          <span className={isMobile ? "sr-only" : "sr-only md:not-sr-only md:inline-block font-medium text-sm"}>
             {languages.find(lang => lang.code === currentLanguage)?.label}
           </span>
         </Button>
@@ -43,6 +43,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ isMobile = false })
           <DropdownMenuItem 
             key={lang.code}
             onClick={() => setCurrentLanguage(lang.code)}
+            className="cursor-pointer font-medium"
           >
             {lang.label}
           </DropdownMenuItem>

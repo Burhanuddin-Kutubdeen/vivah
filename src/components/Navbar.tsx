@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import LanguageSelector from '@/components/navbar/LanguageSelector';
@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
           <Button 
             variant="ghost" 
             size="icon"
-            className="md:hidden"
+            className="md:hidden text-matrimony-700 dark:text-matrimony-300 hover:bg-matrimony-50 dark:hover:bg-matrimony-900/20"
             onClick={() => setIsMobileMenuOpen(true)}
           >
             <Menu className="h-6 w-6" />

@@ -43,10 +43,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
       className="fixed inset-y-0 right-0 w-full max-w-xs bg-white dark:bg-gray-900 z-50 shadow-xl p-4 flex flex-col"
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold">Menu</h2>
+        <h2 className="text-xl font-serif font-bold text-matrimony-700 dark:text-matrimony-300">Menu</h2>
         <button
           onClick={onClose}
-          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="p-2 rounded-full hover:bg-matrimony-50 dark:hover:bg-matrimony-900/20 text-matrimony-700 dark:text-matrimony-300 transition-colors"
           aria-label="Close menu"
         >
           <X size={24} />
@@ -111,8 +111,8 @@ const MobileNavLink: React.FC<MobileNavLinkProps> = ({ to, icon, onClick, childr
       cn(
         'flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors',
         isActive
-          ? 'bg-matrimony-50 text-matrimony-900 dark:bg-matrimony-900/20 dark:text-matrimony-50'
-          : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+          ? 'bg-matrimony-50 text-matrimony-700 dark:bg-matrimony-900/20 dark:text-matrimony-300'
+          : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
       )
     }
   >

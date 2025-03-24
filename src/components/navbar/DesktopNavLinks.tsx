@@ -10,13 +10,18 @@ const DesktopNavLinks: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { translate } = useTranslations();
 
+  const navLinkBaseClasses = "transition-colors hover:text-matrimony-600 px-3 py-1.5 text-sm font-medium";
+  const navLinkActiveClasses = "text-matrimony-600 dark:text-matrimony-400";
+  const navLinkInactiveClasses = "text-gray-700 dark:text-gray-300";
+  const navLinkWithIconClasses = "transition-colors hover:text-matrimony-600 px-3 py-1.5 flex items-center gap-1.5 text-sm font-medium";
+
   return (
     <nav className="ml-6 flex space-x-1">
       <NavLink
         to="/"
         className={({ isActive }) => cn(
-          "transition-colors hover:text-primary px-3 py-1.5 text-sm font-medium",
-          isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+          navLinkBaseClasses,
+          isActive ? navLinkActiveClasses : navLinkInactiveClasses
         )}
         end
       >
@@ -28,8 +33,8 @@ const DesktopNavLinks: React.FC = () => {
           <NavLink
             to="/discover"
             className={({ isActive }) => cn(
-              "transition-colors hover:text-primary px-3 py-1.5 flex items-center gap-1.5 text-sm font-medium",
-              isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+              navLinkWithIconClasses,
+              isActive ? navLinkActiveClasses : navLinkInactiveClasses
             )}
           >
             <Search className="h-4 w-4" />
@@ -39,8 +44,8 @@ const DesktopNavLinks: React.FC = () => {
           <NavLink
             to="/matches"
             className={({ isActive }) => cn(
-              "transition-colors hover:text-primary px-3 py-1.5 flex items-center gap-1.5 text-sm font-medium",
-              isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+              navLinkWithIconClasses,
+              isActive ? navLinkActiveClasses : navLinkInactiveClasses
             )}
           >
             <Heart className="h-4 w-4" />
@@ -50,8 +55,8 @@ const DesktopNavLinks: React.FC = () => {
           <NavLink
             to="/liked-you"
             className={({ isActive }) => cn(
-              "transition-colors hover:text-primary px-3 py-1.5 flex items-center gap-1.5 text-sm font-medium",
-              isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+              navLinkWithIconClasses,
+              isActive ? navLinkActiveClasses : navLinkInactiveClasses
             )}
           >
             <ThumbsUp className="h-4 w-4" />
@@ -61,8 +66,8 @@ const DesktopNavLinks: React.FC = () => {
           <NavLink
             to="/messages"
             className={({ isActive }) => cn(
-              "transition-colors hover:text-primary px-3 py-1.5 flex items-center gap-1.5 text-sm font-medium",
-              isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+              navLinkWithIconClasses,
+              isActive ? navLinkActiveClasses : navLinkInactiveClasses
             )}
           >
             <MessageCircle className="h-4 w-4" />
@@ -72,8 +77,8 @@ const DesktopNavLinks: React.FC = () => {
           <NavLink
             to="/profile"
             className={({ isActive }) => cn(
-              "transition-colors hover:text-primary px-3 py-1.5 flex items-center gap-1.5 text-sm font-medium",
-              isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+              navLinkWithIconClasses,
+              isActive ? navLinkActiveClasses : navLinkInactiveClasses
             )}
           >
             <User className="h-4 w-4" />
@@ -85,8 +90,8 @@ const DesktopNavLinks: React.FC = () => {
           <NavLink
             to="/how-it-works"
             className={({ isActive }) => cn(
-              "transition-colors hover:text-primary px-3 py-1.5 text-sm font-medium",
-              isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+              navLinkBaseClasses,
+              isActive ? navLinkActiveClasses : navLinkInactiveClasses
             )}
           >
             {translate('navbar.howItWorks')}
@@ -95,8 +100,8 @@ const DesktopNavLinks: React.FC = () => {
           <NavLink
             to="/success-stories"
             className={({ isActive }) => cn(
-              "transition-colors hover:text-primary px-3 py-1.5 text-sm font-medium",
-              isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+              navLinkBaseClasses,
+              isActive ? navLinkActiveClasses : navLinkInactiveClasses
             )}
           >
             {translate('navbar.successStories')}
