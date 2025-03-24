@@ -5,10 +5,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTranslations } from '@/hooks/use-translations';
 import { cn } from '@/lib/utils';
 import { Heart, MessageCircle, Search, ThumbsUp } from 'lucide-react';
+import { useMessageRequests } from '@/components/messages/hooks/useMessageRequests';
 
 const DesktopNavLinks: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { translate } = useTranslations();
+  const { requests } = useMessageRequests();
+  
+  const hasPendingRequests = requests.length > 0;
 
   const navLinkBaseClasses = "transition-colors hover:text-matrimony-600 px-3 py-1.5 text-sm font-medium";
   const navLinkActiveClasses = "text-matrimony-600 dark:text-matrimony-400";
@@ -63,16 +67,21 @@ const DesktopNavLinks: React.FC = () => {
             {translate('navbar.likedYou')}
           </NavLink>
           
-          <NavLink
-            to="/messages"
-            className={({ isActive }) => cn(
-              navLinkWithIconClasses,
-              isActive ? navLinkActiveClasses : navLinkInactiveClasses
+          <div className="relative">
+            <NavLink
+              to="/messages"
+              className={({ isActive }) => cn(
+                navLinkWithIconClasses,
+                isActive ? navLinkActiveClasses : navLinkInactiveClasses
+              )}
+            >
+              <MessageCircle className="h-4 w-4" />
+              {translate('navbar.messages')}
+            </NavLink>
+            {hasPendingRequests && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-matrimony-600 rounded-full"></span>
             )}
-          >
-            <MessageCircle className="h-4 w-4" />
-            {translate('navbar.messages')}
-          </NavLink>
+          </div>
         </>
       ) : (
         <>

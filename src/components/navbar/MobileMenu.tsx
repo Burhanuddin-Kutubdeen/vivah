@@ -6,6 +6,7 @@ import { Heart, Home, MessageCircle, Search, Info, BookHeart, X, ThumbsUp } from
 import { cn } from '@/lib/utils';
 import { useTranslations } from '@/hooks/use-translations';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMessageRequests } from '@/components/messages/hooks/useMessageRequests';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -15,6 +16,9 @@ interface MobileMenuProps {
 const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
   const { isAuthenticated } = useAuth();
   const { translate } = useTranslations();
+  const { requests } = useMessageRequests();
+  
+  const hasPendingRequests = requests.length > 0;
 
   const menuVariants = {
     closed: {
@@ -72,7 +76,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
               {translate('navbar.likedYou')}
             </MobileNavLink>
             
-            <MobileNavLink to="/messages" icon={<MessageCircle size={20} />} onClick={onClose}>
+            <MobileNavLink 
+              to="/messages" 
+              icon={<MessageCircle size={20} />} 
+              onClick={onClose}
+              hasBadge={hasPendingRequests}
+            >
               {translate('navbar.messages')}
             </MobileNavLink>
           </>
@@ -97,15 +106,16 @@ interface MobileNavLinkProps {
   icon: React.ReactNode;
   onClick: () => void;
   children: React.ReactNode;
+  hasBadge?: boolean;
 }
 
-const MobileNavLink: React.FC<MobileNavLinkProps> = ({ to, icon, onClick, children }) => (
+const MobileNavLink: React.FC<MobileNavLinkProps> = ({ to, icon, onClick, children, hasBadge }) => (
   <NavLink
     to={to}
     onClick={onClick}
     className={({ isActive }) =>
       cn(
-        'flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors',
+        'flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors relative',
         isActive
           ? 'bg-matrimony-50 text-matrimony-700 dark:bg-matrimony-900/20 dark:text-matrimony-300'
           : 'hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
@@ -114,6 +124,9 @@ const MobileNavLink: React.FC<MobileNavLinkProps> = ({ to, icon, onClick, childr
   >
     <span className="text-matrimony-600 dark:text-matrimony-400">{icon}</span>
     <span>{children}</span>
+    {hasBadge && (
+      <span className="absolute top-3 right-4 w-2 h-2 bg-matrimony-600 rounded-full"></span>
+    )}
   </NavLink>
 );
 
