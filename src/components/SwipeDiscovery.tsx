@@ -108,6 +108,7 @@ const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({
             <SwipeActionButtons 
               onSwipeLeft={() => isOffline ? null : handleSwipe('left')}
               onSwipeRight={() => isOffline ? null : handleSwipe('right')}
+              onSuperLike={() => isOffline ? null : handleSuperLike()}
               isOffline={isOffline}
               isPremium={isPremium}
               remainingLikes={remainingLikes}

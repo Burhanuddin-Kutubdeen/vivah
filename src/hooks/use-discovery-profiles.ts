@@ -53,8 +53,7 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
           .from('profiles')
           .select('*')
           .eq('gender', oppositeGender)
-          .neq('id', user.id) // Don't include the current user
-          .order('created_at', { ascending: false });
+          .neq('id', user.id); // Don't include the current user
         
         if (error) {
           console.error('Error fetching profiles:', error);
@@ -71,8 +70,31 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
           return;
         }
         
+        // Fetch user's dislikes to filter them out
+        const { data: dislikesData, error: dislikesError } = await supabase
+          .from('likes')
+          .select('liked_profile_id')
+          .eq('user_id', user.id)
+          .eq('status', 'disliked');
+          
+        if (dislikesError) {
+          console.error('Error fetching dislikes:', dislikesError);
+        }
+        
+        // Create a set of disliked profile IDs for faster lookup
+        const dislikedProfileIds = new Set(
+          dislikesData?.map(dislike => dislike.liked_profile_id) || []
+        );
+        
+        console.log(`Found ${dislikedProfileIds.size} disliked profiles to filter out`);
+        
+        // Filter out disliked profiles
+        const filteredProfilesData = profilesData.filter(
+          profile => !dislikedProfileIds.has(profile.id)
+        );
+        
         // Convert database profiles to DiscoveryProfile format
-        const discoveryProfiles: DiscoveryProfile[] = profilesData.map(profile => {
+        const discoveryProfiles: DiscoveryProfile[] = filteredProfilesData.map(profile => {
           const age = profile.date_of_birth ? calculateAge(profile.date_of_birth) : 25;
           return {
             id: profile.id,
@@ -126,6 +148,42 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
     fetchProfiles();
   }, [preferences, user]);
 
+  // Function to record a like or dislike in the database
+  const recordInteraction = useCallback(async (
+    profileId: string, 
+    status: 'pending' | 'disliked'
+  ) => {
+    try {
+      if (!user || !profileId) return false;
+      
+      // Ensure the ID is a valid UUID before storing in the database
+      if (!profileId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+        console.error("Invalid profile ID format. Expected UUID format.");
+        return false;
+      }
+      
+      // Store the interaction in the database
+      const { error } = await supabase
+        .from('likes')
+        .upsert({
+          user_id: user.id,
+          liked_profile_id: profileId,
+          status: status,
+          created_at: new Date().toISOString()
+        }, { onConflict: 'user_id, liked_profile_id' });
+      
+      if (error) {
+        console.error("Error storing interaction:", error);
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error("Error recording interaction:", error);
+      return false;
+    }
+  }, [user]);
+
   // Function to notify a liked profile
   const notifyProfileLiked = useCallback(async (likedProfile: DiscoveryProfile) => {
     try {
@@ -133,48 +191,32 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
       
       console.log(`${user.email} liked ${likedProfile.name}'s profile`);
       
-      // Ensure the ID is a valid UUID before storing in the database
-      if (!likedProfile.id || typeof likedProfile.id !== 'string' || 
-          !likedProfile.id.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-        console.error("Invalid profile ID format. Expected UUID format.");
-        toast.error("Could not save like - profile ID format is invalid");
-        return;
+      // Record the like in the database
+      const success = await recordInteraction(likedProfile.id, 'pending');
+      
+      if (success) {
+        toast.success(`Notification sent to ${likedProfile.name}`);
       }
-      
-      // Store the like in the database
-      const { error } = await supabase
-        .from('likes')
-        .upsert({
-          user_id: user.id,
-          liked_profile_id: likedProfile.id,
-          status: 'pending',
-          created_at: new Date().toISOString()
-        }, { onConflict: 'user_id, liked_profile_id' });
-      
-      if (error) {
-        console.error("Error storing like:", error);
-        return;
-      }
-      
-      toast.success(`Notification sent to ${likedProfile.name}`);
-      
     } catch (error) {
       console.error("Error sending like notification:", error);
     }
-  }, [user]);
+  }, [user, recordInteraction]);
 
   const handleSwipe = useCallback((dir: 'left' | 'right') => {
     setDirection(dir);
     
-    // If swiping right (like) and not premium, reduce remaining likes
-    if (dir === 'right') {
-      if (!isPremium) {
-        setRemainingLikes(prev => Math.max(0, prev - 1));
-      }
-      
-      // When swiping right, notify the profile that was liked
-      if (currentProfile) {
+    if (currentProfile) {
+      if (dir === 'right') {
+        // Swiping right (like)
+        if (!isPremium) {
+          setRemainingLikes(prev => Math.max(0, prev - 1));
+        }
+        
+        // Notify the profile that was liked
         notifyProfileLiked(currentProfile);
+      } else {
+        // Swiping left (dislike)
+        recordInteraction(currentProfile.id, 'disliked');
       }
     }
     
@@ -187,7 +229,7 @@ export function useDiscoveryProfiles({ isPremium, preferences }: UseDiscoveryPro
       }
       setDirection(null);
     }, 300);
-  }, [currentProfileIndex, filteredProfiles.length, isPremium, currentProfile, notifyProfileLiked]);
+  }, [currentProfileIndex, filteredProfiles.length, isPremium, currentProfile, notifyProfileLiked, recordInteraction]);
 
   const handleSuperLike = useCallback(() => {
     if (!isPremium) return;
