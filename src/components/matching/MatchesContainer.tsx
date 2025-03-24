@@ -22,13 +22,6 @@ const MatchesContainer: React.FC = () => {
 
   const { toast } = useToast();
 
-  const handleLike = (matchId: string) => {
-    toast({
-      title: "Already Matched",
-      description: "You've already matched with this person. Try sending them a message!",
-    });
-  };
-
   const handleMessage = (matchId: string) => {
     toast({
       title: "Message Started",
@@ -116,7 +109,6 @@ const MatchesContainer: React.FC = () => {
               <MatchCard 
                 key={match.profile.id} 
                 match={match} 
-                onLike={handleLike}
                 onMessage={handleMessage}
               />
             ))}
@@ -144,7 +136,6 @@ const MatchesContainer: React.FC = () => {
               <MatchCard 
                 key={match.profile.id} 
                 match={match} 
-                onLike={handleLike}
                 onMessage={handleMessage}
               />
             ))}

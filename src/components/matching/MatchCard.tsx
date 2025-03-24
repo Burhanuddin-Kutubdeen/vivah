@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Heart, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -9,20 +9,14 @@ import { toast } from 'sonner';
 
 interface MatchCardProps {
   match: Match;
-  onLike: (matchId: string) => void;
   onMessage: (matchId: string) => void;
 }
 
-const MatchCard: React.FC<MatchCardProps> = ({ match, onLike, onMessage }) => {
+const MatchCard: React.FC<MatchCardProps> = ({ match, onMessage }) => {
   const navigate = useNavigate();
   
   const handleViewProfile = () => {
     navigate(`/profile/${match.profile.id}`);
-  };
-  
-  const handleLike = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onLike(match.profile.id);
   };
   
   const handleMessage = (e: React.MouseEvent) => {
@@ -87,20 +81,11 @@ const MatchCard: React.FC<MatchCardProps> = ({ match, onLike, onMessage }) => {
           </div>
         )}
         
-        <div className="flex space-x-2">
+        <div className="flex justify-center">
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex-1 rounded-full border-matrimony-200 hover:text-secondary hover:border-secondary dark:border-gray-700"
-            onClick={handleLike}
-          >
-            <Heart className="h-4 w-4 mr-1" />
-            <span>Like</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1 rounded-full border-matrimony-200 hover:text-matrimony-700 hover:border-matrimony-300 dark:border-gray-700"
+            className="w-full rounded-full border-matrimony-200 hover:text-matrimony-700 hover:border-matrimony-300 dark:border-gray-700"
             onClick={handleMessage}
           >
             <MessageCircle className="h-4 w-4 mr-1" />

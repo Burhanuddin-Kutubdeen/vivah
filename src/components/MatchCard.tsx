@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Heart, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -38,44 +38,6 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
       return;
     }
     setShowProfile(true);
-  };
-  
-  const handleLike = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
-    
-    if (!user) {
-      toast.error("Please log in to like profiles");
-      return;
-    }
-    
-    // Validate ID format
-    if (!isValidUUID(match.id)) {
-      toast.error("Cannot like profile - invalid ID format");
-      return;
-    }
-    
-    try {
-      // Store the like in the database
-      const { error } = await supabase
-        .from('likes')
-        .upsert({
-          user_id: user.id,
-          liked_profile_id: match.id,
-          status: 'pending',
-          created_at: new Date().toISOString()
-        }, { onConflict: 'user_id, liked_profile_id' });
-      
-      if (error) {
-        console.error("Error storing like:", error);
-        toast.error("Failed to like profile");
-        return;
-      }
-      
-      toast.success(`Notification sent to ${match.name}`);
-    } catch (error) {
-      console.error("Error liking profile:", error);
-      toast.error("Something went wrong");
-    }
   };
   
   const handleMessage = (e: React.MouseEvent) => {
@@ -126,20 +88,11 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
           <h3 className="font-medium text-lg">{match.name}, {match.age}</h3>
           <p className="text-sm text-matrimony-600 dark:text-matrimony-400 mb-4">{match.occupation}</p>
           
-          <div className="flex space-x-2">
+          <div className="flex justify-center">
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex-1 rounded-full border-matrimony-200 hover:text-secondary hover:border-secondary dark:border-gray-700"
-              onClick={handleLike}
-            >
-              <Heart className="h-4 w-4 mr-1" />
-              <span>Like</span>
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex-1 rounded-full border-matrimony-200 hover:text-matrimony-700 hover:border-matrimony-300 dark:border-gray-700"
+              className="w-full rounded-full border-matrimony-200 hover:text-matrimony-700 hover:border-matrimony-300 dark:border-gray-700"
               onClick={handleMessage}
             >
               <MessageCircle className="h-4 w-4 mr-1" />
