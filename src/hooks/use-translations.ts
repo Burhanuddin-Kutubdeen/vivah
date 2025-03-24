@@ -36,35 +36,45 @@ export const useTranslations = () => {
       'si': 'ඔබේ ප්‍රොෆයිල් තොරතුරු යාවත්කාලීන කරන්න',
       'ta': 'உங்கள் சுயவிவர தகவலைப் புதுப்பிக்கவும்'
     },
-    'home': {
+    'navbar.home': {
       'en': 'Home',
       'si': 'මුල් පිටුව',
       'ta': 'முகப்பு'
     },
-    'discover': {
+    'navbar.discover': {
       'en': 'Discover',
       'si': 'සොයාගන්න',
       'ta': 'கண்டுபிடி'
     },
-    'messages': {
+    'navbar.messages': {
       'en': 'Messages',
       'si': 'පණිවිඩ',
       'ta': 'செய்திகள்'
     },
-    'profile': {
+    'navbar.profile': {
       'en': 'Profile',
       'si': 'පැතිකඩ',
       'ta': 'சுயவிவரம்'
     },
-    'how_it_works': {
+    'navbar.howItWorks': {
       'en': 'How It Works',
       'si': 'එය කෙසේ ක්‍රියා කරයිද',
       'ta': 'இது எப்படி செயல்படுகிறது'
     },
-    'success_stories': {
+    'navbar.successStories': {
       'en': 'Success Stories',
       'si': 'සාර්ථක කතා',
       'ta': 'வெற்றிக் கதைகள்'
+    },
+    'navbar.matches': {
+      'en': 'Matches',
+      'si': 'ගැලපීම්',
+      'ta': 'பொருத்தங்கள்'
+    },
+    'navbar.likedYou': {
+      'en': 'Liked You',
+      'si': 'ඔබට කැමතියි',
+      'ta': 'உங்களை விரும்பியவர்கள்'
     },
     'loading': {
       'en': 'Loading...',

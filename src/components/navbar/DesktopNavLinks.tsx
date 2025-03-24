@@ -49,7 +49,7 @@ const DesktopNavLinks: React.FC = () => {
             )}
           >
             <Heart className="h-4 w-4" />
-            Matches
+            {translate('navbar.matches')}
           </NavLink>
           
           <NavLink
@@ -60,7 +60,7 @@ const DesktopNavLinks: React.FC = () => {
             )}
           >
             <ThumbsUp className="h-4 w-4" />
-            Liked You
+            {translate('navbar.likedYou')}
           </NavLink>
           
           <NavLink

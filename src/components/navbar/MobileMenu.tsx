@@ -65,11 +65,11 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             </MobileNavLink>
             
             <MobileNavLink to="/matches" icon={<Heart size={20} />} onClick={onClose}>
-              Matches
+              {translate('navbar.matches')}
             </MobileNavLink>
             
             <MobileNavLink to="/liked-you" icon={<ThumbsUp size={20} />} onClick={onClose}>
-              Liked You
+              {translate('navbar.likedYou')}
             </MobileNavLink>
             
             <MobileNavLink to="/messages" icon={<MessageCircle size={20} />} onClick={onClose}>
