@@ -6,26 +6,8 @@ import { useTranslations } from '@/hooks/use-translations';
 import { cn } from '@/lib/utils';
 import { Heart, MessageCircle, Search, User, ThumbsUp } from 'lucide-react';
 
-interface NavLinkProps {
-  to: string;
-  isActive: boolean;
-  children: React.ReactNode;
-}
-
-const StyledNavLink: React.FC<NavLinkProps> = ({ to, isActive, children }) => (
-  <NavLink
-    to={to}
-    className={cn(
-      "transition-colors hover:text-primary px-3 py-1.5 flex items-center gap-1.5 text-sm font-medium",
-      isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
-    )}
-  >
-    {children}
-  </NavLink>
-);
-
 const DesktopNavLinks: React.FC = () => {
-  const { isAuthenticated, isProfileComplete } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { translate } = useTranslations();
 
   return (
