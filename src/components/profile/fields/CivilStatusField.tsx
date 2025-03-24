@@ -16,7 +16,7 @@ const CivilStatusField: React.FC<CivilStatusFieldProps> = ({ control }) => {
       render={({ field }) => (
         <FormItem>
           <FormLabel>Civil Status</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <Select onValueChange={field.onChange} defaultValue={field.value || "single"}>
             <FormControl>
               <SelectTrigger>
                 <SelectValue placeholder="Select your status" />

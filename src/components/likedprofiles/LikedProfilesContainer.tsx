@@ -12,7 +12,7 @@ interface LikedProfilesContainerProps {
 
 const LikedProfilesContainer: React.FC<LikedProfilesContainerProps> = ({ onProfileSelect }) => {
   const [ageFilter, setAgeFilter] = useState<[number, number]>([18, 60]);
-  const [religionFilter, setReligionFilter] = useState<string>('');
+  const [religionFilter, setReligionFilter] = useState<string>('any');
   
   const { profiles, isLoading, error } = useLikedProfiles({
     ageRange: ageFilter,

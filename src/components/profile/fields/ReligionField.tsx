@@ -16,7 +16,7 @@ const ReligionField: React.FC<ReligionFieldProps> = ({ control }) => {
       render={({ field }) => (
         <FormItem>
           <FormLabel>Religion (Optional)</FormLabel>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <Select onValueChange={field.onChange} defaultValue={field.value || "none"}>
             <FormControl>
               <SelectTrigger>
                 <SelectValue placeholder="Select religion (optional)" />
