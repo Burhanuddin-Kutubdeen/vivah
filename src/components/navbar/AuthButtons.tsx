@@ -30,7 +30,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ isMobile = false }) => {
           >
             <Link to="/profile">
               <User size={isMobile ? 18 : 16} className="mr-2" />
-              {translate('profile')}
+              {translate('navbar.profile')}
             </Link>
           </Button>
           <Button 
@@ -47,14 +47,14 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ isMobile = false }) => {
         <>
           <Button 
             variant="outline" 
-            size={isMobile ? "default" : "sm"}
+            size={iMobile ? "default" : "sm"}
             className={`${buttonBaseClass} border-matrimony-300 text-matrimony-700 hover:bg-matrimony-50`}
             asChild
           >
             <Link to="/login">{translate('login')}</Link>
           </Button>
           <Button 
-            size={isMobile ? "default" : "sm"}
+            size={iMobile ? "default" : "sm"}
             className={`${buttonBaseClass} bg-matrimony-600 hover:bg-matrimony-700 transition-colors`}
             asChild
           >

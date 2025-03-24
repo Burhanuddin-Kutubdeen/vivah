@@ -2,7 +2,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, Home, MessageCircle, Search, User, Info, BookHeart, X, ThumbsUp } from 'lucide-react';
+import { Heart, Home, MessageCircle, Search, Info, BookHeart, X, ThumbsUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslations } from '@/hooks/use-translations';
 import { useAuth } from '@/contexts/AuthContext';
@@ -74,10 +74,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             
             <MobileNavLink to="/messages" icon={<MessageCircle size={20} />} onClick={onClose}>
               {translate('navbar.messages')}
-            </MobileNavLink>
-            
-            <MobileNavLink to="/profile" icon={<User size={20} />} onClick={onClose}>
-              {translate('navbar.profile')}
             </MobileNavLink>
           </>
         ) : (

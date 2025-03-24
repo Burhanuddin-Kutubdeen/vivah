@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTranslations } from '@/hooks/use-translations';
 import { cn } from '@/lib/utils';
-import { Heart, MessageCircle, Search, User, ThumbsUp } from 'lucide-react';
+import { Heart, MessageCircle, Search, ThumbsUp } from 'lucide-react';
 
 const DesktopNavLinks: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -72,17 +72,6 @@ const DesktopNavLinks: React.FC = () => {
           >
             <MessageCircle className="h-4 w-4" />
             {translate('navbar.messages')}
-          </NavLink>
-          
-          <NavLink
-            to="/profile"
-            className={({ isActive }) => cn(
-              navLinkWithIconClasses,
-              isActive ? navLinkActiveClasses : navLinkInactiveClasses
-            )}
-          >
-            <User className="h-4 w-4" />
-            {translate('navbar.profile')}
           </NavLink>
         </>
       ) : (
