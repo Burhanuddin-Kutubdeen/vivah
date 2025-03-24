@@ -1,108 +1,114 @@
 
-import React, { useState } from 'react';
+import React from 'react';
+import { Heart, MessageCircle } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import { motion } from 'framer-motion';
-import { Match } from '@/hooks/use-matches';
 import { useNavigate } from 'react-router-dom';
+import { Match } from '@/hooks/use-matches';
 import { toast } from 'sonner';
-import MatchCardImage from './MatchCardImage';
-import MatchCardInfo from './MatchCardInfo';
-import MatchCardButtons from './MatchCardButtons';
-import { isValidUUID } from '@/utils/validation';
-import ProfilePopup from '@/components/profiles/ProfilePopup';
 
 interface MatchCardProps {
   match: Match;
-  onLike?: (matchId: string) => void;
-  onMessage?: (matchId: string) => void;
+  onLike: (matchId: string) => void;
+  onMessage: (matchId: string) => void;
 }
 
 const MatchCard: React.FC<MatchCardProps> = ({ match, onLike, onMessage }) => {
-  const { profile, matchDetails } = match;
   const navigate = useNavigate();
-  const [showProfile, setShowProfile] = useState(false);
   
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Prevent default to avoid navigation
-    e.preventDefault();
-    e.stopPropagation(); // Also stop propagation
-    
-    if (!isValidUUID(profile.id)) {
-      toast.error("Cannot view profile - invalid ID format");
-      return;
-    }
-    setShowProfile(true);
+  const handleViewProfile = () => {
+    navigate(`/profile/${match.profile.id}`);
   };
   
   const handleLike = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
-    
-    if (!isValidUUID(profile.id)) {
-      toast.error("Cannot like profile - invalid ID format");
-      return;
-    }
-    
-    if (onLike) {
-      onLike(profile.id);
-    }
+    e.stopPropagation();
+    onLike(match.profile.id);
   };
   
   const handleMessage = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation();
+    onMessage(match.profile.id);
     
-    if (!isValidUUID(profile.id)) {
-      toast.error("Cannot message profile - invalid ID format");
-      return;
-    }
-    
-    if (onMessage) {
-      onMessage(profile.id);
-    } else {
-      // Navigate to messages page with this specific conversation open
-      navigate(`/messages?userId=${profile.id}&name=${encodeURIComponent(profile.name)}`);
-      toast(`Starting conversation with ${profile.name}`, {
-        description: "Waiting for them to accept your message request"
-      });
-    }
+    // Navigate to messages with this profile
+    navigate(`/messages?userId=${match.profile.id}&name=${encodeURIComponent(match.profile.name)}`);
   };
 
-  return (
-    <>
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden cursor-pointer"
-        onClick={handleCardClick}
-      >
-        <MatchCardImage 
-          imageUrl={profile.imageUrl}
-          name={profile.name}
-          isNewMatch={matchDetails.isNewMatch}
-          matchPercentage={matchDetails.score}
-        />
+  // Determine shared interests to display (max 3)
+  const sharedInterestsToShow = match.matchDetails.sharedInterests.slice(0, 3);
 
-        <MatchCardInfo
-          name={profile.name}
-          age={profile.age}
-          location={profile.location}
-          sharedInterests={matchDetails.sharedInterests}
-        />
-        
-        <div className="px-4 pb-4">
-          <MatchCardButtons 
-            onLike={handleLike}
-            onMessage={handleMessage}
+  return (
+    <motion.div 
+      className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden cursor-pointer"
+      onClick={handleViewProfile}
+      whileHover={{ 
+        y: -5, 
+        transition: { duration: 0.2 } 
+      }}
+    >
+      <div className="relative">
+        {match.matchDetails.isNewMatch && (
+          <div className="absolute top-3 left-3 z-10">
+            <span className="bg-secondary text-white text-xs font-medium px-2.5 py-1 rounded-full">
+              New Match
+            </span>
+          </div>
+        )}
+        <div className="h-48 overflow-hidden">
+          <img 
+            src={match.profile.imageUrl} 
+            alt={match.profile.name} 
+            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           />
         </div>
-      </motion.div>
+        <div className="absolute bottom-3 right-3 bg-white dark:bg-gray-900 rounded-full px-2 py-1 text-xs font-medium text-matrimony-700 dark:text-matrimony-300 shadow-sm">
+          {match.matchDetails.score}% Match
+        </div>
+      </div>
 
-      {showProfile && (
-        <ProfilePopup 
-          profileId={profile.id} 
-          onClose={() => setShowProfile(false)} 
-        />
-      )}
-    </>
+      <div className="p-4">
+        <h3 className="font-medium text-lg">{match.profile.name}, {match.profile.age}</h3>
+        <p className="text-sm text-matrimony-600 dark:text-matrimony-400 mb-2">{match.profile.occupation}</p>
+        
+        {sharedInterestsToShow.length > 0 && (
+          <div className="mb-3">
+            <p className="text-xs text-matrimony-500 dark:text-matrimony-400 mb-1">Shared interests:</p>
+            <div className="flex flex-wrap gap-1">
+              {sharedInterestsToShow.map((interest, index) => (
+                <span key={index} className="bg-matrimony-50 dark:bg-gray-700 text-matrimony-600 dark:text-matrimony-300 text-xs px-2 py-0.5 rounded-full">
+                  {interest}
+                </span>
+              ))}
+              {match.matchDetails.sharedInterests.length > 3 && (
+                <span className="text-xs text-matrimony-400">
+                  +{match.matchDetails.sharedInterests.length - 3} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+        
+        <div className="flex space-x-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 rounded-full border-matrimony-200 hover:text-secondary hover:border-secondary dark:border-gray-700"
+            onClick={handleLike}
+          >
+            <Heart className="h-4 w-4 mr-1" />
+            <span>Like</span>
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1 rounded-full border-matrimony-200 hover:text-matrimony-700 hover:border-matrimony-300 dark:border-gray-700"
+            onClick={handleMessage}
+          >
+            <MessageCircle className="h-4 w-4 mr-1" />
+            <span>Message</span>
+          </Button>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 

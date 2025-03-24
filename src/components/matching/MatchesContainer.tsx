@@ -23,15 +23,13 @@ const MatchesContainer: React.FC = () => {
   const { toast } = useToast();
 
   const handleLike = (matchId: string) => {
-    // In a real app, this would send a like notification or update the database
     toast({
-      title: "Liked Profile",
-      description: "You've liked this profile. We'll notify them!",
+      title: "Already Matched",
+      description: "You've already matched with this person. Try sending them a message!",
     });
   };
 
   const handleMessage = (matchId: string) => {
-    // In a real app, this would redirect to a chat or create a new conversation
     toast({
       title: "Message Started",
       description: "You can now start chatting with this match!",
@@ -62,7 +60,7 @@ const MatchesContainer: React.FC = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Your Matches</h1>
         <p className="text-matrimony-600 dark:text-matrimony-300">
-          Discover people who share your interests and values
+          People who like you back - you're now ready to connect!
         </p>
       </div>
 
@@ -126,7 +124,7 @@ const MatchesContainer: React.FC = () => {
         ) : (
           <div className="text-center py-10 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <p className="text-matrimony-600 dark:text-matrimony-300">
-              No curated matches found. Update your profile to get better matches.
+              No mutual matches found. Like more profiles to get matches, and check back when someone likes you back!
             </p>
           </div>
         )}
@@ -154,7 +152,7 @@ const MatchesContainer: React.FC = () => {
         ) : (
           <div className="text-center py-10 bg-gray-50 dark:bg-gray-800 rounded-lg">
             <p className="text-matrimony-600 dark:text-matrimony-300">
-              No matches found with current filters. Try adjusting your preferences.
+              No matches found. Try liking more profiles in the discovery page to find mutual matches!
             </p>
           </div>
         )}
