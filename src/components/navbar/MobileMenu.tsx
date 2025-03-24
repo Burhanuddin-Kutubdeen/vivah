@@ -58,7 +58,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
           {translate('navbar.home')}
         </MobileNavLink>
         
-        {isAuthenticated && (
+        {isAuthenticated ? (
           <>
             <MobileNavLink to="/discover" icon={<Search size={20} />} onClick={onClose}>
               {translate('navbar.discover')}
@@ -80,15 +80,17 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
               {translate('navbar.profile')}
             </MobileNavLink>
           </>
+        ) : (
+          <>
+            <MobileNavLink to="/how-it-works" icon={<Info size={20} />} onClick={onClose}>
+              {translate('navbar.howItWorks')}
+            </MobileNavLink>
+            
+            <MobileNavLink to="/success-stories" icon={<BookHeart size={20} />} onClick={onClose}>
+              {translate('navbar.successStories')}
+            </MobileNavLink>
+          </>
         )}
-        
-        <MobileNavLink to="/how-it-works" icon={<Info size={20} />} onClick={onClose}>
-          {translate('navbar.howItWorks')}
-        </MobileNavLink>
-        
-        <MobileNavLink to="/success-stories" icon={<BookHeart size={20} />} onClick={onClose}>
-          {translate('navbar.successStories')}
-        </MobileNavLink>
       </nav>
     </motion.div>
   );

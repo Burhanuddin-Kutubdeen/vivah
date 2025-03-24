@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Camera, Edit } from 'lucide-react';
@@ -38,14 +37,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     <>
       {/* Profile Header */}
       <div className="relative h-56 md:h-72 bg-matrimony-600">
-        <Button 
-          variant="secondary" 
-          size="sm" 
-          className="absolute top-4 right-4 rounded-full"
-        >
-          <Edit className="h-4 w-4 mr-1" />
-          Edit Cover
-        </Button>
+        {/* Removed Edit Cover button */}
         
         <div className="absolute -bottom-16 left-8 rounded-full border-4 border-white dark:border-gray-800 overflow-hidden w-32 h-32">
           <img 

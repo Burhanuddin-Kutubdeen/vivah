@@ -63,34 +63,51 @@ export const useProfileLike = (profileId: string) => {
       return { success: false, error: "Invalid profile ID format" };
     }
 
-    // Prevent multiple clicks or if already liked
-    if (isLiking || hasLiked) {
-      return { success: false, error: "Already processing or liked" };
+    // Prevent multiple clicks
+    if (isLiking) {
+      return { success: false, error: "Already processing" };
     }
     
     setIsLiking(true);
 
     try {
-      // Record the like in the database
-      const { error } = await supabase
-        .from('likes')
-        .insert({
-          user_id: user.id,
-          liked_profile_id: profileId,
-          status: 'pending'
-        });
+      // If already liked, unlike the profile
+      if (hasLiked) {
+        const { error } = await supabase
+          .from('likes')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('liked_profile_id', profileId);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // Update state
-      setHasLiked(true);
-      setIsLiking(false);
-      
-      return { success: true };
+        // Update state
+        setHasLiked(false);
+        setIsLiking(false);
+        
+        return { success: true, action: 'unliked' };
+      } else {
+        // Record the like in the database
+        const { error } = await supabase
+          .from('likes')
+          .insert({
+            user_id: user.id,
+            liked_profile_id: profileId,
+            status: 'pending'
+          });
+
+        if (error) throw error;
+
+        // Update state
+        setHasLiked(true);
+        setIsLiking(false);
+        
+        return { success: true, action: 'liked' };
+      }
     } catch (error) {
-      console.error("Error liking profile:", error);
+      console.error("Error liking/unliking profile:", error);
       setIsLiking(false);
-      return { success: false, error: "Failed to send like" };
+      return { success: false, error: "Failed to process action" };
     }
   };
 

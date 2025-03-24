@@ -23,14 +23,21 @@ const LikeButton: React.FC<LikeButtonProps> = ({ profileId, name }) => {
     const result = await handleLike();
     
     if (result.success) {
-      toast({
-        title: "Interest Shown",
-        description: `${name} will be notified of your interest`,
-      });
-    } else if (result.error && !hasLiked) {
+      if (result.action === 'unliked') {
+        toast({
+          title: "Interest Removed",
+          description: `You've removed your interest in ${name}`,
+        });
+      } else {
+        toast({
+          title: "Interest Shown",
+          description: `${name} will be notified of your interest`,
+        });
+      }
+    } else {
       toast({
         title: "Error",
-        description: result.error || "Failed to send like. Please try again.",
+        description: result.error || "Failed to process. Please try again.",
         variant: "destructive",
       });
     }
@@ -40,7 +47,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({ profileId, name }) => {
     <Button 
       onClick={onLikeClick}
       size="sm" 
-      disabled={isLiking || hasLiked}
+      disabled={isLiking}
       className={`${
         hasLiked 
           ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200" 

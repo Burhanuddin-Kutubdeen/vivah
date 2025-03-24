@@ -41,7 +41,7 @@ const DesktopNavLinks: React.FC = () => {
         {translate('navbar.home')}
       </NavLink>
       
-      {isAuthenticated && (
+      {isAuthenticated ? (
         <>
           <NavLink
             to="/discover"
@@ -98,27 +98,29 @@ const DesktopNavLinks: React.FC = () => {
             {translate('navbar.profile')}
           </NavLink>
         </>
+      ) : (
+        <>
+          <NavLink
+            to="/how-it-works"
+            className={({ isActive }) => cn(
+              "transition-colors hover:text-primary px-3 py-1.5 text-sm font-medium",
+              isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+            )}
+          >
+            {translate('navbar.howItWorks')}
+          </NavLink>
+          
+          <NavLink
+            to="/success-stories"
+            className={({ isActive }) => cn(
+              "transition-colors hover:text-primary px-3 py-1.5 text-sm font-medium",
+              isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
+            )}
+          >
+            {translate('navbar.successStories')}
+          </NavLink>
+        </>
       )}
-      
-      <NavLink
-        to="/how-it-works"
-        className={({ isActive }) => cn(
-          "transition-colors hover:text-primary px-3 py-1.5 text-sm font-medium",
-          isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
-        )}
-      >
-        {translate('navbar.howItWorks')}
-      </NavLink>
-      
-      <NavLink
-        to="/success-stories"
-        className={({ isActive }) => cn(
-          "transition-colors hover:text-primary px-3 py-1.5 text-sm font-medium",
-          isActive ? "text-primary dark:text-primary" : "text-gray-700 dark:text-gray-300"
-        )}
-      >
-        {translate('navbar.successStories')}
-      </NavLink>
     </nav>
   );
 };
