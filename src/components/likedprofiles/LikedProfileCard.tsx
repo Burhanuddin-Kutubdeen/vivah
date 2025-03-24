@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useProfileLike } from '@/hooks/use-profile-like';
 
 interface ProfileCardProps {
   profile: {
@@ -22,6 +23,25 @@ interface ProfileCardProps {
 
 const LikedProfileCard: React.FC<ProfileCardProps> = ({ profile, onSelect }) => {
   const navigate = useNavigate();
+  const { isLiking, hasLiked, handleLike } = useProfileLike(profile.id);
+
+  const handleLikeClick = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    
+    const result = await handleLike();
+    
+    if (result.success) {
+      if (result.action === 'liked') {
+        toast(`You liked ${profile.name}`, {
+          description: "If they like you back, you'll match!"
+        });
+      } else {
+        toast(`You unliked ${profile.name}`);
+      }
+    } else {
+      toast.error(result.error || "Failed to process your like");
+    }
+  };
 
   const handleMessage = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
@@ -76,6 +96,20 @@ const LikedProfileCard: React.FC<ProfileCardProps> = ({ profile, onSelect }) => 
         )}
         
         <div className="flex space-x-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className={`flex-1 rounded-full ${
+              hasLiked 
+                ? "bg-green-100 text-green-700 border-green-200 hover:bg-green-200" 
+                : "border-matrimony-200 hover:text-secondary hover:border-secondary dark:border-gray-700"
+            }`}
+            onClick={handleLikeClick}
+            disabled={isLiking}
+          >
+            <Heart className={`h-4 w-4 mr-1 ${hasLiked ? "fill-green-500 text-green-500" : ""}`} />
+            <span>{hasLiked ? "Liked" : "Like"}</span>
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 

@@ -44,7 +44,7 @@ const MessageButton: React.FC<MessageButtonProps> = ({ profileId, name }) => {
       onClick={onMessageClick}
       size="sm" 
       disabled={isMessaging}
-      className="bg-matrimony-600 hover:bg-matrimony-700 text-white rounded-full flex-1 transition-colors duration-300"
+      className="bg-matrimony-600 hover:bg-matrimony-700 text-white rounded-full w-full max-w-xs transition-colors duration-300"
     >
       {isMessaging ? (
         <Loader2 size={16} className="mr-1 animate-spin" />
