@@ -41,14 +41,14 @@ const MatchFilters: React.FC<MatchFiltersProps> = ({ filters, onApplyFilters, is
   const handleReligionChange = (value: string) => {
     setLocalFilters(prev => ({
       ...prev,
-      religion: value
+      religion: value === "any" ? undefined : value
     }));
   };
 
   const handleCivilStatusChange = (value: string) => {
     setLocalFilters(prev => ({
       ...prev,
-      civilStatus: value
+      civilStatus: value === "any" ? undefined : value
     }));
   };
 
@@ -146,14 +146,14 @@ const MatchFilters: React.FC<MatchFiltersProps> = ({ filters, onApplyFilters, is
                 Religion
               </label>
               <Select 
-                value={localFilters.religion || ''} 
+                value={localFilters.religion || 'any'} 
                 onValueChange={handleReligionChange}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select religion" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="any">Any</SelectItem>
                   <SelectItem value="hindu">Hindu</SelectItem>
                   <SelectItem value="christian">Christian</SelectItem>
                   <SelectItem value="muslim">Muslim</SelectItem>
@@ -172,14 +172,14 @@ const MatchFilters: React.FC<MatchFiltersProps> = ({ filters, onApplyFilters, is
                 Matrimony Status
               </label>
               <Select 
-                value={localFilters.civilStatus || ''} 
+                value={localFilters.civilStatus || 'any'} 
                 onValueChange={handleCivilStatusChange}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any</SelectItem>
+                  <SelectItem value="any">Any</SelectItem>
                   <SelectItem value="single">Single</SelectItem>
                   <SelectItem value="divorced">Divorced</SelectItem>
                   <SelectItem value="widowed">Widowed</SelectItem>

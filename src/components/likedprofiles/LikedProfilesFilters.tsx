@@ -26,8 +26,8 @@ const LikedProfilesFilters: React.FC<LikedProfilesFiltersProps> = ({
 
   const handleReset = () => {
     setAgeRange([18, 60]);
-    setReligion('');
-    onFilterChange([18, 60], '');
+    setReligion('any');
+    onFilterChange([18, 60], 'any');
   };
 
   return (
@@ -68,7 +68,7 @@ const LikedProfilesFilters: React.FC<LikedProfilesFiltersProps> = ({
                 <SelectValue placeholder="Any Religion" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any Religion</SelectItem>
+                <SelectItem value="any">Any Religion</SelectItem>
                 <SelectItem value="hinduism">Hinduism</SelectItem>
                 <SelectItem value="christianity">Christianity</SelectItem>
                 <SelectItem value="islam">Islam</SelectItem>
