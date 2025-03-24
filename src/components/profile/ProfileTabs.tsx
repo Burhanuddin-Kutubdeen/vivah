@@ -17,12 +17,23 @@ interface Match {
   isNewMatch: boolean;
 }
 
-const ProfileTabs: React.FC = () => {
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [loading, setLoading] = useState(true);
+interface ProfileTabsProps {
+  matches?: Match[];
+}
+
+const ProfileTabs: React.FC<ProfileTabsProps> = ({ matches: initialMatches }) => {
+  const [matches, setMatches] = useState<Match[]>(initialMatches || []);
+  const [loading, setLoading] = useState(!initialMatches);
   const { user } = useAuth();
 
   useEffect(() => {
+    // If matches were provided as props, use those instead of fetching
+    if (initialMatches && initialMatches.length > 0) {
+      setMatches(initialMatches);
+      setLoading(false);
+      return;
+    }
+
     const fetchRealProfiles = async () => {
       if (!user) return;
       
@@ -68,7 +79,7 @@ const ProfileTabs: React.FC = () => {
     };
     
     fetchRealProfiles();
-  }, [user]);
+  }, [user, initialMatches]);
 
   return (
     <div className="mt-10">
