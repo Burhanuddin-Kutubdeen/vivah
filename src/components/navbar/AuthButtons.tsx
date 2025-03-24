@@ -47,14 +47,14 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ isMobile = false }) => {
         <>
           <Button 
             variant="outline" 
-            size={iMobile ? "default" : "sm"}
+            size={isMobile ? "default" : "sm"}
             className={`${buttonBaseClass} border-matrimony-300 text-matrimony-700 hover:bg-matrimony-50`}
             asChild
           >
             <Link to="/login">{translate('login')}</Link>
           </Button>
           <Button 
-            size={iMobile ? "default" : "sm"}
+            size={isMobile ? "default" : "sm"}
             className={`${buttonBaseClass} bg-matrimony-600 hover:bg-matrimony-700 transition-colors`}
             asChild
           >
