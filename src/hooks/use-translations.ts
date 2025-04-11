@@ -97,9 +97,9 @@ export const useTranslations = () => {
       'ta': 'வெளியேறு'
     },
     'pricing_monthly': {
-      'en': '5,000 LKR',
-      'si': 'රු. 5,000',
-      'ta': 'ரூ. 5,000'
+      'en': '2,999 LKR',
+      'si': 'රු. 2,999',
+      'ta': 'ரூ. 2,999'
     },
     'per_month': {
       'en': '/month',

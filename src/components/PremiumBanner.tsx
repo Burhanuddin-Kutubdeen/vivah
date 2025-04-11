@@ -75,7 +75,7 @@ const PremiumBanner: React.FC = () => {
                 className="mb-8 md:mb-0"
               >
                 <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-4xl font-bold text-matrimony-700 dark:text-matrimony-300">{translate('pricing_monthly')}</span>
+                  <span className="text-4xl font-bold text-matrimony-700 dark:text-matrimony-300">2,999 LKR</span>
                   <span className="text-matrimony-500 dark:text-matrimony-400">{translate('per_month')}</span>
                 </div>
                 
