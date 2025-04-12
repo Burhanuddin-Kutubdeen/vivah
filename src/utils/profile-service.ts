@@ -15,14 +15,15 @@ export async function createProfile(profileData: Partial<ProfileFormValues>) {
     return userError;
   }
   
+  // Convert form data to database format
+  const dbProfileData = convertFormDataToDbFormat(profileData);
+  
   const { error } = await supabase
     .from('profiles')
-    .insert([
-      {
-        id: userData.user.id,
-        ...profileData
-      }
-    ]);
+    .insert({
+      id: userData.user.id,
+      ...dbProfileData
+    });
   
   if (error) {
     console.error('Error creating profile:', error);
@@ -44,9 +45,12 @@ export async function updateProfile(profileData: Partial<ProfileFormValues>) {
     return userError;
   }
   
+  // Convert form data to database format
+  const dbProfileData = convertFormDataToDbFormat(profileData);
+  
   const { error } = await supabase
     .from('profiles')
-    .update(profileData)
+    .update(dbProfileData)
     .eq('id', userData.user.id);
   
   if (error) {
@@ -79,4 +83,31 @@ export async function getProfile() {
   }
   
   return { data, error };
+}
+
+/**
+ * Convert form data format to database format
+ */
+function convertFormDataToDbFormat(formData: Partial<ProfileFormValues>): Record<string, any> {
+  const result: Record<string, any> = {
+    ...formData
+  };
+
+  // Convert dateOfBirth field to date_of_birth
+  if (formData.dateOfBirth) {
+    result.date_of_birth = formData.dateOfBirth.toISOString().split('T')[0];
+    delete result.dateOfBirth;
+  }
+
+  // Convert string height to number
+  if (formData.height !== undefined) {
+    result.height = formData.height ? parseFloat(formData.height) : null;
+  }
+
+  // Convert string weight to number
+  if (formData.weight !== undefined) {
+    result.weight = formData.weight ? parseFloat(formData.weight) : null;
+  }
+
+  return result;
 }

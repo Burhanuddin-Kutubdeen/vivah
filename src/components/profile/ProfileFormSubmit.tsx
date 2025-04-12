@@ -84,27 +84,10 @@ const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
         return;
       }
       
-      // Use our updateProfile function from the profile-service
+      // Pass the form values directly to updateProfile, which will handle the conversion
       const profileData = {
-        first_name: values.first_name,
-        last_name: values.last_name,
-        date_of_birth: values.dateOfBirth.toISOString().split('T')[0],
-        gender: values.gender,
-        civil_status: values.civil_status,
-        religion: values.religion || null,
-        location: values.location,
-        bio: values.bio,
-        interests: values.interests,
-        height: values.height ? parseFloat(values.height) : null,
-        weight: values.weight ? parseFloat(values.weight) : null,
+        ...values,
         avatar_url: avatarUrl,
-        education: values.education || null,
-        job: values.job || null,
-        exercise: values.exercise || null,
-        drinking: values.drinking || null,
-        smoking: values.smoking || null,
-        wants_kids: values.wants_kids || null,
-        has_kids: values.has_kids || null,
         updated_at: new Date().toISOString(),
       };
       
