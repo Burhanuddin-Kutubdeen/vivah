@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileFormValues } from './ProfileFormSchema';
 import SubmitButton from './fields/SubmitButton';
+import { updateProfile } from '@/utils/profile-service';
 
 interface ProfileFormSubmitProps {
   avatarUrl: string | null;
@@ -84,38 +84,40 @@ const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
         return;
       }
       
-      // Add request timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
+      // Use our updateProfile function from the profile-service
+      const profileData = {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        date_of_birth: values.dateOfBirth.toISOString().split('T')[0],
+        gender: values.gender,
+        civil_status: values.civil_status,
+        religion: values.religion || null,
+        location: values.location,
+        bio: values.bio,
+        interests: values.interests,
+        height: values.height ? parseFloat(values.height) : null,
+        weight: values.weight ? parseFloat(values.weight) : null,
+        avatar_url: avatarUrl,
+        education: values.education || null,
+        job: values.job || null,
+        exercise: values.exercise || null,
+        drinking: values.drinking || null,
+        smoking: values.smoking || null,
+        wants_kids: values.wants_kids || null,
+        has_kids: values.has_kids || null,
+        updated_at: new Date().toISOString(),
+      };
       
-      // Update profile in database
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          first_name: values.first_name,
-          last_name: values.last_name,
-          date_of_birth: values.dateOfBirth.toISOString().split('T')[0],
-          gender: values.gender,
-          civil_status: values.civil_status,
-          religion: values.religion || null,
-          location: values.location,
-          bio: values.bio,
-          interests: values.interests,
-          height: values.height ? parseFloat(values.height) : null,
-          weight: values.weight ? parseFloat(values.weight) : null,
-          avatar_url: avatarUrl,
-          education: values.education || null,
-          job: values.job || null,
-          exercise: values.exercise || null,
-          drinking: values.drinking || null,
-          smoking: values.smoking || null,
-          wants_kids: values.wants_kids || null,
-          has_kids: values.has_kids || null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
+      // Add request timeout handling
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Request timed out")), 8000);
+      });
       
-      clearTimeout(timeoutId);
+      // Race between the update request and the timeout
+      const error = await Promise.race([
+        updateProfile(profileData),
+        timeoutPromise
+      ]);
       
       if (error) {
         console.error("Profile update error:", error);
@@ -165,7 +167,7 @@ const ProfileFormSubmit: React.FC<ProfileFormSubmitProps> = ({
       setSaveSuccess(false);
       
       // Special handling for timeout errors
-      if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+      if (error.name === 'AbortError' || error.message?.includes('aborted') || error.message?.includes('timed out')) {
         toast({
           title: "Connection timed out",
           description: "The server is taking too long to respond. Please try again later.",
