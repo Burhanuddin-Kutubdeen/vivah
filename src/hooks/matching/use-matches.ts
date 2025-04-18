@@ -1,44 +1,37 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Match, MatchFilters } from './types';
-import { fetchMutualMatches } from './match-service';
+import { Match, MatchFilters } from './types'; // Update the import path
 import { applyFiltersToMatches, sortMatchesByPriority } from './match-utils';
+import { getMatch } from '@/utils/api-service';
 
-export const useMatches = () => {
+export const useMatches = (userId: string) => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [curatedMatches, setCuratedMatches] = useState<Match[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [lastRefreshDate, setLastRefreshDate] = useState<Date>(new Date());
   const [filters, setFilters] = useState<MatchFilters>({
     priority: 'interests'
   });
-  const { user } = useAuth();
   const { toast } = useToast();
 
   // Function to load matches with optional filters
-  const loadMatches = useCallback(async (customFilters?: MatchFilters) => {
-    if (!user) {
-      setError('You must be logged in to view matches');
-      return;
-    }
-
+  const loadMatches = useCallback(async (userId: string, customFilters?: MatchFilters) => {
     setIsLoading(true);
-    setError(null);
 
     try {
-      const { matches: fetchedMatches, error: fetchError } = await fetchMutualMatches(user.id);
-      
-      if (fetchError) {
-        setError(fetchError);
+      const fetchedMatches = await getMatch(userId, "");
+
+      if (!fetchedMatches) {
         toast({
           title: 'Error',
-          description: fetchError,
+          description: "Error getting the matches",
           variant: 'destructive',
         });
-        return;
+      }
+
+      if (!Array.isArray(fetchedMatches)) {
+        throw new Error("Invalid matches data: Matches should be an array.");
       }
       
       // Apply filters to the fetched matches
@@ -59,7 +52,6 @@ export const useMatches = () => {
       }
     } catch (err) {
       console.error('Unexpected error in loadMatches:', err);
-      setError('An unexpected error occurred');
       toast({
         title: 'Error',
         description: 'An unexpected error occurred. Please try again later.',
@@ -67,8 +59,8 @@ export const useMatches = () => {
       });
     } finally {
       setIsLoading(false);
-    }
-  }, [user, filters, toast]);
+    } 
+  }, [filters, toast]);
 
   // Apply filters and refresh matches
   const applyFilters = useCallback((newFilters: MatchFilters) => {
@@ -78,26 +70,18 @@ export const useMatches = () => {
     }));
     
     loadMatches({
-      ...filters,
-      ...newFilters
-    });
-  }, [filters, loadMatches]);
-
-  // Fetch matches on component mount and when filters change
-  useEffect(() => {
-    if (user) {
-      loadMatches();
-    }
-  }, [user, loadMatches]);
+        ...filters,
+        ...newFilters
+      }, userId);
+  }, [filters, loadMatches, userId]);
 
   return {
     matches,
     curatedMatches,
     isLoading,
-    error,
     lastRefreshDate,
     filters,
     applyFilters,
-    refreshMatches: () => loadMatches()
+    refreshMatches: () => loadMatches(userId)
   };
 };

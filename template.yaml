@@ -1,0 +1,180 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  vivah-backend
+
+  Sample SAM Template for vivah-backend
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  RegisterLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/auth/
+      Handler: register
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        Register:
+          Type: Api
+          Properties:
+            Path: /auth/register
+            Method: post
+  LoginLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/auth/
+      Handler: login
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        Login:
+          Type: Api
+          Properties:
+            Path: /auth/login
+            Method: post
+  CreateProfileLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/profile/
+      Handler: create-profile
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        CreateProfile:
+          Type: Api
+          Properties:
+            Path: /profile
+            Method: post
+  GetProfileLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/profile/
+      Handler: get-profile
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        GetProfile:
+          Type: Api
+          Properties:
+            Path: /profile/{user_id}
+            Method: get
+  UpdateProfileLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/profile/
+      Handler: update-profile
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        UpdateProfile:
+          Type: Api
+          Properties:
+            Path: /profile/{user_id}
+            Method: put
+  CreateMatchLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/matches/
+      Handler: create-match
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        CreateMatch:
+          Type: Api
+          Properties:
+            Path: /match
+            Method: post
+  GetMatchLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/matches/
+      Handler: get-match
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        GetMatch:
+          Type: Api
+          Properties:
+            Path: /match/{user_id}/{match_id}
+            Method: get
+  CreateLikeLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/likes/
+      Handler: create-like
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        CreateLike:
+          Type: Api
+          Properties:
+            Path: /like
+            Method: post
+  GetLikeLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/likes/
+      Handler: get-like
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        GetLike:
+          Type: Api
+          Properties:
+            Path: /like/{user_id}/{liked_user_id}
+            Method: get
+  CreateMessageLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/messages/
+      Handler: create-message
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        CreateMessage:
+          Type: Api
+          Properties:
+            Path: /message
+            Method: post
+  GetMessageLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/messages/
+      Handler: get-message
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        GetMessage:
+          Type: Api
+          Properties:
+            Path: /message/{user_id}/{message_id}
+            Method: get
+  GetMessagesByChatIdLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend-go/messages/
+      Handler: get-messages-by-chat-id
+      Runtime: go1.x
+      Architectures:
+        - x86_64
+      Events:
+        GetMessagesByChatId:
+          Type: Api
+          Properties:
+            Path: /messages/{chat_id}
+            Method: get
