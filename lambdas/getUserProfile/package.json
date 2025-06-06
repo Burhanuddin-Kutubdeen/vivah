@@ -1,0 +1,17 @@
+{
+  "name": "get-user-profile-lambda",
+  "version": "1.0.0",
+  "description": "Lambda function to get user profile.",
+  "main": "index.js",
+  "type": "commonjs",
+  "dependencies": {
+    "pg": "^8.11.3",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "zip-local": "^0.3.5"
+  },
+  "scripts": {
+    "package": "rm -f deployment-package.zip && zip -r deployment-package.zip . -x '*.git*' '*node_modules/aws-sdk/*' '*node_modules/zip-local/*'"
+  }
+}

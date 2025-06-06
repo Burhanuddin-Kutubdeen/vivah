@@ -1,0 +1,219 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Vivah Matchmaking App SAM Template
+  This template defines the backend Lambdas and API Gateway for the Vivah app.
+
+Globals:
+  Function:
+    Timeout: 15 # Default timeout for all functions in seconds
+    MemorySize: 256 # Default memory size in MB
+    Runtime: nodejs18.x # Assuming Node.js 18.x for all Lambdas
+    Handler: index.handler # Default handler file and function
+    Environment: # Common environment variables (placeholders, to be set in AWS)
+      Variables:
+        DB_HOST: YOUR_RDS_ENDPOINT # Placeholder - Configure in AWS
+        DB_PORT: 5432 # Placeholder - Configure in AWS
+        DB_NAME: vivahapp # Placeholder - Configure in AWS
+        DB_USER: YOUR_DB_USER # Placeholder - Configure in AWS
+        DB_PASSWORD: YOUR_DB_PASSWORD # Placeholder - Configure in AWS (Consider Secrets Manager for prod)
+        JWT_SECRET: YOUR_JWT_SECRET # Placeholder - Configure in AWS (Consider Secrets Manager for prod)
+        # NODE_OPTIONS: --enable-source-maps # Useful for debugging if you have source maps
+    Architectures:
+      - x86_64
+    # Note: For database access within a VPC, VpcConfig would be needed here or per function.
+    # VpcConfig:
+    #   SecurityGroupIds:
+    #     - sg-xxxxxxxxxxxxxxxxx # Replace with your DB security group
+    #   SubnetIds:
+    #     - subnet-xxxxxxxxxxxxxxxxx # Replace with your private subnet IDs
+    #     - subnet-yyyyyyyyyyyyyyyyy
+  Api:
+    Cors: # Default CORS configuration for all API Gateway endpoints
+      AllowMethods: "'POST, GET, PUT, OPTIONS, HEAD'" # Must be a string, enclosed in single quotes
+      AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+      AllowOrigin: "'*'" # Be more specific for production (e.g., "'https://yourfrontenddomain.com'")
+      # MaxAge: "'600'" # Optional: Max age for preflight requests
+      # AllowCredentials: false # Set to true if you need to allow cookies/auth headers from frontend
+
+Resources:
+  # --- Authentication Lambdas ---
+  RegisterUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vivah-registerUser
+      CodeUri: lambdas/registerUser/ # Path to the Lambda code
+      Policies:
+        # Add policies required by this function, e.g., RDS access if using IAM auth, basic execution role
+        - AWSLambdaBasicExecutionRole
+        # - RDSDataServiceFullAccessPolicy # Example if using RDS Data API (not for pg driver)
+        # If Lambda is in VPC to access RDS, it needs VPC execution policy
+        # - AWSLambdaVPCAccessExecutionRole
+      Events:
+        RegisterApi:
+          Type: Api
+          Properties:
+            Path: /auth/register
+            Method: post
+
+  LoginUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vivah-loginUser
+      CodeUri: lambdas/loginUser/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        # - AWSLambdaVPCAccessExecutionRole
+      Events:
+        LoginApi:
+          Type: Api
+          Properties:
+            Path: /auth/login
+            Method: post
+
+  # --- Profile Lambdas ---
+  GetUserProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vivah-getUserProfile
+      CodeUri: lambdas/getUserProfile/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        # - AWSLambdaVPCAccessExecutionRole
+      Events:
+        GetProfileApi:
+          Type: Api
+          Properties:
+            Path: /profile
+            Method: get
+            # Auth: # Example of how you might add a Lambda authorizer later
+            #   Authorizer: MyLambdaTokenAuthorizer
+
+  UpdateUserProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vivah-updateUserProfile
+      CodeUri: lambdas/updateUserProfile/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        # - AWSLambdaVPCAccessExecutionRole
+      Events:
+        UpdateProfileApi:
+          Type: Api
+          Properties:
+            Path: /profile
+            Method: put
+            # Auth:
+            #   Authorizer: MyLambdaTokenAuthorizer
+
+  # --- Like Lambda ---
+  LikeUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vivah-likeUser
+      CodeUri: lambdas/likeUser/
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        # - AWSLambdaVPCAccessExecutionRole
+      Events:
+        LikeUserApi:
+          Type: Api
+          Properties:
+            Path: /like
+            Method: post
+            # Auth:
+            #   Authorizer: MyLambdaTokenAuthorizer
+
+  # --- Get Liked Users Lambda ---
+  GetLikedUsersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vivah-getLikedUsers
+      CodeUri: lambdas/getLikedUsers/
+      # Handler, Runtime, Environment, etc., will be inherited from Globals if not specified here
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        # - AWSLambdaVPCAccessExecutionRole # Add if your Lambdas are in a VPC to access RDS
+      Events:
+        GetLikedUsersApi:
+          Type: Api
+          Properties:
+            Path: /likes # As per user's spec for this function
+            Method: get
+            # Auth: # Placeholder for Lambda Authorizer to be added in Phase 5
+            #   Authorizer: MyLambdaTokenAuthorizer
+
+  # --- Get Match Suggestions Lambda ---
+  GetMatchSuggestionsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vivah-getMatchSuggestions
+      CodeUri: lambdas/getMatchSuggestions/
+      # Handler, Runtime, Environment, etc., will be inherited from Globals if not specified here
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        # - AWSLambdaVPCAccessExecutionRole # Add if your Lambdas are in a VPC to access RDS
+      Events:
+        GetMatchSuggestionsApi:
+          Type: Api
+          Properties:
+            Path: /suggestions # As per user's spec
+            Method: get
+            # Auth: # Placeholder for Lambda Authorizer to be added in Phase 5
+            #   Authorizer: MyLambdaTokenAuthorizer
+
+  # --- Generate Match Suggestions Lambda (Scheduled) ---
+  GenerateMatchSuggestionsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vivah-generateMatchSuggestions
+      CodeUri: lambdas/generateMatchSuggestions/
+      # Handler, Runtime, Environment, etc., will be inherited from Globals if not specified here
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        # - AWSLambdaVPCAccessExecutionRole # Add if your Lambdas are in a VPC to access RDS
+      Events:
+        MatchmakingSchedule:
+          Type: Schedule # This defines an EventBridge (CloudWatch Events) Schedule rule
+          Properties:
+            Schedule: rate(3 days) # As per user's spec
+            Name: VivahGenerateSuggestionsSchedule
+            Description: Triggers generation of match suggestions every 3 days
+            Enabled: True # Set to False if you want to deploy it disabled initially
+
+  # --- Get Matches Lambda ---
+  GetMatchesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vivah-getMatches
+      CodeUri: lambdas/getMatches/
+      # Handler, Runtime, Environment, etc., will be inherited from Globals if not specified here
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        # - AWSLambdaVPCAccessExecutionRole # Add if your Lambdas are in a VPC to access RDS
+      Events:
+        GetMatchesApi:
+          Type: Api
+          Properties:
+            Path: /matches # As per user's spec for this function
+            Method: get
+            # Auth: # Placeholder for Lambda Authorizer to be added in Phase 5
+            #   Authorizer: MyLambdaTokenAuthorizer
+
+# Outputs: # Optional: Define outputs, like the API Gateway endpoint URL
+#   VivahApiEndpoint:
+#     Description: "API Gateway endpoint URL for Vivah App"
+#     Value: !Sub "https://\${ServerlessRestApi}.execute-api.\${AWS::Region}.amazonaws.com/Prod" # Or your stage name
+
+# Example Lambda Authorizer Definition (for later, as per Phase 5)
+# MyLambdaTokenAuthorizer:
+#   Type: AWS::Serverless::Function
+#   Properties:
+#     FunctionName: vivah-tokenAuthorizer
+#     CodeUri: lambdas/tokenAuthorizer/ # You would need to create this Lambda
+#     Handler: index.handler
+#     Runtime: nodejs18.x
+#     Policies: [AWSLambdaBasicExecutionRole]
+#     Environment:
+#       Variables:
+#         JWT_SECRET: YOUR_JWT_SECRET # Must match the one used for signing
