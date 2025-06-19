@@ -3,7 +3,6 @@ import { useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { signUpUser, signInUser, signOutUser, resetPassword } from '@/lib/auth-utils';
 import { useNavigate } from 'react-router-dom';
-import type { User } from '@supabase/supabase-js';
 
 export const useAuthActions = (
   setIsProfileComplete: (value: boolean) => void,
@@ -15,7 +14,7 @@ export const useAuthActions = (
 
   // Sign up handler
   const signUp = useCallback(async (email: string, password: string, userData: any) => {
-    const onSignUpSuccess = async (newUser: User) => {
+    const onSignUpSuccess = async (newUser: any) => {
       console.log("Sign up success callback triggered");
       
       // Set profile as incomplete and navigate to profile setup
@@ -65,7 +64,7 @@ export const useAuthActions = (
 
   // Sign in handler
   const signIn = useCallback(async (email: string, password: string) => {
-    const onSignInSuccess = async (loggedInUser: User) => {
+    const onSignInSuccess = async (loggedInUser: any) => {
       console.log("Sign in success callback triggered");
       
       toast({

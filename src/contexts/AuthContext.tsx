@@ -1,14 +1,13 @@
 
 import React, { createContext, useContext, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import type { User, Session } from '@supabase/supabase-js';
 import { useAuthState } from '@/hooks/use-auth-state';
 import { useProfileManagement } from '@/hooks/use-profile-management';
 import { useAuthActions } from '@/hooks/use-auth-actions';
 
 interface AuthContextProps {
-  user: User | null;
-  session: Session | null;
+  user: any | null;
+  session: any | null;
   loading: boolean;
   isAuthenticated: boolean;
   signUp: (email: string, password: string, userData: any) => Promise<{ error: any; data: any }>;
