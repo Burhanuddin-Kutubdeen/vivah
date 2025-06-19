@@ -7,6 +7,9 @@ export const useDiscoveryProfiles = () => {
   const [profiles, setProfiles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
+  const [direction, setDirection] = useState<'left' | 'right' | null>(null);
+  const [remainingLikes, setRemainingLikes] = useState(10); // Default daily likes
   const { user } = useAuth();
 
   useEffect(() => {
@@ -27,9 +30,47 @@ export const useDiscoveryProfiles = () => {
     fetchProfiles();
   }, [user]);
 
+  const currentProfile = profiles[currentProfileIndex] || null;
+  const hasProfiles = profiles.length > 0;
+
+  const handleSwipe = (swipeDirection: 'left' | 'right') => {
+    setDirection(swipeDirection);
+    
+    // Move to next profile after a short delay
+    setTimeout(() => {
+      if (currentProfileIndex < profiles.length - 1) {
+        setCurrentProfileIndex(prev => prev + 1);
+      }
+      setDirection(null);
+      
+      // Decrease remaining likes if it's a right swipe (like)
+      if (swipeDirection === 'right') {
+        setRemainingLikes(prev => Math.max(0, prev - 1));
+      }
+    }, 300);
+  };
+
+  const handleSuperLike = () => {
+    // Similar to regular like but with super like logic
+    handleSwipe('right');
+  };
+
+  const applyPreferences = (preferences: any) => {
+    // This would filter profiles based on preferences
+    // For now, we'll just log the preferences
+    console.log('Applying preferences:', preferences);
+  };
+
   return {
     profiles,
     isLoading,
-    error
+    error,
+    currentProfile,
+    direction,
+    remainingLikes,
+    handleSwipe,
+    handleSuperLike,
+    applyPreferences,
+    hasProfiles
   };
 };

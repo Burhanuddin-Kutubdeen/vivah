@@ -2,8 +2,20 @@
 import { useState, useEffect } from 'react';
 import { api } from '@/services/api';
 
+export interface ProfileData {
+  id: string;
+  first_name: string;
+  last_name: string;
+  avatar_url?: string;
+  bio?: string;
+  age?: number;
+  location?: string;
+  interests?: string[];
+  [key: string]: any;
+}
+
 export const useProfileData = (profileId: string) => {
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
