@@ -4,7 +4,6 @@ import { MessageCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { isValidUUID } from '@/utils/validation';
@@ -28,9 +27,8 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   const [showProfile, setShowProfile] = useState(false);
   
   const handleCardClick = (e: React.MouseEvent) => {
-    // Prevent default to avoid navigation
     e.preventDefault();
-    e.stopPropagation(); // Also stop propagation
+    e.stopPropagation();
     
     if (!isValidUUID(match.id)) {
       console.error("Invalid profile ID format:", match.id);
@@ -41,17 +39,14 @@ const MatchCard: React.FC<MatchCardProps> = ({ match }) => {
   };
   
   const handleMessage = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation();
     
-    // Validate ID format
     if (!isValidUUID(match.id)) {
       toast.error("Cannot message profile - invalid ID format");
       return;
     }
     
-    // Navigate to the messages page with this specific user's conversation open
     navigate(`/messages?userId=${match.id}&name=${encodeURIComponent(match.name)}`);
-    
     toast.info(`Waiting for ${match.name} to accept your message request`);
   };
 

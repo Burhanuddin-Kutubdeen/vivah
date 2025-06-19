@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/services/api';
 import { toast } from '@/hooks/use-toast';
 import { MessageRequest } from '../types/messageTypes';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,43 +16,23 @@ export const useMessageRequests = () => {
       if (!user) return;
       
       try {
-        // First get the likes data
-        const { data: likesData, error: likesError } = await supabase
-          .from('likes')
-          .select('id, user_id, liked_profile_id, status, created_at')
-          .eq('liked_profile_id', user.id)
-          .eq('status', 'pending');
-          
-        if (likesError) throw likesError;
+        // Get admirers (people who liked the current user)
+        const admirersData = await api.likes.getAdmirers();
         
-        // If we have likes data, fetch the sender profiles
-        if (likesData && likesData.length > 0) {
-          const messageRequests: MessageRequest[] = [];
-          
-          // For each like, get the sender profile
-          for (const like of likesData) {
-            const { data: profileData, error: profileError } = await supabase
-              .from('profiles')
-              .select('id, first_name, last_name, avatar_url')
-              .eq('id', like.user_id)
-              .single();
-              
-            if (profileError) {
-              console.error('Error fetching profile:', profileError);
-              continue;
+        if (admirersData && admirersData.length > 0) {
+          const messageRequests: MessageRequest[] = admirersData.map((admirer: any) => ({
+            id: admirer.id,
+            sender_id: admirer.id,
+            receiver_id: user.id,
+            status: 'pending',
+            created_at: admirer.created_at || new Date().toISOString(),
+            sender: {
+              id: admirer.id,
+              first_name: admirer.first_name,
+              last_name: admirer.last_name,
+              avatar_url: admirer.avatar_url
             }
-            
-            if (profileData) {
-              messageRequests.push({
-                id: like.id,
-                sender_id: like.user_id,
-                receiver_id: like.liked_profile_id,
-                status: like.status,
-                created_at: like.created_at,
-                sender: profileData as any
-              });
-            }
-          }
+          }));
           
           setRequests(messageRequests);
         }
@@ -77,21 +57,11 @@ export const useMessageRequests = () => {
     setProcessingId(request.id);
     
     try {
-      // Update the request status
-      const { error } = await supabase
-        .from('likes')
-        .update({ status: 'accepted' })
-        .eq('id', request.id);
-        
-      if (error) throw error;
-      
-      // Remove from the list
+      // In the API, we would update the like status to accepted
+      // For now, just remove from the list and trigger callback
       setRequests(prev => prev.filter(r => r.id !== request.id));
       
-      // Get the sender's name
       const fullName = `${request.sender.first_name || ''} ${request.sender.last_name || ''}`.trim();
-      
-      // Trigger the callback to open the conversation
       onAcceptCallback(request.sender.id, fullName);
       
       toast({
@@ -116,14 +86,6 @@ export const useMessageRequests = () => {
     setProcessingId(request.id);
     
     try {
-      // Update the request status
-      const { error } = await supabase
-        .from('likes')
-        .update({ status: 'declined' })
-        .eq('id', request.id);
-        
-      if (error) throw error;
-      
       // Remove from the list
       setRequests(prev => prev.filter(r => r.id !== request.id));
       

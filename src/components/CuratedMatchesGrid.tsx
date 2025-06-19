@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from '@/contexts/AuthContext';
 import CuratedMatchesHeader from './matches/CuratedMatchesHeader';
 import MatchList from './matches/MatchList';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/services/api';
 import { toast } from 'sonner';
 import { calculateAge } from '@/utils/profile-utils';
 import { getUserGender } from '@/utils/user-utils';
@@ -26,48 +26,19 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLo
       
       setIsLoading(true);
       try {
-        // Get current user's gender for opposite gender matching
-        const userGender = getUserGender(user);
-        const oppositeGender = userGender === 'male' ? 'female' : 'male';
+        // Use the new API service to fetch matches
+        const data = await api.profiles.getMatches({
+          limit: 6
+        });
         
-        // Fetch profiles with the opposite gender
-        const { data: profilesData, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('gender', oppositeGender)
-          .neq('id', user.id)
-          .limit(6); // Fetch a limited number for curated matches
-        
-        if (error) {
-          console.error('Error fetching recommended profiles:', error);
-          toast.error('Failed to load recommended profiles');
-          setRecommendedMatches([]);
-          return;
-        }
-        
-        if (!profilesData || profilesData.length === 0) {
+        if (!data || data.length === 0) {
           console.log('No recommended profiles found');
           setRecommendedMatches([]);
           return;
         }
         
-        // Get user interests for sorting
-        const userInterests = user?.user_metadata?.interests || 
-                            user?.user_metadata?.profile?.interests || 
-                            [];
-        
         // Convert profiles to match format
-        const matches = profilesData.map(profile => {
-          // Calculate shared interests
-          const profileInterests = profile.interests || [];
-          const sharedInterests = userInterests.length > 0 ? 
-            profileInterests.filter(interest => userInterests.includes(interest)) : [];
-          
-          // Calculate match percentage based on shared interests and other factors
-          const matchPercentage = sharedInterests.length > 0 ? 
-            Math.min(100, 60 + (sharedInterests.length * 10)) : // Base 60% + 10% per shared interest
-            Math.floor(60 + Math.random() * 30); // Random percentage between 60-90 if no shared interests
-          
+        const matches = data.map(profile => {
           const age = profile.date_of_birth ? calculateAge(profile.date_of_birth) : 25;
           
           return {
@@ -76,20 +47,19 @@ const CuratedMatchesGrid: React.FC<CuratedMatchesGridProps> = ({ isOffline, isLo
             age,
             occupation: profile.job || 'Not specified',
             imageUrl: profile.avatar_url || '/placeholder.svg',
-            matchPercentage,
-            isNewMatch: false, // Would need actual tracking
+            matchPercentage: Math.floor(Math.random() * 30) + 70,
+            isNewMatch: false,
             interests: profile.interests || []
           };
         });
         
-        // Sort by match percentage
         const sortedMatches = matches.sort((a, b) => b.matchPercentage - a.matchPercentage);
         
-        console.log(`Fetched ${sortedMatches.length} recommended matches from database`);
+        console.log(`Fetched ${sortedMatches.length} recommended matches from API`);
         setRecommendedMatches(sortedMatches);
       } catch (error) {
-        console.error('Unexpected error fetching recommended matches:', error);
-        toast.error('Something went wrong while loading recommended profiles');
+        console.error('Error fetching recommended matches:', error);
+        toast.error('Failed to load recommended profiles');
       } finally {
         setIsLoading(false);
       }

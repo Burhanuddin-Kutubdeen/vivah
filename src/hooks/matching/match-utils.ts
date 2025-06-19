@@ -1,9 +1,8 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/services/api";
 import { calculateAge } from '@/utils/profile-utils';
 import { Match, MatchProfile, MatchDetails, MatchFilters } from './types';
 
-// Function to apply filters to matches
 export const applyFiltersToMatches = (
   matches: Match[],
   filters: MatchFilters
@@ -40,7 +39,6 @@ export const applyFiltersToMatches = (
   return filteredMatches;
 };
 
-// Function to sort matches based on priority
 export const sortMatchesByPriority = (
   matches: Match[],
   priority: MatchFilters['priority'] = 'interests'
@@ -51,15 +49,12 @@ export const sortMatchesByPriority = (
     if (priority === 'interests') {
       return b.matchDetails.sharedInterests.length - a.matchDetails.sharedInterests.length;
     } else if (priority === 'age') {
-      // Sort by closest age to the user (assuming we have user age)
       return a.profile.age - b.profile.age;
     } else if (priority === 'location') {
-      // For locations, we just maintain the order but prioritize matches with locations
       if (a.profile.location && !b.profile.location) return -1;
       if (!a.profile.location && b.profile.location) return 1;
       return 0;
     } else {
-      // Default to match score
       return b.matchDetails.score - a.matchDetails.score;
     }
   });
@@ -67,21 +62,16 @@ export const sortMatchesByPriority = (
   return sortedMatches;
 };
 
-// Convert database profiles to Match objects
 export const convertProfilesToMatches = (
   profiles: any[],
   userInterests: string[]
 ): Match[] => {
   return profiles.map(profile => {
-    // Calculate shared interests
     const profileInterests = profile.interests || [];
     const sharedInterests = userInterests.length > 0 ? 
       profileInterests.filter((interest: string) => userInterests.includes(interest)) : [];
     
-    // Calculate match score based on shared interests
     const interestScore = Math.min(100, 60 + (sharedInterests.length * 10));
-    
-    // Get match profile age
     const age = profile.date_of_birth ? calculateAge(profile.date_of_birth) : 30;
     
     return {
@@ -102,7 +92,7 @@ export const convertProfilesToMatches = (
       matchDetails: {
         score: interestScore,
         sharedInterests,
-        isNewMatch: true // Consider all matches as new for now
+        isNewMatch: true
       }
     };
   });

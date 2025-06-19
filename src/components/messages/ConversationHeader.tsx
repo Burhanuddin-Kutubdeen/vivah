@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from 'lucide-react';
 import { Conversation } from './ConversationList';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/services/api';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,35 +20,24 @@ const ConversationHeader: React.FC<ConversationHeaderProps> = ({ conversation })
   const [lastName, setLastName] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch first name and last name from profiles
     const fetchProfileData = async () => {
       if (!conversation.id) return;
       
       try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', conversation.id)
-          .maybeSingle();
-          
-        if (error) {
-          console.error('Error fetching profile data:', error);
-          return;
-        }
+        const data = await api.profiles.get(conversation.id);
         
-        if (data) {
-          setFirstName(data.first_name);
-          setLastName(data.last_name);
-        }
+        if (!data) return;
+        
+        setFirstName(data.first_name);
+        setLastName(data.last_name);
       } catch (err) {
-        console.error('Error in profile fetch:', err);
+        console.error('Error fetching profile data:', err);
       }
     };
     
     fetchProfileData();
   }, [conversation.id]);
   
-  // Create a display name using firstName and lastName if available
   const displayName = firstName || lastName ? 
     [firstName, lastName].filter(Boolean).join(' ') : 
     conversation.person.name;

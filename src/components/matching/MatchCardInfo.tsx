@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Badge } from "@/components/ui/badge";
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/services/api';
 import { isValidUUID } from '@/utils/validation';
 
 interface MatchCardInfoProps {
@@ -22,18 +22,13 @@ const MatchCardInfo: React.FC<MatchCardInfoProps> = ({
   const [displayName, setDisplayName] = useState<string>(name);
   
   useEffect(() => {
-    // If we have a valid profileId, fetch the actual name from profiles
     const fetchProfileName = async () => {
       if (!profileId || !isValidUUID(profileId)) return;
       
       try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('first_name, last_name')
-          .eq('id', profileId)
-          .maybeSingle();
-          
-        if (error || !data) return;
+        const data = await api.profiles.get(profileId);
+        
+        if (!data) return;
         
         const firstName = data.first_name || '';
         const lastName = data.last_name || '';
