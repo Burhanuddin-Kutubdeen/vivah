@@ -23,9 +23,18 @@ import { Suspense } from 'react';
 import './App.css';
 
 function App() {
+  console.log('App component is rendering');
+  
   return (
     <>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-matrimony-500 mx-auto"></div>
+            <p className="mt-4 text-matrimony-600">Loading application...</p>
+          </div>
+        </div>
+      }>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />

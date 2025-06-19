@@ -20,15 +20,23 @@ export const useAuthState = (onUserChange: (userId: string | null) => void) => {
           return;
         }
 
-        const userData = await api.auth.getUser();
-        console.log("User authenticated:", userData.id);
-        
-        setUser(userData);
-        setSession({ user: userData, token });
-        onUserChange(userData.id);
+        try {
+          const userData = await api.auth.getUser();
+          console.log("User authenticated:", userData.id);
+          
+          setUser(userData);
+          setSession({ user: userData, token });
+          onUserChange(userData.id);
+        } catch (apiError) {
+          console.log("Auth check failed, clearing token");
+          localStorage.removeItem('auth_token');
+          onUserChange(null);
+          setUser(null);
+          setSession(null);
+        }
       } catch (error) {
-        console.error('Error getting user:', error);
-        localStorage.removeItem('auth_token');
+        console.error('Error during auth initialization:', error);
+        // Don't clear auth state on initialization errors
         onUserChange(null);
       } finally {
         setLoading(false);

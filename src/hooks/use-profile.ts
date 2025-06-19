@@ -12,7 +12,10 @@ export const useProfile = (profileId?: string, user?: any) => {
   useEffect(() => {
     const fetchProfile = async () => {
       const id = profileId || user?.id;
-      if (!id) return;
+      if (!id) {
+        setIsLoading(false);
+        return;
+      }
       
       try {
         const data = await api.profiles.get(id);
@@ -23,6 +26,7 @@ export const useProfile = (profileId?: string, user?: any) => {
           const requiredFields = ['first_name', 'last_name', 'date_of_birth', 'gender', 'location'];
           const isComplete = requiredFields.every(field => data[field]);
           setIsProfileComplete(isComplete);
+          setProfileCheckError(null);
         }
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -43,6 +47,7 @@ export const useProfile = (profileId?: string, user?: any) => {
         const requiredFields = ['first_name', 'last_name', 'date_of_birth', 'gender', 'location'];
         const isComplete = requiredFields.every(field => data[field]);
         setIsProfileComplete(isComplete);
+        setProfileCheckError(null);
         return isComplete;
       }
       return false;
@@ -70,6 +75,7 @@ export const useProfile = (profileId?: string, user?: any) => {
     profile,
     isLoading,
     error,
+    isProfileComplete,
     checkProfileCompletion,
     setIsProfileComplete,
     profileCheckError,

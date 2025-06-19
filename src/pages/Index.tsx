@@ -8,6 +8,8 @@ import Footer from '@/components/Footer';
 import AnimatedTransition from '@/components/AnimatedTransition';
 
 const Index = () => {
+  console.log('Index page is rendering');
+  
   return (
     <AnimatedTransition>
       <div className="min-h-screen bg-white dark:bg-gray-900">
