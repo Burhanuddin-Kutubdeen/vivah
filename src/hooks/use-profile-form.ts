@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/services/api";
 import { useToast } from '@/hooks/use-toast';
 import { profileFormSchema, ProfileFormValues } from '@/components/profile/ProfileFormSchema';
 
@@ -40,32 +40,7 @@ export const useProfileForm = (userId: string | undefined, connectionError: bool
       try {
         setLoadError(false);
         
-        // Add timeout for the request
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-        
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('first_name, last_name, date_of_birth, gender, civil_status, religion, location, bio, interests, height, weight, education, job, exercise, drinking, smoking, wants_kids, has_kids')
-          .eq('id', userId)
-          .maybeSingle();
-          
-        clearTimeout(timeoutId);
-        
-        if (error) {
-          console.error("Error loading profile data:", error);
-          setLoadError(true);
-          
-          // Only show toast if not already showing connection error
-          if (!connectionError) {
-            toast({
-              title: "Error loading profile data",
-              description: "Your previously saved data couldn't be loaded. You can still continue setting up your profile.",
-              variant: "destructive",
-            });
-          }
-          return;
-        }
+        const data = await api.profiles.get(userId);
         
         if (data) {
           // Only set form values if we have data

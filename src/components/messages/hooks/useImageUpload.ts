@@ -1,8 +1,7 @@
 
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/services/api';
 import { toast } from 'sonner';
-import { v4 as uuidv4 } from 'uuid';
 
 export const useImageUpload = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -47,26 +46,8 @@ export const useImageUpload = () => {
     
     setIsUploading(true);
     try {
-      // Create a unique file name
-      const fileExt = selectedImage.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = `chat-images/${fileName}`;
-      
-      // Upload to Supabase storage
-      const { error: uploadError } = await supabase.storage
-        .from('chat-attachments')
-        .upload(filePath, selectedImage);
-      
-      if (uploadError) {
-        throw uploadError;
-      }
-      
-      // Get the public URL
-      const { data } = supabase.storage
-        .from('chat-attachments')
-        .getPublicUrl(filePath);
-      
-      return data.publicUrl;
+      const response = await api.files.uploadChatImage(selectedImage);
+      return response.url;
     } catch (error) {
       console.error('Error uploading image:', error);
       toast.error('Failed to upload image. Please try again.');

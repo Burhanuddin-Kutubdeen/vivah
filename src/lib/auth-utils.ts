@@ -1,6 +1,5 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import type { User, Session } from '@supabase/supabase-js';
+import { api } from '@/services/api';
 
 // Authentication utility functions
 export const validateEmail = (email: string): boolean => {
@@ -12,12 +11,12 @@ export const signUpUser = async (
   email: string, 
   password: string, 
   userData: any,
-  onSuccess: (user: User, session: Session | null) => void
+  onSuccess: (user: any, session: any) => void
 ) => {
   try {
     console.log("Signing up with:", email);
     
-    // Validate email format before sending to Supabase
+    // Validate email format
     if (!validateEmail(email)) {
       return { 
         error: { 
@@ -27,52 +26,23 @@ export const signUpUser = async (
       };
     }
     
-    // Get the current domain for redirecting email verification
-    const domain = window.location.origin;
-    console.log("Current domain for redirect:", domain);
-
-    // Make sure to include first_name and last_name in metadata
-    const { error, data } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          first_name: userData.firstName,
-          last_name: userData.lastName,
-        },
-        emailRedirectTo: `${domain}/login?verified=true`,
-      },
+    const data = await api.auth.signUp(email, password, {
+      first_name: userData.firstName,
+      last_name: userData.lastName,
     });
 
-    if (error) {
-      console.error("Registration error:", error);
-      return { error, data: null };
+    console.log("User registered successfully:", data.user.id);
+    
+    // Store auth token
+    if (data.token) {
+      localStorage.setItem('auth_token', data.token);
     }
-
-    // If registration successful and we have user data, update the profiles table
-    if (data.user) {
-      console.log("User registered successfully:", data.user.id);
-      
-      // Also update the profiles table with first and last name
-      try {
-        await supabase
-          .from('profiles')
-          .update({
-            first_name: userData.firstName,
-            last_name: userData.lastName
-          })
-          .eq('id', data.user.id);
-      } catch (profileError) {
-        console.error("Error updating profile:", profileError);
-        // We don't fail the signup if profile update fails
-      }
-      
-      onSuccess(data.user, data.session);
-    }
+    
+    onSuccess(data.user, data.session || null);
     
     return { error: null, data };
   } catch (error: any) {
-    console.error("Unexpected registration error:", error);
+    console.error("Registration error:", error);
     return { error, data: null };
   }
 };
@@ -80,43 +50,36 @@ export const signUpUser = async (
 export const signInUser = async (
   email: string, 
   password: string,
-  onSuccess: (user: User) => void
+  onSuccess: (user: any) => void
 ) => {
   try {
     console.log("Signing in with:", email);
-    const { error, data } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    
+    const data = await api.auth.signIn(email, password);
 
-    if (error) {
-      console.error("Login error:", error);
-      return { error, data: null };
+    console.log("User logged in successfully:", data.user.id);
+    
+    // Store auth token
+    if (data.token) {
+      localStorage.setItem('auth_token', data.token);
     }
-
-    // If logged in successfully, call the onSuccess callback
-    if (data.user) {
-      console.log("User logged in successfully:", data.user.id);
-      onSuccess(data.user);
-    }
+    
+    onSuccess(data.user);
     
     return { error: null, data };
   } catch (error: any) {
-    console.error("Unexpected login error:", error);
+    console.error("Login error:", error);
     return { error, data: null };
   }
 };
 
 export const signOutUser = async () => {
   try {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Logout error:", error);
-      return { error };
-    }
+    await api.auth.signOut();
+    localStorage.removeItem('auth_token');
     return { error: null };
   } catch (error: any) {
-    console.error("Unexpected logout error:", error);
+    console.error("Logout error:", error);
     return { error };
   }
 };
@@ -125,7 +88,7 @@ export const resetPassword = async (email: string) => {
   try {
     console.log("Requesting password reset for:", email);
     
-    // Validate email format before sending to Supabase
+    // Validate email format
     if (!validateEmail(email)) {
       return { 
         error: { 
@@ -135,18 +98,11 @@ export const resetPassword = async (email: string) => {
       };
     }
     
-    const { error, data } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/reset-password',
-    });
-
-    if (error) {
-      console.error("Password reset error:", error);
-      return { error, data: null };
-    }
+    const data = await api.auth.resetPassword(email);
     
     return { error: null, data };
   } catch (error: any) {
-    console.error("Unexpected password reset error:", error);
+    console.error("Password reset error:", error);
     return { error, data: null };
   }
 };

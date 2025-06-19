@@ -1,5 +1,5 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/services/api';
 import type { ProfileFormValues } from '@/components/profile/ProfileFormSchema';
 
 /**
@@ -8,28 +8,16 @@ import type { ProfileFormValues } from '@/components/profile/ProfileFormSchema';
  * @returns Any error that occurred during the operation
  */
 export async function createProfile(profileData: Partial<ProfileFormValues>) {
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  
-  if (userError || !userData.user) {
-    console.error('Error getting authenticated user:', userError);
-    return userError;
-  }
-  
-  // Convert form data to database format
-  const dbProfileData = convertFormDataToDbFormat(profileData);
-  
-  const { error } = await supabase
-    .from('profiles')
-    .insert({
-      id: userData.user.id,
-      ...dbProfileData
-    });
-  
-  if (error) {
+  try {
+    // Convert form data to database format
+    const dbProfileData = convertFormDataToDbFormat(profileData);
+    
+    await api.profiles.create(dbProfileData);
+    return null;
+  } catch (error: any) {
     console.error('Error creating profile:', error);
+    return error;
   }
-  
-  return error;
 }
 
 /**
@@ -38,26 +26,18 @@ export async function createProfile(profileData: Partial<ProfileFormValues>) {
  * @returns Any error that occurred during the operation
  */
 export async function updateProfile(profileData: Partial<ProfileFormValues>) {
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  
-  if (userError || !userData.user) {
-    console.error('Error getting authenticated user:', userError);
-    return userError;
-  }
-  
-  // Convert form data to database format
-  const dbProfileData = convertFormDataToDbFormat(profileData);
-  
-  const { error } = await supabase
-    .from('profiles')
-    .update(dbProfileData)
-    .eq('id', userData.user.id);
-  
-  if (error) {
+  try {
+    // Convert form data to database format
+    const dbProfileData = convertFormDataToDbFormat(profileData);
+    
+    // Get current user to get their ID
+    const user = await api.auth.getUser();
+    await api.profiles.update(user.id, dbProfileData);
+    return null;
+  } catch (error: any) {
     console.error('Error updating profile:', error);
+    return error;
   }
-  
-  return error;
 }
 
 /**
@@ -65,24 +45,14 @@ export async function updateProfile(profileData: Partial<ProfileFormValues>) {
  * @returns The profile data and any error that occurred
  */
 export async function getProfile() {
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  
-  if (userError || !userData.user) {
-    console.error('Error getting authenticated user:', userError);
-    return { data: null, error: userError };
-  }
-  
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userData.user.id)
-    .maybeSingle();
-  
-  if (error) {
+  try {
+    const user = await api.auth.getUser();
+    const data = await api.profiles.get(user.id);
+    return { data, error: null };
+  } catch (error: any) {
     console.error('Error getting profile:', error);
+    return { data: null, error };
   }
-  
-  return { data, error };
 }
 
 /**

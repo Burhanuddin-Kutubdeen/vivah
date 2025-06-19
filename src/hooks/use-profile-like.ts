@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/services/api";
 import { isValidUUID } from '@/utils/validation';
 
 export const useProfileLike = (profileId: string) => {
@@ -24,23 +24,11 @@ export const useProfileLike = (profileId: string) => {
       if (!isValidUUID(profileId)) return;
       
       try {
-        const { data, error } = await supabase
-          .from('likes')
-          .select('status')
-          .eq('user_id', user.id)
-          .eq('liked_profile_id', profileId)
-          .single();
-          
-        if (error && error.code !== 'PGRST116') {
-          console.error("Error checking like status:", error);
-          return;
-        }
-        
-        if (data) {
-          setHasLiked(true);
-        }
+        const likes = await api.likes.getByUser(user.id);
+        const hasLikedProfile = likes.some((like: any) => like.liked_profile_id === profileId);
+        setHasLiked(hasLikedProfile);
       } catch (error) {
-        console.error("Error in checkExistingLike:", error);
+        console.error("Error checking like status:", error);
       }
     };
     
@@ -73,35 +61,14 @@ export const useProfileLike = (profileId: string) => {
     try {
       // If already liked, unlike the profile
       if (hasLiked) {
-        const { error } = await supabase
-          .from('likes')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('liked_profile_id', profileId);
-
-        if (error) throw error;
-
-        // Update state
+        await api.likes.delete(profileId);
         setHasLiked(false);
         setIsLiking(false);
-        
         return { success: true, action: 'unliked' };
       } else {
-        // Record the like in the database
-        const { error } = await supabase
-          .from('likes')
-          .insert({
-            user_id: user.id,
-            liked_profile_id: profileId,
-            status: 'pending'
-          });
-
-        if (error) throw error;
-
-        // Update state
+        await api.likes.create(profileId);
         setHasLiked(true);
         setIsLiking(false);
-        
         return { success: true, action: 'liked' };
       }
     } catch (error) {
