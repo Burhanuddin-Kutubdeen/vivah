@@ -25,7 +25,15 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { toast } = useToast();
   
-  // Profile management (state and functions)
+  // Auth state management (this doesn't use useAuth, so no circular dependency)
+  const { user, session, loading } = useAuthState((userId: string | null) => {
+    // This callback is passed to useAuthState, will be called when user changes
+    if (userId) {
+      handleUserChange(userId);
+    }
+  });
+  
+  // Profile management (now receives user as parameter to avoid circular dependency)
   const {
     isProfileComplete,
     setIsProfileComplete,
@@ -33,10 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     handleUserChange,
     navigateBasedOnProfile,
     profileCheckError
-  } = useProfileManagement();
-  
-  // Auth state management
-  const { user, session, loading } = useAuthState(handleUserChange);
+  } = useProfileManagement(user);
   
   // Auth actions (sign up, sign in, sign out)
   const { signUp, signIn, signOut, forgotPassword } = useAuthActions(

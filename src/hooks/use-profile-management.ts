@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useProfile } from '@/hooks/use-profile';
 import { useNavigate } from 'react-router-dom';
 
-export const useProfileManagement = () => {
+export const useProfileManagement = (user?: any) => {
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   const profileCheckInProgress = useRef(false);
   const { toast } = useToast();
@@ -14,7 +14,7 @@ export const useProfileManagement = () => {
     checkProfileCompletion: checkProfileStatus,
     setIsProfileComplete: setProfileIsComplete,
     profileCheckError
-  } = useProfile();
+  } = useProfile(undefined, user);
   
   // Function to check profile completion that updates both states
   const checkProfileCompletion = useCallback(async (userId: string) => {

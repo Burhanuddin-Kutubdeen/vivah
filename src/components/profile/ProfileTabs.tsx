@@ -1,117 +1,115 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import MatchCard from '@/components/MatchCard';
-import { api } from '@/services/api';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
-import { calculateAge } from '@/utils/profile-utils';
+import { useProfile } from '@/hooks/use-profile';
+import ProfileLoading from './ProfileLoading';
 
-interface Match {
-  id: string;
-  name: string;
-  age: number;
-  occupation: string;
-  imageUrl: string;
-  matchPercentage: number;
-  isNewMatch: boolean;
-}
-
-interface ProfileTabsProps {
-  matches?: Match[];
-}
-
-const ProfileTabs: React.FC<ProfileTabsProps> = ({ matches: initialMatches }) => {
-  const [matches, setMatches] = useState<Match[]>(initialMatches || []);
-  const [loading, setLoading] = useState(!initialMatches);
+const ProfileTabs: React.FC = () => {
   const { user } = useAuth();
+  const { profile, isLoading } = useProfile(undefined, user);
 
-  useEffect(() => {
-    if (initialMatches && initialMatches.length > 0) {
-      setMatches(initialMatches);
-      setLoading(false);
-      return;
-    }
-
-    const fetchRealProfiles = async () => {
-      if (!user) return;
-      
-      try {
-        setLoading(true);
-        
-        const data = await api.profiles.getMatches({ limit: 6 });
-        
-        if (data) {
-          const formattedMatches = data.map(profile => {
-            const fullName = [profile.first_name, profile.last_name].filter(Boolean).join(' ');
-            const age = profile.date_of_birth ? calculateAge(profile.date_of_birth) : 30;
-            
-            return {
-              id: profile.id,
-              name: fullName || 'Anonymous',
-              age: age,
-              occupation: profile.job || 'Not specified',
-              imageUrl: profile.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1064&q=80',
-              matchPercentage: Math.floor(Math.random() * 30) + 70,
-              isNewMatch: Math.random() > 0.7
-            };
-          });
-          
-          setMatches(formattedMatches);
-        }
-      } catch (err) {
-        console.error('Error in profile fetch:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const calculateAge = (dateOfBirth: string): number => {
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
     
-    fetchRealProfiles();
-  }, [user, initialMatches]);
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      return age - 1;
+    }
+    return age;
+  };
+
+  if (isLoading) {
+    return <ProfileLoading />;
+  }
 
   return (
-    <div className="mt-10">
-      <Tabs defaultValue="matches"v className="w-full">
-        <TabsList className="w-full mb-6">
-          <TabsTrigger value="matches" className="flex-1">Your Matches</TabsTrigger>
-          <TabsTrigger value="activity" className="flex-1">Recent Activity</TabsTrigger>
-          <TabsTrigger value="preferences" className="flex-1">Preferences</TabsTrigger>
-        </TabsList>
-        <TabsContent value="matches">
-          {loading ? (
-            <div className="flex justify-center p-8">
-              <Loader2 className="h-8 w-8 animate-spin text-matrimony-500" />
+    <Tabs defaultValue="overview" className="w-full">
+      <TabsList className="grid w-full grid-cols-3">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="preferences">Preferences</TabsTrigger>
+        <TabsTrigger value="activity">Activity</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="overview" className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Personal Information</CardTitle>
+            <CardDescription>Your basic profile details</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</label>
+                <p className="mt-1">{profile?.first_name} {profile?.last_name}</p>
+              </div>
+              {profile?.date_of_birth && (
+                <div>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Age</label>
+                  <p className="mt-1">{calculateAge(profile.date_of_birth)} years old</p>
+                </div>
+              )}
+              {profile?.location && (
+                <div>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Location</label>
+                  <p className="mt-1">{profile.location}</p>
+                </div>
+              )}
+              {profile?.job && (
+                <div>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Profession</label>
+                  <p className="mt-1">{profile.job}</p>
+                </div>
+              )}
             </div>
-          ) : matches.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {matches.map(match => (
-                <MatchCard key={match.id} match={match} />
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center">
-              <p className="text-matrimony-600 dark:text-matrimony-300">
-                No matches found. Complete your profile to find better matches.
-              </p>
-            </div>
-          )}
-        </TabsContent>
-        <TabsContent value="activity">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center">
-            <p className="text-matrimony-600 dark:text-matrimony-300">
-              Your recent activity will appear here.
-            </p>
-          </div>
-        </TabsContent>
-        <TabsContent value="preferences">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center">
-            <p className="text-matrimony-600 dark:text-matrimony-300">
-              Your matching preferences will appear here.
-            </p>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
+            {profile?.bio && (
+              <div>
+                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">About</label>
+                <p className="mt-1 text-gray-700 dark:text-gray-300">{profile.bio}</p>
+              </div>
+            )}
+            {profile?.interests && profile.interests.length > 0 && (
+              <div>
+                <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Interests</label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {profile.interests.map((interest, index) => (
+                    <Badge key={index} variant="secondary">{interest}</Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="preferences" className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Match Preferences</CardTitle>
+            <CardDescription>Your dating preferences and criteria</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-500 dark:text-gray-400">Preferences settings coming soon...</p>
+          </CardContent>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="activity" className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Your recent matches and interactions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-500 dark:text-gray-400">Activity history coming soon...</p>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
   );
 };
 

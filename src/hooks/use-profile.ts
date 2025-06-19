@@ -1,15 +1,13 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { api } from '@/services/api';
 
-export const useProfile = (profileId?: string) => {
+export const useProfile = (profileId?: string, user?: any) => {
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isProfileComplete, setIsProfileComplete] = useState(false);
   const [profileCheckError, setProfileCheckError] = useState<string | null>(null);
-  const { user } = useAuth();
 
   useEffect(() => {
     const fetchProfile = async () => {
