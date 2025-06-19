@@ -6,8 +6,17 @@ import SwipeActionButtons from './discovery/SwipeActionButtons';
 import DiscoveryLoading from './discovery/DiscoveryLoading';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from 'lucide-react';
+import { useLoadingProgress } from '@/hooks/use-loading-progress';
 
-const SwipeDiscovery: React.FC = () => {
+interface SwipeDiscoveryProps {
+  isOffline?: boolean;
+  isPremium?: boolean;
+}
+
+const SwipeDiscovery: React.FC<SwipeDiscoveryProps> = ({ 
+  isOffline = false, 
+  isPremium = false 
+}) => {
   const {
     currentProfile,
     direction,
@@ -19,8 +28,10 @@ const SwipeDiscovery: React.FC = () => {
     error
   } = useDiscoveryProfiles();
 
+  const progress = useLoadingProgress(isLoading);
+
   if (isLoading) {
-    return <DiscoveryLoading />;
+    return <DiscoveryLoading progress={progress} />;
   }
 
   if (error) {
@@ -57,9 +68,11 @@ const SwipeDiscovery: React.FC = () => {
 
       {/* Action Buttons */}
       <SwipeActionButtons
-        onPass={() => handleSwipe('left')}
-        onLike={() => handleSwipe('right')}
+        onSwipeLeft={() => handleSwipe('left')}
+        onSwipeRight={() => handleSwipe('right')}
         onSuperLike={handleSuperLike}
+        isOffline={isOffline}
+        isPremium={isPremium}
         remainingLikes={remainingLikes}
       />
     </div>
